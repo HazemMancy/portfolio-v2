@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Liquid Hydraulics — Hazem ElMancy</title>
-  <meta name="description" content="Single-phase liquid hydraulic calculator: Darcy-Weisbach friction losses, static head, total pressure drop and head. Friction factor via Swamee-Jain / Colebrook-White or f=64/Re (laminar). Service-type limit checks per API RP 14E." />
+  <meta name="description" content="Single-phase liquid hydraulic calculator: Darcy-Weisbach friction losses, static head, total pressure drop and head. SI and Imperial unit systems." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    /* ── TOKENS ─────────────────────────────────────────── */
+    /* ── TOKENS ───────────────────────────────────────────── */
     :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
     [data-theme="dark"]{
       --bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--border:hsl(222,30%,18%);
@@ -18,8 +18,8 @@
       --primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);
       --sec-bg:hsl(222,41%,16%);--inp-bg:hsl(222,47%,9%);
       --green:hsl(142,71%,45%);--green-bg:hsl(142,71%,45%,.06);--green-border:hsl(142,71%,45%,.25);
-      --amber:hsl(38,92%,50%); --amber-bg:hsl(38,92%,50%,.05);--amber-border:hsl(38,92%,50%,.25);
-      --red:hsl(0,72%,55%);    --red-bg:hsl(0,72%,55%,.07);   --red-border:hsl(0,72%,55%,.3);
+      --amber:hsl(38,92%,50%);--amber-bg:hsl(38,92%,50%,.05);--amber-border:hsl(38,92%,50%,.25);
+      --red:hsl(0,72%,55%);--red-bg:hsl(0,72%,55%,.07);--red-border:hsl(0,72%,55%,.3);
     }
     [data-theme="light"]{
       --bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--border:hsl(214,32%,88%);
@@ -27,19 +27,19 @@
       --primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);
       --sec-bg:hsl(210,40%,94%);--inp-bg:hsl(0,0%,100%);
       --green:hsl(142,71%,38%);--green-bg:hsl(142,71%,38%,.06);--green-border:hsl(142,71%,38%,.3);
-      --amber:hsl(38,92%,40%); --amber-bg:hsl(38,92%,40%,.06);--amber-border:hsl(38,92%,40%,.3);
-      --red:hsl(0,72%,48%);    --red-bg:hsl(0,72%,48%,.07);   --red-border:hsl(0,72%,48%,.3);
+      --amber:hsl(38,92%,40%);--amber-bg:hsl(38,92%,40%,.06);--amber-border:hsl(38,92%,40%,.3);
+      --red:hsl(0,72%,48%);--red-bg:hsl(0,72%,48%,.07);--red-border:hsl(0,72%,48%,.3);
     }
-    /* ── RESET ───────────────────────────────────────────── */
+    /* ── RESET ────────────────────────────────────────────── */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
     body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
     a{color:inherit;text-decoration:none}
     button{font-family:inherit;cursor:pointer;border:none;background:none}
-    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-    /* ── NAVBAR ──────────────────────────────────────────── */
-    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s}
+    /* ── NAVBAR ───────────────────────────────────────────── */
+    #navbar{position:sticky;top:0;z-index:100;width:100%;background:var(--bg);transition:background .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
     .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
@@ -50,14 +50,14 @@
     .nav-link-calc{display:flex;align-items:center;gap:.35rem;padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
     .theme-toggle{width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;border:none;cursor:pointer}
     .theme-toggle:hover{background:var(--sec-bg);color:var(--fg)}
-    .desktop-th{display:none} @media(min-width:1024px){.desktop-th{display:flex}}
-    .mob-ctrl{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mob-ctrl{display:none}}
+    .desktop-th{display:none}@media(min-width:1024px){.desktop-th{display:flex}}
+    .mob-ctrl{display:flex;align-items:center;gap:.25rem}@media(min-width:1024px){.mob-ctrl{display:none}}
     .mob-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
-    .mob-menu.open{display:block} @media(min-width:1024px){.mob-menu{display:none!important}}
+    .mob-menu.open{display:block}@media(min-width:1024px){.mob-menu{display:none!important}}
     .mob-menu a{display:block;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
     .mob-menu a:hover{background:var(--sec-bg);color:var(--fg)}
 
-    /* ── PAGE HEADER ─────────────────────────────────────── */
+    /* ── PAGE HEADER ──────────────────────────────────────── */
     .ph{padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--border)}
     .ph-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
     .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
@@ -68,51 +68,75 @@
     .badge-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
     .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:9999px;font-size:.58rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--sec-bg)}
 
-    /* ── MAIN LAYOUT ─────────────────────────────────────── */
-    /* Mobile: single column. Tablet+: 2-col. Desktop: fixed right 390px. */
+    /* ── UNIT TOGGLE PILL ─────────────────────────────────── */
+    /* Standard pill pattern — reuse in all future calculators */
+    .unit-pill{
+      display:inline-flex;align-items:center;
+      background:var(--sec-bg);border:1px solid var(--border);
+      border-radius:9999px;padding:2px;
+    }
+    .unit-pill button{
+      padding:.22rem .75rem;font-size:.65rem;font-weight:600;
+      letter-spacing:.06em;border-radius:9999px;
+      color:var(--muted);transition:background .15s,color .15s;
+      border:none;background:none;cursor:pointer;
+    }
+    .unit-pill button.active{
+      background:var(--primary);color:#fff;
+      box-shadow:0 1px 4px hsl(217,91%,60%,.35);
+    }
+
+    /* ── MAIN LAYOUT ──────────────────────────────────────── */
     .calc-wrap{max-width:72rem;margin:0 auto;padding:1.25rem 1rem 2rem}
     .calc-grid{
-      display:grid;
-      gap:1.25rem;
-      grid-template-columns:1fr;     /* mobile default */
-      grid-template-areas:
-        "inputs"
-        "results"
-        "meta";
+      display:grid;gap:1.25rem;
+      grid-template-columns:1fr;
+      grid-template-areas:"inputs""results""meta";
     }
     @media(min-width:768px){
       .calc-grid{
         grid-template-columns:1fr 1fr;
-        grid-template-areas:
-          "inputs results"
-          "meta   meta";
+        grid-template-areas:"inputs results""meta meta";
+        align-items:start;          /* <-- CRITICAL: prevents stretch/overlap */
       }
     }
     @media(min-width:1024px){
       .calc-grid{
         grid-template-columns:1fr 390px;
-        grid-template-areas:
-          "inputs results"
-          "meta   meta";
+        grid-template-areas:"inputs results""meta meta";
+        align-items:start;
       }
     }
-    .col-inputs {grid-area:inputs}
+    .col-inputs{grid-area:inputs}
     .col-results{grid-area:results}
-    .col-meta   {grid-area:meta}
+    .col-meta{grid-area:meta}
 
-    /* Sticky inputs on desktop */
-    @media(min-width:768px){
-      .col-inputs{position:sticky;top:calc(var(--navbar-h) + .75rem);align-self:start}
+    /* Sticky — ONLY on viewports tall enough that it won't clip */
+    @media(min-width:768px) and (min-height:600px){
+      .col-inputs{
+        position:sticky;
+        top:calc(var(--navbar-h) + .75rem);
+        /* Hard cap so it never exceeds viewport and overlays the right col */
+        max-height:calc(100vh - var(--navbar-h) - 1.5rem);
+        overflow-y:auto;
+        /* custom scrollbar inside the sticky panel */
+        scrollbar-width:thin;
+      }
     }
 
     /* ── CARD ─────────────────────────────────────────────── */
     .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
-    .card-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.55rem}
+    .card-hd{
+      padding:.85rem 1.1rem;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:.55rem;
+      /* Allow wrapping on very narrow cards */
+      flex-wrap:wrap;
+    }
     .hd-icon{width:1.6rem;height:1.6rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
-    .card-title{font-size:.78rem;font-weight:600}
+    .card-title{font-size:.78rem;font-weight:600;flex:1;min-width:0}
     .card-body{padding:1rem 1.1rem}
 
-    /* ── FORM ELEMENTS ───────────────────────────────────── */
+    /* ── FORM ELEMENTS ────────────────────────────────────── */
     .flabel{font-size:.68rem;color:var(--muted);display:block;margin-bottom:.3rem;font-weight:500}
     .fnote{font-size:.6rem;color:var(--muted);margin-top:.2rem;line-height:1.4}
     input[type=number],input[type=text],select{
@@ -127,16 +151,16 @@
     input:focus,select:focus{border-color:var(--primary)}
     .err-msg{font-size:.62rem;color:hsl(0,72%,65%);margin-top:.2rem;display:none}
 
-    /* ── GRID HELPERS ────────────────────────────────────── */
+    /* ── GRID HELPERS ─────────────────────────────────────── */
     .g2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
     .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem}
     @media(max-width:480px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
 
-    /* ── INPUT SECTION BOX ───────────────────────────────── */
+    /* ── INPUT SECTION BOX ────────────────────────────────── */
     .isec{padding:.85rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--sec-bg);margin-bottom:.75rem}
     .isec-title{font-size:.65rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
 
-    /* ── BUTTONS ─────────────────────────────────────────── */
+    /* ── BUTTONS ──────────────────────────────────────────── */
     .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
     .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--fg)}.btn-outline:hover{background:var(--sec-bg)}
@@ -144,8 +168,7 @@
     .btn-sm{padding:.28rem .65rem;font-size:.68rem}
     .btn-full{width:100%;justify-content:center}
 
-    /* ── RESULT PANELS ───────────────────────────────────── */
-    /* Two big KPI boxes side by side */
+    /* ── RESULT PANELS ────────────────────────────────────── */
     .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
     @media(max-width:400px){.kpi-row{grid-template-columns:1fr}}
     .kpi{text-align:center;padding:1rem .75rem;border-radius:var(--radius)}
@@ -166,7 +189,7 @@
     .res-row.hl .res-val{color:var(--primary)}
     .res-unit{font-size:.6rem;color:var(--muted);margin-left:.25rem}
 
-    /* ── STATUS BOXES ────────────────────────────────────── */
+    /* ── STATUS BOXES ─────────────────────────────────────── */
     .box{display:flex;align-items:flex-start;gap:.55rem;border-radius:var(--radius);padding:.65rem .8rem;margin-bottom:.65rem}
     .box p,.box span{font-size:.67rem;line-height:1.75}
     .box-warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
@@ -174,62 +197,44 @@
     .box-err{background:var(--red-bg);border:1px solid var(--red-border)}
     .box-err p{color:hsl(0,72%,65%)}
 
-    /* ── LIMIT BADGE ─────────────────────────────────────── */
+    /* ── LIMIT BADGE ──────────────────────────────────────── */
     .lbadge{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:9999px;font-size:.58rem;font-weight:600;border:1px solid;white-space:nowrap}
     .lbadge-ok  {border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.08)}
-    .lbadge-warn{border-color:hsl(38,92%,50%,.4); color:hsl(38,92%,60%); background:hsl(38,92%,50%,.07)}
-    .lbadge-hi  {border-color:hsl(0,72%,55%,.4);  color:hsl(0,72%,65%);  background:hsl(0,72%,55%,.07)}
+    .lbadge-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+    .lbadge-hi  {border-color:hsl(0,72%,55%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,55%,.07)}
 
-    /* ── REGIME CHIP ─────────────────────────────────────── */
+    /* ── REGIME CHIP ──────────────────────────────────────── */
     .regime{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid}
     .r-lam  {border-color:hsl(217,91%,60%,.4);color:hsl(217,91%,70%);background:hsl(217,91%,60%,.08)}
-    .r-trans{border-color:hsl(38,92%,50%,.4); color:hsl(38,92%,60%); background:hsl(38,92%,50%,.07)}
+    .r-trans{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
     .r-turb {border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
 
-    /* ── ACCORDION (trace / methodology) ─────────────────── */
+    /* ── ACCORDION ────────────────────────────────────────── */
     .accordion{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-    .acc-trigger{
-      width:100%;display:flex;align-items:center;gap:.55rem;
-      padding:.85rem 1.1rem;cursor:pointer;background:none;border:none;
-      font-family:var(--font);font-size:.78rem;font-weight:600;color:var(--fg);
-      transition:background .15s;
-    }
+    .acc-trigger{width:100%;display:flex;align-items:center;gap:.55rem;padding:.85rem 1.1rem;cursor:pointer;background:none;border:none;font-family:var(--font);font-size:.78rem;font-weight:600;color:var(--fg);transition:background .15s}
     .acc-trigger:hover{background:var(--sec-bg)}
     .acc-trigger .acc-icon{margin-left:auto;color:var(--muted);transition:transform .2s}
     .acc-trigger[aria-expanded="true"] .acc-icon{transform:rotate(180deg)}
     .acc-body{display:none;padding:.85rem 1.1rem;border-top:1px solid var(--border)}
     .acc-body.open{display:block}
 
-    /* Trace box */
-    .trace-box{
-      background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);
-      padding:.65rem .85rem;font-size:.65rem;color:var(--muted);
-      font-family:'Courier New',monospace;line-height:1.9;
-      max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;
-    }
-
-    /* Methodology / references */
+    .trace-box{background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem;font-size:.65rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.9;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
     .ref-panel{font-size:.67rem;color:var(--muted);line-height:1.85}
     .ref-panel h4{font-size:.68rem;font-weight:600;color:var(--fg);margin:1rem 0 .35rem}
     .ref-panel h4:first-child{margin-top:0}
     .ref-panel li{margin-left:1.1rem;padding:.08rem 0}
 
-    /* Meta row: 2-col on tablet+, 1-col mobile */
     .meta-grid{display:grid;gap:1rem;grid-template-columns:1fr}
     @media(min-width:640px){.meta-grid{grid-template-columns:1fr 1fr}}
 
-    /* ── PLACEHOLDER ─────────────────────────────────────── */
     .placeholder{padding:2.5rem 1rem;text-align:center}
     .placeholder p{font-size:.78rem;color:var(--muted);margin-top:.5rem}
 
-    /* ── FOOTER ──────────────────────────────────────────── */
     footer{border-top:1px solid var(--border);padding:1.1rem 1rem;margin-top:1rem}
     .ft-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem}
     .ft-links{display:flex;align-items:center;gap:.65rem}
     .ft-icon{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
     .ft-icon:hover{color:var(--fg);border-color:var(--fg)}
-
-    /* ── UTIL ────────────────────────────────────────────── */
     .text-primary{color:var(--primary)}.fw7{font-weight:700}.fs-sm{font-size:.875rem}.fs-xs{font-size:.72rem}
   </style>
 </head>
@@ -294,19 +299,22 @@
   </div>
 </div>
 
-<!-- CALCULATOR AREA -->
+<!-- CALCULATOR -->
 <div class="calc-wrap">
   <div class="calc-grid">
 
-    <!-- ══════════════════════════════════════
-         LEFT — INPUTS (sticky on desktop)
-    ══════════════════════════════════════ -->
+    <!-- ══ LEFT — INPUTS ══════════════════════════════════ -->
     <div class="col-inputs">
       <div class="card">
         <div class="card-hd">
           <div class="hd-icon"><i data-lucide="droplets" style="width:14px;height:14px"></i></div>
           <span class="card-title">Input Parameters</span>
-          <div style="margin-left:auto;display:flex;gap:.3rem">
+          <!-- SI / Imperial pill toggle -->
+          <div class="unit-pill" id="unitPill">
+            <button id="btnSI"  class="active" onclick="setUnits('SI')">SI</button>
+            <button id="btnIMP"            onclick="setUnits('IMP')">Imperial</button>
+          </div>
+          <div style="display:flex;gap:.3rem;margin-left:.4rem">
             <button class="btn btn-outline btn-sm" onclick="loadTestCase()">
               <i data-lucide="flask-conical" style="width:11px;height:11px"></i>Test
             </button>
@@ -322,22 +330,22 @@
             <div class="isec-title"><i data-lucide="droplet" style="width:12px;height:12px"></i>Fluid &amp; Flow</div>
             <div class="g2">
               <div>
-                <label class="flabel">Flow Rate (m³/h)</label>
+                <label class="flabel" id="lblFlow">Flow Rate (m&sup3;/h)</label>
                 <input type="number" id="inpFlow" min="0" step="any" oninput="calculate()" placeholder="e.g. 100" />
                 <div class="err-msg" id="errFlow">Must be &gt; 0</div>
               </div>
               <div>
-                <label class="flabel">Density &rho; (kg/m³)</label>
+                <label class="flabel" id="lblRho">&rho; Density (kg/m&sup3;)</label>
                 <input type="number" id="inpRho" min="0" step="any" oninput="calculate()" placeholder="e.g. 850" />
                 <div class="err-msg" id="errRho">Must be &gt; 0</div>
               </div>
               <div>
-                <label class="flabel">Viscosity &mu; (cP)</label>
+                <label class="flabel">&mu; Viscosity (cP)</label>
                 <input type="number" id="inpMu" min="0" step="any" oninput="calculate()" placeholder="e.g. 5" />
                 <div class="err-msg" id="errMu">Must be &gt; 0</div>
               </div>
               <div>
-                <label class="flabel">Pipe Length L (m)</label>
+                <label class="flabel" id="lblLen">Pipe Length (m)</label>
                 <input type="number" id="inpLen" min="0" step="any" oninput="calculate()" placeholder="e.g. 200" />
                 <div class="err-msg" id="errLen">Must be &gt; 0</div>
               </div>
@@ -350,26 +358,22 @@
             <div class="g3">
               <div>
                 <label class="flabel">NPS</label>
-                <select id="selNPS" onchange="onNPSChange()">
-                  <option value="custom">— Custom —</option>
-                </select>
+                <select id="selNPS" onchange="onNPSChange()"><option value="custom">&mdash; Custom &mdash;</option></select>
               </div>
               <div>
                 <label class="flabel">Schedule</label>
-                <select id="selSch" onchange="onSchChange()">
-                  <option value="custom">— Custom —</option>
-                </select>
+                <select id="selSch" onchange="onSchChange()"><option value="custom">&mdash; Custom &mdash;</option></select>
               </div>
               <div>
-                <label class="flabel">ID (mm)</label>
+                <label class="flabel" id="lblDia">ID (mm)</label>
                 <input type="number" id="inpDia" min="0" step="any" oninput="onCustomDia()" placeholder="e.g. 154" />
                 <div class="err-msg" id="errDia">Must be &gt; 0</div>
               </div>
             </div>
             <div style="margin-top:.55rem">
-              <label class="flabel">Roughness &epsilon; (mm)</label>
+              <label class="flabel" id="lblRough">&epsilon; Roughness (mm)</label>
               <input type="number" id="inpRough" value="0.0457" min="0" step="any" oninput="calculate()" />
-              <div class="fnote">Default 0.0457 mm — commercial CS (Moody / GPSA)</div>
+              <div class="fnote" id="noteRough">Default 0.0457 mm &mdash; commercial CS (Moody / GPSA)</div>
             </div>
           </div>
 
@@ -378,21 +382,18 @@
             <div class="isec-title"><i data-lucide="arrow-up-down" style="width:12px;height:12px"></i>Elevation &amp; Service</div>
             <div class="g2">
               <div>
-                <label class="flabel">&Delta;z Elevation (m)</label>
+                <label class="flabel" id="lblDz">&Delta;z Elevation (m)</label>
                 <input type="number" id="inpDz" value="0" step="any" oninput="calculate()" />
                 <div class="fnote">+ uphill &nbsp;|&nbsp; &minus; downhill</div>
               </div>
               <div>
                 <label class="flabel">Service Type</label>
-                <select id="selService" onchange="calculate()">
-                  <option value="">— None —</option>
-                </select>
+                <select id="selService" onchange="calculate()"><option value="">&mdash; None &mdash;</option></select>
                 <div class="fnote">API RP 14E limit check</div>
               </div>
             </div>
           </div>
 
-          <!-- Error -->
           <div id="globalErr" class="box box-err" style="display:none;margin-top:.65rem">
             <i data-lucide="circle-x" style="width:13px;height:13px;color:hsl(0,72%,65%);flex-shrink:0;margin-top:2px"></i>
             <p id="globalErrText"></p>
@@ -403,14 +404,11 @@
           </button>
         </div>
       </div>
-    </div><!-- end col-inputs -->
+    </div><!-- /col-inputs -->
 
-    <!-- ══════════════════════════════════════
-         RIGHT — RESULTS
-    ══════════════════════════════════════ -->
+    <!-- ══ RIGHT — RESULTS ════════════════════════════════ -->
     <div class="col-results">
 
-      <!-- Placeholder -->
       <div id="placeholderCard" class="card">
         <div class="placeholder">
           <i data-lucide="droplets" style="width:32px;height:32px;color:var(--muted);opacity:.25;display:block;margin:0 auto"></i>
@@ -418,13 +416,11 @@
         </div>
       </div>
 
-      <!-- Warnings -->
       <div id="warningsCard" class="box box-warn" style="display:none">
         <i data-lucide="triangle-alert" style="width:13px;height:13px;color:var(--amber);flex-shrink:0;margin-top:2px"></i>
         <p id="warningsText"></p>
       </div>
 
-      <!-- Service limits -->
       <div id="limitsCard" class="card" style="display:none;margin-bottom:.75rem">
         <div class="card-hd">
           <div class="hd-icon" style="background:hsl(38,92%,50%,.1)">
@@ -436,41 +432,37 @@
         <div class="card-body" style="padding:.75rem 1rem"><div id="limitsBody"></div></div>
       </div>
 
-      <!-- Main results -->
       <div id="resultsCard" class="card" style="display:none">
         <div class="card-hd">
           <div class="hd-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>
           <span class="card-title">Results</span>
           <span id="regimeChip" style="margin-left:.4rem"></span>
+          <!-- Unit system badge in results header -->
+          <span id="unitBadge" style="margin-left:auto;font-size:.6rem;font-weight:600;padding:.15rem .5rem;border-radius:9999px;background:var(--primary-bg);color:var(--primary);border:1px solid hsl(217,91%,60%,.3)">SI</span>
         </div>
         <div class="card-body">
-          <!-- KPI row: side-by-side on all viewports -->
           <div class="kpi-row">
             <div class="kpi kpi-blue">
               <div class="kpi-lbl">Total &Delta;P</div>
-              <div><span class="kpi-val" id="bigTotalDP">—</span><span class="kpi-unit">bar</span></div>
+              <div><span class="kpi-val" id="bigTotalDP">&mdash;</span><span class="kpi-unit" id="kpiDPUnit">bar</span></div>
               <div class="kpi-sub" id="bigDPBreakdown"></div>
             </div>
             <div class="kpi kpi-green">
               <div class="kpi-lbl" style="color:var(--green)">Total Head</div>
-              <div><span class="kpi-val" id="bigTotalHead">—</span><span class="kpi-unit">m liq.</span></div>
+              <div><span class="kpi-val" id="bigTotalHead">&mdash;</span><span class="kpi-unit" id="kpiHeadUnit">m liq.</span></div>
               <div class="kpi-sub" id="bigHeadBreakdown"></div>
             </div>
           </div>
-          <!-- Detail grid -->
           <div class="res-grid" id="detailGrid"></div>
         </div>
       </div>
 
-    </div><!-- end col-results -->
+    </div><!-- /col-results -->
 
-    <!-- ══════════════════════════════════════
-         FULL-WIDTH BOTTOM: Trace + Methodology
-    ══════════════════════════════════════ -->
+    <!-- ══ FULL-WIDTH META ════════════════════════════════ -->
     <div class="col-meta">
       <div class="meta-grid">
 
-        <!-- Calculation Trace accordion -->
         <div id="traceAccordion" class="accordion" style="display:none">
           <button class="acc-trigger" onclick="toggleAcc('traceBody',this)" aria-expanded="false">
             <div class="hd-icon"><i data-lucide="file-code" style="width:14px;height:14px"></i></div>
@@ -482,7 +474,6 @@
           </div>
         </div>
 
-        <!-- Methodology accordion -->
         <div class="accordion">
           <button class="acc-trigger" onclick="toggleAcc('methBody',this)" aria-expanded="false">
             <div class="hd-icon"><i data-lucide="book-open" style="width:14px;height:14px"></i></div>
@@ -493,19 +484,29 @@
             <div class="ref-panel">
               <h4>Methodology</h4>
               <ul>
-                <li>Darcy-Weisbach: &Delta;P<sub>f</sub> = f &middot; (L/D) &middot; (&rho;v&sup2;/2) &mdash; incompressible liquid</li>
-                <li>Turbulent (Re &ge; 4000): Swamee-Jain explicit Colebrook-White &mdash; f = 0.25/[log(&epsilon;/3.7D + 5.74/Re<sup>0.9</sup>)]&sup2;</li>
+                <li>Darcy-Weisbach: &Delta;P<sub>f</sub> = f&middot;(L/D)&middot;(&rho;v&sup2;/2) &mdash; incompressible liquid</li>
+                <li>Turbulent (Re &ge; 4000): Swamee-Jain &mdash; f = 0.25/[log(&epsilon;/3.7D + 5.74/Re<sup>0.9</sup>)]&sup2;</li>
                 <li>Laminar (Re &lt; 2300): f = 64/Re (Hagen-Poiseuille)</li>
-                <li>Transition (2300 &ndash; 4000): linear interpolation</li>
-                <li>Static: &Delta;P<sub>s</sub> = &rho;&middot;g&middot;&Delta;z / 10<sup>5</sup> bar; +&Delta;z = uphill</li>
-                <li>Total: &Delta;P<sub>total</sub> = &Delta;P<sub>f</sub> + &Delta;P<sub>s</sub>; H<sub>total</sub> = H<sub>f</sub> + &Delta;z</li>
+                <li>Transition (2300&ndash;4000): linear interpolation</li>
+                <li>Static: &Delta;P<sub>s</sub> = &rho;&middot;g&middot;&Delta;z / 10<sup>5</sup>; +&Delta;z = uphill</li>
+                <li>All calculations performed in SI internally; Imperial display applies conversion factors only</li>
+              </ul>
+              <h4>Unit Conversions (Imperial output)</h4>
+              <ul>
+                <li>Flow: 1 m&sup3;/h = 4.40287 USGPM</li>
+                <li>Length / ID / &Delta;z: 1 m = 3.28084 ft; 1 mm = 0.03937 in</li>
+                <li>Density: 1 kg/m&sup3; = 0.062428 lb/ft&sup3;</li>
+                <li>Pressure: 1 bar = 14.5038 psi</li>
+                <li>Head: 1 m = 3.28084 ft liq.</li>
+                <li>Velocity: 1 m/s = 3.28084 ft/s</li>
+                <li>&Delta;P/100 ft reported when Imperial selected</li>
               </ul>
               <h4>Assumptions</h4>
               <ul>
                 <li>Steady-state, single-phase incompressible flow</li>
                 <li>Isothermal &mdash; &rho; and &mu; constant along pipe</li>
                 <li>Newtonian fluid; major losses only (no fittings/bends)</li>
-                <li>Roughness uniform; default 0.0457 mm (commercial CS, GPSA Table 17-7)</li>
+                <li>Roughness default 0.0457 mm = 0.0018 in (commercial CS, GPSA Table 17-7)</li>
               </ul>
               <h4>Limits &mdash; API RP 14E</h4>
               <ul>
@@ -525,10 +526,10 @@
         </div>
 
       </div>
-    </div><!-- end col-meta -->
+    </div><!-- /col-meta -->
 
-  </div><!-- end calc-grid -->
-</div><!-- end calc-wrap -->
+  </div><!-- /calc-grid -->
+</div><!-- /calc-wrap -->
 
 <footer>
   <div class="ft-inner">
@@ -547,6 +548,93 @@
 <script>
 const G = 9.80665;
 
+/* ── UNIT SYSTEM ─────────────────────────────────────────────────────────
+   Global state — copy this block to all future calculators.
+   All physics is always done in SI. Imperial is display-only.
+   Conversion factors: SI → Imperial
+────────────────────────────────────────────────────────────────────────── */
+let unitSys = 'SI'; // 'SI' | 'IMP'
+
+const C = {
+  // Input-field conversion factors: value user types × factor → SI value
+  // IMP→SI
+  flowToSI : { SI:1,          IMP:1/4.40287 },  // USGPM → m³/h  (×0.2271)
+  lenToSI  : { SI:1,          IMP:0.3048    },  // ft → m
+  rhoToSI  : { SI:1,          IMP:16.0185   },  // lb/ft³ → kg/m³
+  diaToSI  : { SI:1,          IMP:25.4      },  // inch → mm  (stored in mm)
+  roughToSI: { SI:1,          IMP:25.4      },  // inch → mm
+  dzToSI   : { SI:1,          IMP:0.3048    },  // ft → m
+  // SI→IMP output display
+  pBar     : { SI:1,          IMP:14.5038   },  // bar → psi
+  head     : { SI:1,          IMP:3.28084   },  // m → ft
+  vel      : { SI:1,          IMP:3.28084   },  // m/s → ft/s
+  dP100    : { SI:1,          IMP:14.5038/30.48 }, // bar/100m → psi/100ft
+};
+
+const U = {
+  flow  : { SI:'m\u00b3/h',  IMP:'USGPM' },
+  len   : { SI:'m',          IMP:'ft'    },
+  rho   : { SI:'kg/m\u00b3', IMP:'lb/ft\u00b3' },
+  dia   : { SI:'mm',         IMP:'in'    },
+  rough : { SI:'mm',         IMP:'in'    },
+  dz    : { SI:'m',          IMP:'ft'    },
+  pres  : { SI:'bar',        IMP:'psi'   },
+  head  : { SI:'m liq.',     IMP:'ft liq.'},
+  vel   : { SI:'m/s',        IMP:'ft/s'  },
+  dp100 : { SI:'bar/100m',   IMP:'psi/100ft'},
+};
+
+function setUnits(sys){
+  if(unitSys === sys) return;
+  const prev = unitSys;
+  unitSys = sys;
+
+  // Swap pill active state
+  document.getElementById('btnSI') .classList.toggle('active', sys==='SI');
+  document.getElementById('btnIMP').classList.toggle('active', sys==='IMP');
+
+  // Convert existing field values
+  convertField('inpFlow',  prev==='SI' ? 4.40287    : 1/4.40287);
+  convertField('inpLen',   prev==='SI' ? 3.28084    : 0.3048   );
+  convertField('inpRho',   prev==='SI' ? 0.062428   : 16.0185  );
+  convertField('inpDia',   prev==='SI' ? 1/25.4     : 25.4     );
+  convertField('inpRough', prev==='SI' ? 1/25.4     : 25.4     );
+  convertField('inpDz',    prev==='SI' ? 3.28084    : 0.3048   );
+
+  // Update labels
+  document.getElementById('lblFlow') .textContent = 'Flow Rate ('+U.flow[sys]+')';
+  document.getElementById('lblRho')  .textContent = '\u03c1 Density ('+U.rho[sys]+')';
+  document.getElementById('lblLen')  .textContent = 'Pipe Length ('+U.len[sys]+')';
+  document.getElementById('lblDia')  .textContent = 'ID ('+U.dia[sys]+')';
+  document.getElementById('lblRough').textContent = '\u03b5 Roughness ('+U.rough[sys]+')';
+  document.getElementById('lblDz')   .textContent = '\u0394z Elevation ('+U.dz[sys]+')';
+
+  // Update roughness note
+  document.getElementById('noteRough').textContent =
+    sys==='SI' ? 'Default 0.0457 mm \u2014 commercial CS (Moody / GPSA)'
+               : 'Default 0.0018 in \u2014 commercial CS (Moody / GPSA)';
+
+  // Update schedule dropdown displayed IDs
+  refreshSchDropdown();
+
+  calculate();
+}
+
+function convertField(id, factor){
+  const el = document.getElementById(id);
+  const v = parseFloat(el.value);
+  if(isFinite(v) && v !== 0) el.value = fmtInput(v * factor);
+}
+
+function fmtInput(v){
+  if(!isFinite(v)) return '';
+  const a = Math.abs(v);
+  if(a >= 1000) return v.toFixed(1);
+  if(a >= 1)    return v.toFixed(3);
+  return v.toPrecision(4);
+}
+
+/* ── PIPE DB (ASME B36.10 — OD & wall in mm) ──────────────────────────── */
 const PIPE_DB = {
   '0.5"' :{ OD:21.3,  SCH:{ '40':2.77,'80':3.73,'160':4.78,'XXS':7.47 }},
   '0.75"':{ OD:26.7,  SCH:{ '40':2.87,'80':3.91,'160':5.56,'XXS':7.82 }},
@@ -567,40 +655,40 @@ const PIPE_DB = {
 };
 
 const SERVICE_LIMITS = [
-  { service:'Crude Oil — Pump Suction',    vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Low velocity; ΔP/100m ≤ 0.3 bar/100m. NPSHa sensitivity.' },
-  { service:'Crude Oil — Pump Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E: v ≤ 3 m/s; ΔP/100m ≤ 1.5 bar/100m.' },
-  { service:'Crude Oil — Gravity Line',    vMin:0.3, vMax:1.2, dpMax:0.2,  note:'Gravity flow — low ΔP; slope typically governs.' },
-  { service:'Condensate — Pump Suction',   vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Flash risk — keep velocity low.' },
-  { service:'Condensate — Pump Discharge', vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E guidance.' },
-  { service:'MEG / DEG / TEG',             vMin:0.3, vMax:2.0, dpMax:1.0,  note:'Higher viscosity; moderate velocity.' },
-  { service:'Methanol / Chemical Inj.',    vMin:0.3, vMax:3.0, dpMax:2.0,  note:'Small-bore high-pressure injection lines.' },
-  { service:'Produced Water — Suction',    vMin:0.5, vMax:2.0, dpMax:0.5,  note:'Erosion risk above 2 m/s with solids.' },
-  { service:'Produced Water — Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'Check erosion if sand present.' },
-  { service:'Cooling Water',               vMin:0.9, vMax:3.0, dpMax:1.5,  note:'Min 0.9 m/s to prevent fouling.' },
-  { service:'Firewater',                   vMin:1.0, vMax:3.0, dpMax:1.0,  note:'Min velocity to maintain pressure during demand.' },
-  { service:'Diesel / Fuel Oil',           vMin:0.3, vMax:2.0, dpMax:0.8,  note:'Viscosity-dependent; verify flow regime.' },
-  { service:'Lube Oil',                    vMin:0.3, vMax:1.5, dpMax:0.5,  note:'Laminar flow typical — verify Re.' },
+  { service:'Crude Oil \u2014 Pump Suction',    vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Low velocity; \u0394P/100m \u2264 0.3 bar/100m. NPSHa sensitivity.' },
+  { service:'Crude Oil \u2014 Pump Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E: v \u2264 3 m/s; \u0394P/100m \u2264 1.5 bar/100m.' },
+  { service:'Crude Oil \u2014 Gravity Line',    vMin:0.3, vMax:1.2, dpMax:0.2,  note:'Gravity flow \u2014 low \u0394P; slope typically governs.' },
+  { service:'Condensate \u2014 Pump Suction',   vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Flash risk \u2014 keep velocity low.' },
+  { service:'Condensate \u2014 Pump Discharge', vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E guidance.' },
+  { service:'MEG / DEG / TEG',                  vMin:0.3, vMax:2.0, dpMax:1.0,  note:'Higher viscosity; moderate velocity.' },
+  { service:'Methanol / Chemical Inj.',         vMin:0.3, vMax:3.0, dpMax:2.0,  note:'Small-bore high-pressure injection lines.' },
+  { service:'Produced Water \u2014 Suction',    vMin:0.5, vMax:2.0, dpMax:0.5,  note:'Erosion risk above 2 m/s with solids.' },
+  { service:'Produced Water \u2014 Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'Check erosion if sand present.' },
+  { service:'Cooling Water',                    vMin:0.9, vMax:3.0, dpMax:1.5,  note:'Min 0.9 m/s to prevent fouling.' },
+  { service:'Firewater',                        vMin:1.0, vMax:3.0, dpMax:1.0,  note:'Min velocity to maintain pressure during demand.' },
+  { service:'Diesel / Fuel Oil',                vMin:0.3, vMax:2.0, dpMax:0.8,  note:'Viscosity-dependent; verify flow regime.' },
+  { service:'Lube Oil',                         vMin:0.3, vMax:1.5, dpMax:0.5,  note:'Laminar flow typical \u2014 verify Re.' },
 ];
 
 function fmtN(n, d){
-  if(!isFinite(n)) return '—';
-  d = d !== undefined ? d : 4;
+  if(!isFinite(n)) return '\u2014';
+  d = d!==undefined ? d : 4;
   const a = Math.abs(n);
-  if(a === 0) return '0';
-  if(a >= 1e6)  return n.toExponential(3);
-  if(a >= 1000) return n.toFixed(1);
-  if(a >= 100)  return n.toFixed(2);
-  if(a >= 1)    return n.toFixed(d < 3 ? 3 : d);
+  if(a===0) return '0';
+  if(a>=1e6)  return n.toExponential(3);
+  if(a>=1000) return n.toFixed(1);
+  if(a>=100)  return n.toFixed(2);
+  if(a>=1)    return n.toFixed(d<3?3:d);
   return n.toPrecision(4);
 }
 
-/* ── PIPE PICKER ─────────────────────────────────── */
+/* ── PIPE PICKER ──────────────────────────────────────────────────────── */
 function initPipePicker(){
   const selNPS = document.getElementById('selNPS');
-  selNPS.innerHTML = '<option value="custom">— Custom —</option>';
+  selNPS.innerHTML = '<option value="custom">\u2014 Custom \u2014</option>';
   Object.keys(PIPE_DB).forEach(nps=>{
     const o = document.createElement('option');
-    o.value = nps; o.textContent = 'NPS ' + nps;
+    o.value = nps; o.textContent = 'NPS '+nps;
     selNPS.appendChild(o);
   });
   const selSvc = document.getElementById('selService');
@@ -611,176 +699,218 @@ function initPipePicker(){
   });
 }
 
+function refreshSchDropdown(){
+  const nps = document.getElementById('selNPS').value;
+  const curSch = document.getElementById('selSch').value;
+  if(nps==='custom'||!PIPE_DB[nps]) return;
+  const sel = document.getElementById('selSch');
+  sel.innerHTML = '<option value="custom">\u2014 Custom \u2014</option>';
+  Object.keys(PIPE_DB[nps].SCH).forEach(sch=>{
+    const o = document.createElement('option');
+    o.value = sch;
+    const id_mm = PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch];
+    const idDisp = unitSys==='SI' ? id_mm.toFixed(1)+' mm' : (id_mm/25.4).toFixed(3)+'"';
+    o.textContent = 'SCH '+sch+' (ID '+idDisp+')';
+    sel.appendChild(o);
+  });
+  sel.value = curSch;
+}
+
 function onNPSChange(){
   const nps = document.getElementById('selNPS').value;
   const selSch = document.getElementById('selSch');
-  selSch.innerHTML = '<option value="custom">— Custom —</option>';
-  if(nps !== 'custom' && PIPE_DB[nps]){
+  selSch.innerHTML = '<option value="custom">\u2014 Custom \u2014</option>';
+  if(nps!=='custom'&&PIPE_DB[nps]){
     Object.keys(PIPE_DB[nps].SCH).forEach(sch=>{
       const o = document.createElement('option');
       o.value = sch;
-      const id = (PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch]).toFixed(1);
-      o.textContent = 'SCH ' + sch + ' (ID ' + id + ' mm)';
+      const id_mm = PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch];
+      const idDisp = unitSys==='SI' ? id_mm.toFixed(1)+' mm' : (id_mm/25.4).toFixed(3)+'"';
+      o.textContent = 'SCH '+sch+' (ID '+idDisp+')';
       selSch.appendChild(o);
     });
-    if(PIPE_DB[nps].SCH['40']) selSch.value = '40';
+    if(PIPE_DB[nps].SCH['40']) selSch.value='40';
     onSchChange();
-  } else { calculate(); }
+  } else calculate();
 }
 
 function onSchChange(){
   const nps = document.getElementById('selNPS').value;
   const sch = document.getElementById('selSch').value;
-  if(nps !== 'custom' && sch !== 'custom' && PIPE_DB[nps]?.SCH[sch]){
-    document.getElementById('inpDia').value = (PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch]).toFixed(1);
+  if(nps!=='custom'&&sch!=='custom'&&PIPE_DB[nps]?.SCH[sch]){
+    const id_mm = PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch];
+    document.getElementById('inpDia').value =
+      unitSys==='SI' ? id_mm.toFixed(1) : (id_mm/25.4).toFixed(4);
   }
   calculate();
 }
 
 function onCustomDia(){
-  document.getElementById('selNPS').value = 'custom';
-  document.getElementById('selSch').innerHTML = '<option value="custom">— Custom —</option>';
+  document.getElementById('selNPS').value='custom';
+  document.getElementById('selSch').innerHTML='<option value="custom">\u2014 Custom \u2014</option>';
   calculate();
 }
 
-/* ── FRICTION FACTOR ─────────────────────────────── */
-function frictionFactor(Re, eps, D){
-  if(Re <= 0) return 0;
-  if(Re < 2300) return 64/Re;
-  if(Re >= 4000){
-    const d = Math.log10(eps/D/3.7 + 5.74/Math.pow(Re,0.9));
+/* ── CONVERT INPUTS TO SI BEFORE CALC ────────────────────────────────── */
+function getSI(){
+  // Returns all values in SI units regardless of unit toggle
+  const raw = v => parseFloat(document.getElementById(v).value);
+  const imp = unitSys==='IMP';
+  return {
+    flowM3h : imp ? raw('inpFlow') / 4.40287  : raw('inpFlow'),   // USGPM→m³/h
+    rho     : imp ? raw('inpRho')  * 16.0185  : raw('inpRho'),    // lb/ft³→kg/m³
+    muCP    : raw('inpMu'),                                        // cP — same both
+    L       : imp ? raw('inpLen')  * 0.3048   : raw('inpLen'),    // ft→m
+    D_mm    : imp ? raw('inpDia')  * 25.4     : raw('inpDia'),    // in→mm
+    eps_mm  : imp ? (parseFloat(document.getElementById('inpRough').value)||0.0018)*25.4
+                  : (parseFloat(document.getElementById('inpRough').value)||0.0457),
+    dz      : imp ? (parseFloat(document.getElementById('inpDz').value)||0)*0.3048
+                  : (parseFloat(document.getElementById('inpDz').value)||0),
+  };
+}
+
+/* ── FRICTION FACTOR ──────────────────────────────────────────────────── */
+function frictionFactor(Re,eps,D){
+  if(Re<=0) return 0;
+  if(Re<2300) return 64/Re;
+  if(Re>=4000){
+    const d=Math.log10(eps/D/3.7+5.74/Math.pow(Re,0.9));
     return 0.25/(d*d);
   }
-  const fL = 64/2300;
-  const dT = Math.log10(eps/D/3.7 + 5.74/Math.pow(4000,0.9));
-  const fT = 0.25/(dT*dT);
-  return fL + (Re-2300)/1700*(fT-fL);
+  const fL=64/2300;
+  const dT=Math.log10(eps/D/3.7+5.74/Math.pow(4000,0.9));
+  const fT=0.25/(dT*dT);
+  return fL+(Re-2300)/1700*(fT-fL);
 }
 
 function flowRegime(Re){
-  if(Re < 2300)  return { label:'Laminar',    cls:'r-lam',   method:'f = 64/Re' };
-  if(Re < 4000)  return { label:'Transition', cls:'r-trans', method:'Interpolated f' };
-  return             { label:'Turbulent',   cls:'r-turb',  method:'Swamee-Jain' };
+  if(Re<2300)  return{label:'Laminar',   cls:'r-lam',  method:'f = 64/Re'};
+  if(Re<4000)  return{label:'Transition',cls:'r-trans',method:'Interpolated f'};
+  return            {label:'Turbulent', cls:'r-turb', method:'Swamee-Jain'};
 }
 
-/* ── MAIN CALCULATE ──────────────────────────────── */
+/* ── MAIN CALCULATE ───────────────────────────────────────────────────── */
 function calculate(){
   clearErrors();
-  const flowM3h = parseFloat(document.getElementById('inpFlow').value);
-  const rho     = parseFloat(document.getElementById('inpRho').value);
-  const muCP    = parseFloat(document.getElementById('inpMu').value);
-  const L       = parseFloat(document.getElementById('inpLen').value);
-  const D_mm    = parseFloat(document.getElementById('inpDia').value);
-  const eps_mm  = parseFloat(document.getElementById('inpRough').value) || 0.0457;
-  const dz      = parseFloat(document.getElementById('inpDz').value) || 0;
+  const s = getSI();
 
-  let ok = true;
-  if(!isFinite(flowM3h)||flowM3h<=0){ showErr('errFlow'); ok=false; }
-  if(!isFinite(rho)||rho<=0){         showErr('errRho');  ok=false; }
-  if(!isFinite(muCP)||muCP<=0){       showErr('errMu');   ok=false; }
-  if(!isFinite(L)||L<=0){             showErr('errLen');  ok=false; }
-  if(!isFinite(D_mm)||D_mm<=0){       showErr('errDia');  ok=false; }
+  let ok=true;
+  if(!isFinite(s.flowM3h)||s.flowM3h<=0){ showErr('errFlow'); ok=false; }
+  if(!isFinite(s.rho)||s.rho<=0){         showErr('errRho');  ok=false; }
+  if(!isFinite(s.muCP)||s.muCP<=0){       showErr('errMu');   ok=false; }
+  if(!isFinite(s.L)||s.L<=0){             showErr('errLen');  ok=false; }
+  if(!isFinite(s.D_mm)||s.D_mm<=0){       showErr('errDia');  ok=false; }
   if(!ok){ hideResults(); return; }
 
-  const Q   = flowM3h/3600;
-  const D   = D_mm/1000;
-  const eps = eps_mm/1000;
-  const mu  = muCP/1000;
+  const Q   = s.flowM3h/3600;
+  const D   = s.D_mm/1000;
+  const eps = s.eps_mm/1000;
+  const mu  = s.muCP/1000;
   const A   = Math.PI*D*D/4;
   const v   = Q/A;
-  const Re  = rho*v*D/mu;
-  const f   = frictionFactor(Re, eps, D);
+  const Re  = s.rho*v*D/mu;
+  const f   = frictionFactor(Re,eps,D);
   const regime = flowRegime(Re);
 
-  const dPf_Pa   = f*(L/D)*(rho*v*v/2);
-  const dPf_bar  = dPf_Pa/1e5;
-  const dPs_Pa   = rho*G*dz;
-  const dPs_bar  = dPs_Pa/1e5;
-  const dPtot    = dPf_bar + dPs_bar;
-  const Hf       = dPf_Pa/(rho*G);
-  const Htot     = Hf + dz;
-  const dPer100  = (dPf_bar/L)*100;
+  // All results in SI
+  const dPf_Pa  = f*(s.L/D)*(s.rho*v*v/2);
+  const dPf_bar = dPf_Pa/1e5;
+  const dPs_bar = s.rho*G*s.dz/1e5;
+  const dPtot   = dPf_bar+dPs_bar;
+  const Hf      = dPf_Pa/(s.rho*G);
+  const Htot    = Hf+s.dz;
+  const dPer100 = (dPf_bar/s.L)*100;
 
-  const warnings = [];
-  if(Re < 2300) warnings.push('Laminar flow (Re = '+Math.round(Re)+') — verify Newtonian assumption. f = 64/Re.');
-  else if(Re < 4000) warnings.push('Transition zone (2300 ≤ Re < 4000) — friction factor interpolated; results indicative only.');
-  if(v > 5) warnings.push('Velocity '+fmtN(v,2)+' m/s > 5 m/s — potential erosion. Check API RP 14E §2.4 erosional velocity.');
-  if(eps_mm/D_mm > 0.05) warnings.push('Relative roughness ε/D = '+fmtN(eps_mm/D_mm,4)+' is high — fully rough turbulent assumed.');
-  if(dPer100 > 5) warnings.push('ΔP/100m = '+fmtN(dPer100,2)+' bar/100m is high — verify line sizing.');
-  if(Math.abs(dz) > 0.5*L) warnings.push('|Δz| = '+Math.abs(dz)+' m exceeds 50% of L — verify pipe geometry.');
+  const warnings=[];
+  if(Re<2300) warnings.push('Laminar flow (Re = '+Math.round(Re)+') \u2014 verify Newtonian assumption.');
+  else if(Re<4000) warnings.push('Transition zone (2300 \u2264 Re < 4000) \u2014 friction factor interpolated.');
+  if(v>5) warnings.push('v = '+fmtN(v,2)+' m/s > 5 m/s \u2014 potential erosion. Check API RP 14E \u00a72.4.');
+  if(s.eps_mm/s.D_mm>0.05) warnings.push('\u03b5/D = '+fmtN(s.eps_mm/s.D_mm,4)+' is high \u2014 fully rough turbulent.');
+  if(dPer100>5) warnings.push('\u0394P/100m = '+fmtN(dPer100,2)+' bar/100m \u2014 verify line sizing.');
+  if(Math.abs(s.dz)>0.5*s.L) warnings.push('|\u0394z| exceeds 50 % of L \u2014 verify pipe geometry.');
 
-  const svcKey = document.getElementById('selService').value;
-  const svc = SERVICE_LIMITS.find(s=>s.service===svcKey);
-  const limitRows = [];
+  const svcKey=document.getElementById('selService').value;
+  const svc=SERVICE_LIMITS.find(s=>s.service===svcKey);
+  const limitRows=[];
   if(svc){
-    limitRows.push({ param:'Velocity', val:fmtN(v,3)+' m/s', max:svc.vMax+' m/s', status:getLimitStatus(v,svc.vMin,svc.vMax) });
-    const dpStat = dPer100 <= svc.dpMax ? 'ok' : dPer100 <= svc.dpMax*1.25 ? 'warn' : 'hi';
-    limitRows.push({ param:'ΔP/100 m', val:fmtN(dPer100,3)+' bar/100m', max:svc.dpMax+' bar/100m', status:dpStat });
+    limitRows.push({param:'Velocity',  val:fmtN(v,3)+' m/s',        max:svc.vMax+' m/s',        status:getLimitStatus(v,svc.vMin,svc.vMax)});
+    const dpStat=dPer100<=svc.dpMax?'ok':dPer100<=svc.dpMax*1.25?'warn':'hi';
+    limitRows.push({param:'\u0394P/100 m',val:fmtN(dPer100,3)+' bar/100m',max:svc.dpMax+' bar/100m',status:dpStat});
   }
 
-  const trace = [
-    'Darcy-Weisbach: ΔPf = f·(L/D)·(ρv²/2)',
-    '──────────────────────────────────────────────',
-    'Q       = '+fmtN(flowM3h)+' m³/h  →  '+fmtN(Q,6)+' m³/s',
-    'ρ       = '+fmtN(rho)+' kg/m³',
-    'μ       = '+fmtN(muCP)+' cP  →  '+fmtN(mu,6)+' Pa·s',
-    'L       = '+fmtN(L)+' m',
-    'D (ID)  = '+fmtN(D_mm)+' mm  →  '+fmtN(D,5)+' m',
-    'ε       = '+fmtN(eps_mm)+' mm | ε/D = '+fmtN(eps/D,6),
-    'Δz      = '+fmtN(dz)+' m',
-    '──────────────────────────────────────────────',
-    'A       = πD²/4 = '+fmtN(A,6)+' m²',
+  // Build SI trace (always SI internally)
+  const trace=[
+    'Darcy-Weisbach: \u0394Pf = f\u00b7(L/D)\u00b7(\u03c1v\u00b2/2)',
+    '\u2500'.repeat(46),
+    'Q       = '+fmtN(s.flowM3h)+' m\u00b3/h  \u2192  '+fmtN(Q,6)+' m\u00b3/s',
+    '\u03c1       = '+fmtN(s.rho)+' kg/m\u00b3',
+    '\u03bc       = '+fmtN(s.muCP)+' cP  \u2192  '+fmtN(mu,6)+' Pa\u00b7s',
+    'L       = '+fmtN(s.L)+' m',
+    'D (ID)  = '+fmtN(s.D_mm)+' mm  \u2192  '+fmtN(D,5)+' m',
+    '\u03b5       = '+fmtN(s.eps_mm)+' mm | \u03b5/D = '+fmtN(eps/D,6),
+    '\u0394z      = '+fmtN(s.dz)+' m',
+    '\u2500'.repeat(46),
+    'A       = \u03c0D\u00b2/4 = '+fmtN(A,6)+' m\u00b2',
     'v       = Q/A = '+fmtN(v,4)+' m/s',
-    'Re      = ρvD/μ = '+Math.round(Re).toLocaleString(),
+    'Re      = \u03c1vD/\u03bc = '+Math.round(Re).toLocaleString(),
     'Regime  = '+regime.label+' ('+regime.method+')',
     'f       = '+fmtN(f,6),
-    '──────────────────────────────────────────────',
-    'ΔPf     = '+fmtN(dPf_bar,5)+' bar  ('+fmtN(dPf_Pa,1)+' Pa)',
-    'ΔPs     = '+fmtN(dPs_bar,5)+' bar  (ρgΔz = '+fmtN(dPs_Pa,1)+' Pa)',
-    'ΔP_tot  = '+fmtN(dPtot,5)+' bar',
-    'ΔPf/100m= '+fmtN(dPer100,4)+' bar/100m',
-    '──────────────────────────────────────────────',
-    'Hf      = ΔPf/(ρg) = '+fmtN(Hf,3)+' m liq.',
-    'Hs (Δz)= '+fmtN(dz,3)+' m liq.',
+    '\u2500'.repeat(46),
+    '\u0394Pf     = '+fmtN(dPf_bar,5)+' bar  ('+fmtN(dPf_Pa,1)+' Pa)',
+    '\u0394Ps     = '+fmtN(dPs_bar,5)+' bar',
+    '\u0394P_tot  = '+fmtN(dPtot,5)+' bar',
+    '\u0394Pf/100m= '+fmtN(dPer100,4)+' bar/100m',
+    '\u2500'.repeat(46),
+    'Hf      = \u0394Pf/(\u03c1g) = '+fmtN(Hf,3)+' m liq.',
+    'Hs (\u0394z)= '+fmtN(s.dz,3)+' m liq.',
     'H_total = '+fmtN(Htot,3)+' m liq.',
   ].join('\n');
 
-  renderResults({ v, Re, f, regime, dPf_bar, dPs_bar, dPtot, dPer100, Hf, dz, Htot, warnings, limitRows, svc, trace });
+  renderResults({v,Re,f,regime,dPf_bar,dPs_bar,dPtot,dPer100,Hf,dz:s.dz,Htot,warnings,limitRows,svc,trace});
 }
 
-/* ── RENDER ──────────────────────────────────────── */
-function getLimitStatus(val, min, max){
-  if(val < min) return 'warn';
-  if(val > max*1.15) return 'hi';
-  if(val > max) return 'warn';
+/* ── RENDER ───────────────────────────────────────────────────────────── */
+function getLimitStatus(val,min,max){
+  if(val<min) return 'warn';
+  if(val>max*1.15) return 'hi';
+  if(val>max) return 'warn';
   return 'ok';
 }
 function lbadgeHTML(s){
-  const m = { ok:['lbadge-ok','✓ OK'], warn:['lbadge-warn','⚠ Exceeds'], hi:['lbadge-hi','✗ High'] };
-  const [c,t] = m[s]||['lbadge-warn',s];
+  const m={ok:['lbadge-ok','\u2713 OK'],warn:['lbadge-warn','\u26a0 Exceeds'],hi:['lbadge-hi','\u2717 High']};
+  const [c,t]=m[s]||['lbadge-warn',s];
   return `<span class="lbadge ${c}">${t}</span>`;
 }
 
 function renderResults(r){
-  document.getElementById('placeholderCard').style.display = 'none';
-  document.getElementById('globalErr').style.display = 'none';
+  const imp = unitSys==='IMP';
+  const pF  = imp ? C.pBar.IMP : 1;   // bar→psi factor
+  const hF  = imp ? C.head.IMP : 1;   // m→ft
+  const vF  = imp ? C.vel.IMP  : 1;   // m/s→ft/s
+  const d100F = imp ? C.dP100.IMP : 1; // bar/100m → psi/100ft
+  const pU  = U.pres[unitSys];  const hU = U.head[unitSys];
+  const vU  = U.vel[unitSys];   const dp100U = U.dp100[unitSys];
+
+  document.getElementById('placeholderCard').style.display='none';
+  document.getElementById('globalErr').style.display='none';
+  document.getElementById('unitBadge').textContent = unitSys==='SI' ? 'SI' : 'Imperial';
 
   // Warnings
-  const wb = document.getElementById('warningsCard');
+  const wb=document.getElementById('warningsCard');
   if(r.warnings.length){
-    wb.style.display = 'flex';
-    document.getElementById('warningsText').innerHTML =
+    wb.style.display='flex';
+    document.getElementById('warningsText').innerHTML=
       r.warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
-  } else wb.style.display = 'none';
+  } else wb.style.display='none';
 
   // Service limits
-  const lc = document.getElementById('limitsCard');
+  const lc=document.getElementById('limitsCard');
   if(r.limitRows.length){
-    lc.style.display = 'block';
-    document.getElementById('limitsServiceName').textContent = document.getElementById('selService').value;
-    let h = '';
+    lc.style.display='block';
+    document.getElementById('limitsServiceName').textContent=document.getElementById('selService').value;
+    let h='';
     r.limitRows.forEach(row=>{
-      h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:.38rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.72rem;margin-bottom:.35rem">`
+      h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:.38rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.72rem;margin-bottom:.35rem">`
         +`<span style="color:var(--muted)">${row.param}</span>`
         +`<div style="display:flex;align-items:center;gap:.45rem">`
         +`<span style="font-weight:600">${row.val}</span>`
@@ -788,112 +918,116 @@ function renderResults(r){
         +lbadgeHTML(row.status)
         +`</div></div>`;
     });
-    if(r.svc?.note) h += `<div style="font-size:.6rem;color:var(--muted);padding:.25rem .6rem;line-height:1.5">${r.svc.note}</div>`;
-    document.getElementById('limitsBody').innerHTML = h;
-  } else lc.style.display = 'none';
+    if(r.svc?.note) h+=`<div style="font-size:.6rem;color:var(--muted);padding:.25rem .6rem;line-height:1.5">${r.svc.note}</div>`;
+    document.getElementById('limitsBody').innerHTML=h;
+  } else lc.style.display='none';
 
   // Regime chip
-  document.getElementById('regimeChip').innerHTML =
+  document.getElementById('regimeChip').innerHTML=
     `<span class="regime ${r.regime.cls}">${r.regime.label} &mdash; Re = ${Math.round(r.Re).toLocaleString()}</span>`;
 
   // KPI
-  document.getElementById('bigTotalDP').textContent  = fmtN(r.dPtot,4);
-  document.getElementById('bigDPBreakdown').innerHTML = 'Friction '+fmtN(r.dPf_bar,4)+' bar&nbsp;|&nbsp;Static '+fmtN(r.dPs_bar,4)+' bar';
-  document.getElementById('bigTotalHead').textContent = fmtN(r.Htot,3);
-  document.getElementById('bigHeadBreakdown').innerHTML = 'Hf '+fmtN(r.Hf,3)+' m&nbsp;|&nbsp;Δz '+fmtN(r.dz,3)+' m';
+  document.getElementById('kpiDPUnit').textContent  = pU;
+  document.getElementById('kpiHeadUnit').textContent = hU;
+  document.getElementById('bigTotalDP').textContent  = fmtN(r.dPtot*pF,4);
+  document.getElementById('bigDPBreakdown').innerHTML=
+    'Friction '+fmtN(r.dPf_bar*pF,4)+' '+pU+'\u00a0|\u00a0Static '+fmtN(r.dPs_bar*pF,4)+' '+pU;
+  document.getElementById('bigTotalHead').textContent = fmtN(r.Htot*hF,3);
+  document.getElementById('bigHeadBreakdown').innerHTML=
+    'Hf '+fmtN(r.Hf*hF,3)+' '+hU+'\u00a0|\u00a0\u0394z '+fmtN(r.dz*hF,3)+' '+hU;
 
-  // Detail rows
-  const rows = [
-    { l:'Velocity',           v:fmtN(r.v,4),        u:'m/s',       hl:true  },
-    { l:'ΔP Friction',        v:fmtN(r.dPf_bar,4),  u:'bar',       hl:false },
-    { l:'ΔP Static',          v:fmtN(r.dPs_bar,4),  u:'bar',       hl:false },
-    { l:'ΔP Total',           v:fmtN(r.dPtot,4),    u:'bar',       hl:true  },
-    { l:'ΔP Friction / 100 m',v:fmtN(r.dPer100,4),  u:'bar/100m',  hl:false },
-    { l:'Friction Head',      v:fmtN(r.Hf,3),       u:'m liq.',    hl:false },
-    { l:'Static Head (Δz)',   v:fmtN(r.dz,3),       u:'m liq.',    hl:false },
-    { l:'Total Head',         v:fmtN(r.Htot,3),     u:'m liq.',    hl:true  },
-    { l:'Reynolds Number',    v:Math.round(r.Re).toLocaleString(), u:'—', hl:false },
-    { l:'Friction Factor f',  v:fmtN(r.f,6),        u:'—',         hl:false },
+  // Detail rows — always show converted display values
+  const rows=[
+    {l:'Velocity',            v:fmtN(r.v*vF,4),          u:vU,     hl:true },
+    {l:'\u0394P Friction',    v:fmtN(r.dPf_bar*pF,4),    u:pU,     hl:false},
+    {l:'\u0394P Static',      v:fmtN(r.dPs_bar*pF,4),    u:pU,     hl:false},
+    {l:'\u0394P Total',       v:fmtN(r.dPtot*pF,4),      u:pU,     hl:true },
+    {l:'\u0394P / 100 '+(imp?'ft':'m'), v:fmtN(r.dPer100*d100F,4), u:dp100U, hl:false},
+    {l:'Friction Head',       v:fmtN(r.Hf*hF,3),         u:hU,     hl:false},
+    {l:'Static Head (\u0394z)',v:fmtN(r.dz*hF,3),        u:hU,     hl:false},
+    {l:'Total Head',          v:fmtN(r.Htot*hF,3),       u:hU,     hl:true },
+    {l:'Reynolds Number',     v:Math.round(r.Re).toLocaleString(), u:'\u2014', hl:false},
+    {l:'Friction Factor f',   v:fmtN(r.f,6),             u:'\u2014',hl:false},
   ];
-  document.getElementById('detailGrid').innerHTML = rows.map(row=>
+  document.getElementById('detailGrid').innerHTML=rows.map(row=>
     `<div class="res-row${row.hl?' hl':''}">`
     +`<span class="res-lbl">${row.l}</span>`
     +`<span><span class="res-val">${row.v}</span><span class="res-unit">${row.u}</span></span>`
     +`</div>`
   ).join('');
 
-  // Trace
-  document.getElementById('traceAccordion').style.display = 'block';
-  document.getElementById('traceBox').textContent = r.trace;
-
-  document.getElementById('resultsCard').style.display = 'block';
+  document.getElementById('traceAccordion').style.display='block';
+  document.getElementById('traceBox').textContent=r.trace;
+  document.getElementById('resultsCard').style.display='block';
   lucide.createIcons();
 }
 
 function hideResults(){
-  ['placeholderCard'].forEach(id=>document.getElementById(id).style.display='block');
+  document.getElementById('placeholderCard').style.display='block';
   ['resultsCard','warningsCard','limitsCard','traceAccordion'].forEach(id=>document.getElementById(id).style.display='none');
   lucide.createIcons();
 }
 
-function showErr(id){ const e=document.getElementById(id); if(e)e.style.display='block'; }
+function showErr(id){const e=document.getElementById(id);if(e)e.style.display='block';}
 function clearErrors(){
-  ['errFlow','errRho','errMu','errLen','errDia'].forEach(id=>{ const e=document.getElementById(id); if(e)e.style.display='none'; });
+  ['errFlow','errRho','errMu','errLen','errDia'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
   document.getElementById('globalErr').style.display='none';
 }
 
-/* ── TEST CASE ───────────────────────────────────── */
+/* ── TEST CASE ────────────────────────────────────────────────────────── */
 function loadTestCase(){
-  document.getElementById('inpFlow').value  = '100';
-  document.getElementById('inpRho').value   = '850';
-  document.getElementById('inpMu').value    = '5';
-  document.getElementById('inpLen').value   = '200';
-  document.getElementById('inpRough').value = '0.0457';
-  document.getElementById('inpDz').value    = '10';
-  document.getElementById('selNPS').value   = '6"';
+  // Always load SI values then convert
+  if(unitSys!=='SI') setUnits('SI');
+  document.getElementById('inpFlow').value='100';
+  document.getElementById('inpRho').value='850';
+  document.getElementById('inpMu').value='5';
+  document.getElementById('inpLen').value='200';
+  document.getElementById('inpRough').value='0.0457';
+  document.getElementById('inpDz').value='10';
+  document.getElementById('selNPS').value='6"';
   onNPSChange();
-  document.getElementById('selSch').value   = '40';
+  document.getElementById('selSch').value='40';
   onSchChange();
-  document.getElementById('selService').value = 'Crude Oil — Pump Discharge';
+  document.getElementById('selService').value='Crude Oil \u2014 Pump Discharge';
   calculate();
 }
 
 function resetForm(){
   ['inpFlow','inpRho','inpMu','inpLen','inpDia'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('inpRough').value = '0.0457';
-  document.getElementById('inpDz').value    = '0';
-  document.getElementById('selNPS').value   = 'custom';
-  document.getElementById('selSch').innerHTML = '<option value="custom">— Custom —</option>';
-  document.getElementById('selService').value = '';
+  document.getElementById('inpRough').value=unitSys==='SI'?'0.0457':'0.0018';
+  document.getElementById('inpDz').value='0';
+  document.getElementById('selNPS').value='custom';
+  document.getElementById('selSch').innerHTML='<option value="custom">\u2014 Custom \u2014</option>';
+  document.getElementById('selService').value='';
   clearErrors(); hideResults();
 }
 
-/* ── ACCORDION ───────────────────────────────────── */
-function toggleAcc(bodyId, trigger){
-  const body = document.getElementById(bodyId);
-  const open = body.classList.toggle('open');
-  trigger.setAttribute('aria-expanded', open);
+/* ── ACCORDION ────────────────────────────────────────────────────────── */
+function toggleAcc(bodyId,trigger){
+  const body=document.getElementById(bodyId);
+  const open=body.classList.toggle('open');
+  trigger.setAttribute('aria-expanded',open);
 }
 
-/* ── THEME / MENU ────────────────────────────────── */
+/* ── THEME / MENU ─────────────────────────────────────────────────────── */
 function toggleTheme(){
-  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', t);
-  ['themeIconD','themeIconM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.setAttribute('data-lucide', t==='dark'?'moon':'sun'); });
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  ['themeIconD','themeIconM'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('data-lucide',t==='dark'?'moon':'sun');});
   lucide.createIcons();
 }
 function toggleMenu(){
-  const m = document.getElementById('mobileMenu');
+  const m=document.getElementById('mobileMenu');
   m.classList.toggle('open');
-  document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open')?'x':'menu');
+  document.getElementById('menuIcon').setAttribute('data-lucide',m.classList.contains('open')?'x':'menu');
   lucide.createIcons();
 }
 
 window.addEventListener('scroll',()=>{
-  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>10);
 });
 
-document.getElementById('year').textContent = new Date().getFullYear();
+document.getElementById('year').textContent=new Date().getFullYear();
 initPipePicker();
 lucide.createIcons();
 </script>
