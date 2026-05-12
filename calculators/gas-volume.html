@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gas Volume Conversion — Hazem ElMancy</title>
+  <meta name="description" content="Real-gas law volume conversion between Nm³/h, Sm³/h, Am³/h, Am³/s, SCFM, MMSCFD and ACFM with user-supplied Z-factors." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
+    [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--bg-card-hover:hsl(222,41%,13%);--border:hsl(222,30%,18%);--foreground:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);--secondary-bg:hsl(222,41%,16%);--input-bg:hsl(222,47%,9%)}
+    [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--bg-card-hover:hsl(0,0%,95%);--border:hsl(214,32%,88%);--foreground:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);--secondary-bg:hsl(210,40%,94%);--input-bg:hsl(0,0%,100%)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+    a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    /* ── NAVBAR ── */
+    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
+    #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+    nav.desktop{display:none;align-items:center;gap:.25rem} @media(min-width:1024px){nav.desktop{display:flex}}
+    .nav-link{padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s;background:none}
+    .nav-link:hover{color:var(--foreground);background:var(--secondary-bg)}
+    .nav-link-calc{display:flex;align-items:center;gap:.4rem;padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
+    .theme-toggle{width:2.25rem;height:2.25rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;background:none;border:none;cursor:pointer}
+    .theme-toggle:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .desktop-th{display:none} @media(min-width:1024px){.desktop-th{display:flex}}
+    .mobile-controls{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mobile-controls{display:none}}
+    .mobile-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
+    .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
+    .mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
+    /* ── PAGE HEADER ── */
+    .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
+    .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
+    .breadcrumb a:hover{color:var(--primary)}
+    .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.5rem}
+    .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
+    .page-desc{color:var(--muted);font-size:.8rem;max-width:40rem;line-height:1.6}
+    .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
+    /* ── LAYOUT ── */
+    .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
+    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 420px;align-items:start}}
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+    .card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+    .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+    .card-title{font-size:.8rem;font-weight:600}
+    .card-body{padding:1.25rem}
+    /* ── FORM ── */
+    .field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem;font-weight:500}
+    .field-note{font-size:.62rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+    input[type=number],select{font-family:var(--font);padding:.45rem .65rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);outline:none;transition:border-color .15s;width:100%}
+    input[type=number]{-moz-appearance:textfield}
+    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input[type=number]:focus,select:focus{border-color:var(--primary)}
+    input.err{border-color:hsl(0,72%,55%)}
+    .err-msg{font-size:.65rem;color:hsl(0,72%,65%);margin-top:.25rem}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
+    @media(max-width:600px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
+    .section-sep{height:1px;background:var(--border);margin:1rem 0}
+    /* ── UNIT SECTION ── */
+    .unit-section{padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--secondary-bg)}
+    .unit-section-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+    .conditions-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-top:.6rem}
+    @media(max-width:600px){.conditions-grid{grid-template-columns:1fr 1fr}}
+    .condition-note{font-size:.62rem;color:var(--muted);padding:.4rem .6rem;background:var(--primary-bg);border:1px solid var(--border);border-radius:.3rem;margin-top:.5rem;line-height:1.6}
+    .ref-badge{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid;margin-left:.5rem}
+    .ref-fixed{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
+    .ref-actual{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.5rem 1.1rem;border-radius:var(--radius);font-size:.78rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
+    .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .btn-sm{padding:.3rem .7rem;font-size:.7rem}
+    .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    /* ── RESULTS ── */
+    .big-result{text-align:center;padding:1.25rem 1rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25);border-radius:var(--radius);margin-bottom:.75rem}
+    .big-result-label{font-size:.68rem;color:var(--muted);margin-bottom:.3rem}
+    .big-result-eq{font-size:.72rem;color:var(--muted);margin-top:.25rem}
+    .big-val{font-size:2rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;line-height:1.1}
+    .big-unit{font-size:.85rem;font-weight:400;color:var(--muted);margin-left:.4rem}
+    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;font-size:.75rem}
+    thead th{padding:.5rem .6rem;text-align:left;font-size:.65rem;font-weight:600;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+    tbody td{padding:.4rem .6rem;border-bottom:1px solid hsl(222,30%,14%);vertical-align:middle;font-variant-numeric:tabular-nums}
+    [data-theme="light"] tbody td{border-bottom:1px solid hsl(214,32%,93%)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr.highlight-row td{background:var(--primary-bg)}
+    tbody tr:hover td{background:var(--secondary-bg)}
+    .value-cell{font-weight:600;color:var(--foreground)}
+    .highlight-row .value-cell{color:var(--primary)}
+    /* ── TRACE ── */
+    .trace-box{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;font-size:.68rem;color:var(--muted);font-family:'Courier New',monospace;line-height:2;max-height:260px;overflow-y:auto}
+    /* ── WARNINGS ── */
+    .warn-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
+    .warn-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
+    /* ── INFO BOX ── */
+    .info-box{display:flex;align-items:flex-start;gap:.6rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
+    .info-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
+    /* ── FOOTER ── */
+    footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
+    .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+    .footer-links{display:flex;align-items:center;gap:.75rem}
+    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
+    .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
+    /* ── SWAP ARROW ── */
+    .swap-btn{display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.45rem .9rem;font-size:.72rem;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);background:none;cursor:pointer;transition:all .15s;margin:0 auto}
+    .swap-btn:hover{background:var(--secondary-bg);color:var(--foreground)}
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════════ -->
+<header id="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
+    <nav class="desktop">
+      <a href="../index.html" class="nav-link">HOME</a>
+      <a href="../index.html#about" class="nav-link">ABOUT</a>
+      <a href="../index.html#experience" class="nav-link">EXPERIENCE</a>
+      <a href="../index.html#projects" class="nav-link">PROJECTS</a>
+      <a href="../index.html#skills" class="nav-link">SKILLS</a>
+      <a href="../index.html#contact" class="nav-link">CONTACT</a>
+      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:16px;height:16px"></i></button>
+    </nav>
+    <div class="mobile-controls">
+      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:16px;height:16px"></i></button>
+      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:16px;height:16px"></i></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../index.html">HOME</a>
+    <a href="../index.html#about">ABOUT</a>
+    <a href="../index.html#experience">EXPERIENCE</a>
+    <a href="../index.html#projects">PROJECTS</a>
+    <a href="../index.html#skills">SKILLS</a>
+    <a href="../index.html#contact">CONTACT</a>
+    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.4rem;margin-top:.5rem"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+  </div>
+</header>
+
+<!-- ═══ PAGE HEADER ══════════════════════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <a href="index.html">Calculators</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <span style="color:var(--foreground)">Gas Volume Conversion</span>
+      </div>
+      <p class="section-label">FLUID PROPERTIES</p>
+      <h1 class="page-title">Gas Volume Conversion</h1>
+      <p class="page-desc">Real-gas law conversion between Nm³/h, Sm³/h, Am³/h, Am³/s, SCFM, MMSCFD and ACFM using PV = ZnRT. User-supplied Z-factors with full step-by-step trace.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem">
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>ISO 13443 — Natural gas ref. conditions</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>GPA 2172 — MMSCFD basis (60°F, 14.696 psia)</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Real gas: PV = ZnRT</span>
+      </div>
+    </div>
+    <a href="index.html" class="btn btn-outline" style="margin-top:auto"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>All Calculators</a>
+  </div>
+</div>
+
+<!-- ═══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
+<div class="calc-layout">
+
+  <!-- ── LEFT: INPUT ── -->
+  <div>
+
+    <!-- SOURCE unit + value -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="arrow-right-to-line" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Source (From)</span>
+        <span id="fromRefBadge" class="ref-badge ref-fixed" style="margin-left:.5rem">Fixed Reference</span>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div>
+            <label class="field-label">Flow Rate / Volume</label>
+            <input type="number" id="inpVolume" value="1000" min="0" step="any" oninput="calculate()" />
+            <div class="err-msg" id="errVolume" style="display:none">Must be > 0</div>
+          </div>
+          <div>
+            <label class="field-label">Unit</label>
+            <select id="fromUnit" onchange="onFromUnitChange()">
+              <option value="Nm3/h">Nm³/h — Normal (0 °C, 101.325 kPa)</option>
+              <option value="Sm3/h" selected>Sm³/h — Standard (15 °C, 101.325 kPa)</option>
+              <option value="Am3/h">Am³/h — Actual m³/h</option>
+              <option value="Am3/s">Am³/s — Actual m³/s</option>
+              <option value="SCFM">SCFM — Std ft³/min (60 °F, 14.696 psia)</option>
+              <option value="MMSCFD">MMSCFD — MM std ft³/day (60 °F)</option>
+              <option value="ACFM">ACFM — Actual ft³/min</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Source conditions (shown only for actual units) -->
+        <div id="fromCondPanel" style="display:none;margin-top:.75rem">
+          <div class="unit-section">
+            <div class="unit-section-title"><i data-lucide="settings-2" style="width:13px;height:13px"></i>Source Operating Conditions</div>
+            <div class="condition-note" id="fromCondNote">Actual-condition unit — supply operating P, T and Z at source.</div>
+            <div class="conditions-grid" style="margin-top:.6rem">
+              <div>
+                <label class="field-label">Pressure (abs)</label>
+                <input type="number" id="fromP" value="10" step="any" oninput="calculate()" />
+              </div>
+              <div>
+                <label class="field-label">P Unit</label>
+                <select id="fromPUnit" onchange="calculate()">
+                  <option value="bara">bara</option>
+                  <option value="barg">barg</option>
+                  <option value="kPa">kPa abs</option>
+                  <option value="psia">psia</option>
+                  <option value="psig">psig</option>
+                  <option value="MPa">MPa abs</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Temperature</label>
+                <div style="display:flex;gap:.35rem">
+                  <input type="number" id="fromT" value="25" step="any" oninput="calculate()" style="flex:1" />
+                  <select id="fromTUnit" onchange="calculate()" style="width:65px;flex-shrink:0">
+                    <option value="C">°C</option>
+                    <option value="K">K</option>
+                    <option value="F">°F</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Z-factor (source)</label>
+                <input type="number" id="fromZ" value="0.950" step="any" oninput="calculate()" />
+                <div class="field-note">User-supplied — from EOS/simulator</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fixed reference note (shown for non-actual units) -->
+        <div id="fromRefPanel" style="margin-top:.75rem">
+          <div class="info-box">
+            <i data-lucide="info" style="width:14px;height:14px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
+            <p id="fromRefText">Fixed reference: 15 °C, 101.325 kPa abs, Z = 1.000 (ISO 13443)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SWAP -->
+    <div style="margin:-.2rem 0;position:relative;z-index:2">
+      <button class="swap-btn" onclick="swapUnits()">
+        <i data-lucide="arrow-down-up" style="width:14px;height:14px"></i>
+        Swap From / To
+      </button>
+    </div>
+
+    <!-- TARGET unit -->
+    <div class="card" style="margin-top:.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="arrow-right-from-line" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Target (To)</span>
+        <span id="toRefBadge" class="ref-badge ref-actual" style="margin-left:.5rem">Actual</span>
+      </div>
+      <div class="card-body">
+        <div>
+          <label class="field-label">Target Unit</label>
+          <select id="toUnit" onchange="onToUnitChange()">
+            <option value="Nm3/h">Nm³/h — Normal (0 °C, 101.325 kPa)</option>
+            <option value="Sm3/h">Sm³/h — Standard (15 °C, 101.325 kPa)</option>
+            <option value="Am3/h" selected>Am³/h — Actual m³/h</option>
+            <option value="Am3/s">Am³/s — Actual m³/s</option>
+            <option value="SCFM">SCFM — Std ft³/min (60 °F, 14.696 psia)</option>
+            <option value="MMSCFD">MMSCFD — MM std ft³/day (60 °F)</option>
+            <option value="ACFM">ACFM — Actual ft³/min</option>
+          </select>
+        </div>
+
+        <!-- Target conditions (shown only for actual units) -->
+        <div id="toCondPanel" style="margin-top:.75rem">
+          <div class="unit-section">
+            <div class="unit-section-title"><i data-lucide="settings-2" style="width:13px;height:13px"></i>Target Operating Conditions</div>
+            <div class="condition-note" id="toCondNote">Actual-condition unit — supply operating P, T and Z at target.</div>
+            <div class="conditions-grid" style="margin-top:.6rem">
+              <div>
+                <label class="field-label">Pressure (abs)</label>
+                <input type="number" id="toP" value="70" step="any" oninput="calculate()" />
+              </div>
+              <div>
+                <label class="field-label">P Unit</label>
+                <select id="toPUnit" onchange="calculate()">
+                  <option value="bara">bara</option>
+                  <option value="barg">barg</option>
+                  <option value="kPa">kPa abs</option>
+                  <option value="psia">psia</option>
+                  <option value="psig">psig</option>
+                  <option value="MPa">MPa abs</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Temperature</label>
+                <div style="display:flex;gap:.35rem">
+                  <input type="number" id="toT" value="60" step="any" oninput="calculate()" style="flex:1" />
+                  <select id="toTUnit" onchange="calculate()" style="width:65px;flex-shrink:0">
+                    <option value="C">°C</option>
+                    <option value="K">K</option>
+                    <option value="F">°F</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">Z-factor (target)</label>
+                <input type="number" id="toZ" value="0.880" step="any" oninput="calculate()" />
+                <div class="field-note">User-supplied — from EOS/simulator</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fixed reference note (shown for non-actual units) -->
+        <div id="toRefPanel" style="display:none;margin-top:.75rem">
+          <div class="info-box">
+            <i data-lucide="info" style="width:14px;height:14px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
+            <p id="toRefText">Fixed reference</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="warn-box" style="margin-top:1.25rem">
+      <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
+      <p>Z-factors are user-supplied and not calculated internally. Use PR/SRK EoS or a validated correlation (Papay, Hall-Yarborough, Dranchuk-Abou-Kassem) for high-pressure streams. Actual-condition units (Am³/h, Am³/s, ACFM) require explicit operating P, T and Z — no surrogate basis is assumed for the all-units table.</p>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: RESULTS ── -->
+  <div>
+
+    <!-- PRIMARY RESULT -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="zap" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Result</span>
+      </div>
+      <div class="card-body">
+        <div class="big-result" id="bigResult">
+          <div class="big-result-label">Converted flow rate</div>
+          <div><span class="big-val" id="bigVal">—</span><span class="big-unit" id="bigUnit"></span></div>
+          <div class="big-result-eq" id="bigEq">Enter source flow rate to calculate.</div>
+        </div>
+
+        <div id="warningsBox" style="display:none" class="warn-box">
+          <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
+          <p id="warningsText"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL-UNITS TABLE -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="table-2" style="width:15px;height:15px"></i></div>
+        <span class="card-title">All Units Summary</span>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Unit</th>
+                <th style="text-align:right">Value</th>
+                <th>Basis</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="allUnitsTbody">
+              <tr><td colspan="4" style="text-align:center;padding:1.25rem;color:var(--muted);font-size:.75rem">Enter source flow rate to calculate.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:.6rem;font-size:.62rem;color:var(--muted);line-height:1.7">
+          <span style="display:inline-flex;align-items:center;gap:.3rem;margin-right:.75rem"><span style="width:8px;height:8px;border-radius:50%;background:hsl(142,71%,50%);display:inline-block"></span>Fixed reference — immutable basis</span>
+          <span style="display:inline-flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:hsl(38,92%,55%);display:inline-block"></span>Actual — condition-dependent (shown only when target)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC TRACE -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="file-code" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Calculation Trace</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleTrace()">Toggle</button>
+      </div>
+      <div id="tracePanel" style="display:none">
+        <div class="card-body" style="padding:.75rem">
+          <div class="trace-box" id="traceBox">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERENCE TABLE -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="book-open" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Reference Conditions</span>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr><th>Unit</th><th>T ref</th><th>P ref</th><th>Z ref</th><th>Standard</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Nm³/h</strong></td><td>0 °C (273.15 K)</td><td>101.325 kPa abs</td><td>1.000</td><td>ISO 13443</td></tr>
+              <tr><td><strong>Sm³/h</strong></td><td>15 °C (288.15 K)</td><td>101.325 kPa abs</td><td>1.000</td><td>ISO 13443</td></tr>
+              <tr><td><strong>SCFM</strong></td><td>60 °F (288.71 K)</td><td>14.696 psia (101.325 kPa)</td><td>1.000</td><td>GPA 2172</td></tr>
+              <tr><td><strong>MMSCFD</strong></td><td>60 °F (288.71 K)</td><td>14.696 psia (101.325 kPa)</td><td>1.000</td><td>GPA 2172</td></tr>
+              <tr><td><strong>Am³/h</strong></td><td colspan="3" style="color:var(--muted);font-style:italic">User-supplied operating conditions</td><td>—</td></tr>
+              <tr><td><strong>Am³/s</strong></td><td colspan="3" style="color:var(--muted);font-style:italic">User-supplied operating conditions</td><td>—</td></tr>
+              <tr><td><strong>ACFM</strong></td><td colspan="3" style="color:var(--muted);font-style:italic">User-supplied operating conditions</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:.6rem;font-size:.62rem;color:var(--muted);line-height:1.7">
+          Validation: 1 MMSCFD → Sm³/h ≈ 1,177.6 Sm³/h (ISO 13443 / GPA 2172 cross-check)
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
+    <div class="footer-links">
+      <a href="tel:+201096597449" class="footer-icon"><i data-lucide="phone" style="width:14px;height:14px"></i></a>
+      <a href="mailto:hazemmancy@outlook.com" class="footer-icon"><i data-lucide="mail" style="width:14px;height:14px"></i></a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="footer-icon">
+        <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg>
+      </a>
+    </div>
+    <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS — exact match with portfolio-v1 gasVolume.ts
+// ═══════════════════════════════════════════════════════════════════════════
+const ATM_KPA      = 101.325;
+const T_NORMAL_K   = 273.15;   // 0 °C  — ISO 13443 Normal
+const T_STANDARD_K = 288.15;   // 15 °C — ISO 13443 Standard
+const T_60F_K      = 288.706;  // 60 °F — GPA 2172 / US standard
+const FT3_TO_M3    = 0.028316846592;
+
+// FLOW_UNITS[key] = { label, factor (→ m³/h), refP_kPa, refT_K, refZ, isActual }
+const FLOW_UNITS = {
+  'Nm3/h':  { label:'Nm³/h',  factor:1,                      refP:ATM_KPA, refT:T_NORMAL_K,   refZ:1.0, isActual:false, refDesc:'0 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
+  'Sm3/h':  { label:'Sm³/h',  factor:1,                      refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:false, refDesc:'15 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
+  'Am3/h':  { label:'Am³/h',  factor:1,                      refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+  'Am3/s':  { label:'Am³/s',  factor:3600,                   refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+  'SCFM':   { label:'SCFM',   factor:FT3_TO_M3*60,           refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
+  'MMSCFD': { label:'MMSCFD', factor:1e6*FT3_TO_M3/24,       refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
+  'ACFM':   { label:'ACFM',   factor:FT3_TO_M3*60,           refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function fmtNum(n, d=4) {
+  if (!isFinite(n)) return '—';
+  if (Math.abs(n) >= 1e6) return n.toExponential(3);
+  if (Math.abs(n) >= 1000) return n.toFixed(1);
+  if (Math.abs(n) >= 100)  return n.toFixed(2);
+  if (Math.abs(n) >= 1)    return n.toFixed(d);
+  return n.toPrecision(4);
+}
+function toKPa(val, unit) {
+  if (unit==='bara')  return val*100;
+  if (unit==='barg')  return (val+1.01325)*100;
+  if (unit==='kPa')   return val;
+  if (unit==='psia')  return val*6.89476;
+  if (unit==='psig')  return (val+14.696)*6.89476;
+  if (unit==='MPa')   return val*1000;
+  return val;
+}
+function toKelvin(val, unit) {
+  if (unit==='K') return val;
+  if (unit==='F') return (val-32)*5/9+273.15;
+  return val+273.15; // °C
+}
+function toggleTheme() {
+  const t = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  ['themeIconD','themeIconM'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.setAttribute('data-lucide', t==='dark'?'moon':'sun');
+  });
+  lucide.createIcons();
+}
+function toggleMenu() {
+  const m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open')?'x':'menu');
+  lucide.createIcons();
+}
+function toggleTrace() {
+  const p = document.getElementById('tracePanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+}
+window.addEventListener('scroll', ()=>{ document.getElementById('navbar').classList.toggle('scrolled', window.scrollY>10); });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UI: show/hide condition panels based on unit selection
+// ═══════════════════════════════════════════════════════════════════════════
+function onFromUnitChange() {
+  const u = document.getElementById('fromUnit').value;
+  const def = FLOW_UNITS[u];
+  const isActual = def.isActual;
+  document.getElementById('fromCondPanel').style.display = isActual ? 'block' : 'none';
+  document.getElementById('fromRefPanel').style.display  = isActual ? 'none' : 'block';
+  document.getElementById('fromRefText').textContent = 'Fixed reference: ' + def.refDesc;
+  const badge = document.getElementById('fromRefBadge');
+  badge.className = 'ref-badge ' + (isActual ? 'ref-actual' : 'ref-fixed');
+  badge.textContent = isActual ? 'Actual Conditions' : 'Fixed Reference';
+  calculate();
+}
+function onToUnitChange() {
+  const u = document.getElementById('toUnit').value;
+  const def = FLOW_UNITS[u];
+  const isActual = def.isActual;
+  document.getElementById('toCondPanel').style.display = isActual ? 'block' : 'none';
+  document.getElementById('toRefPanel').style.display  = isActual ? 'none' : 'block';
+  document.getElementById('toRefText').textContent = 'Fixed reference: ' + def.refDesc;
+  const badge = document.getElementById('toRefBadge');
+  badge.className = 'ref-badge ' + (isActual ? 'ref-actual' : 'ref-fixed');
+  badge.textContent = isActual ? 'Actual Conditions' : 'Fixed Reference';
+  calculate();
+}
+function swapUnits() {
+  const fu = document.getElementById('fromUnit'), tu = document.getElementById('toUnit');
+  const tmp = fu.value; fu.value = tu.value; tu.value = tmp;
+  // swap conditions
+  ['P','T','Z'].forEach(f => {
+    const a = document.getElementById('from'+f), b = document.getElementById('to'+f);
+    if(a&&b){ const v=a.value; a.value=b.value; b.value=v; }
+  });
+  ['PUnit','TUnit'].forEach(f => {
+    const a = document.getElementById('from'+f), b = document.getElementById('to'+f);
+    if(a&&b){ const v=a.value; a.value=b.value; b.value=v; }
+  });
+  onFromUnitChange(); onToUnitChange();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN CALCULATE — exact port of gasVolume.ts logic
+// ═══════════════════════════════════════════════════════════════════════════
+function calculate() {
+  const volume = parseFloat(document.getElementById('inpVolume').value);
+  const fromKey = document.getElementById('fromUnit').value;
+  const toKey   = document.getElementById('toUnit').value;
+  const fromDef = FLOW_UNITS[fromKey];
+  const toDef   = FLOW_UNITS[toKey];
+
+  // Validation
+  const errEl = document.getElementById('errVolume');
+  if (!isFinite(volume) || volume <= 0) {
+    errEl.style.display='block';
+    clearResults(); return;
+  }
+  errEl.style.display='none';
+
+  // Source P, T, Z
+  let P1_kPa, T1_K, Z1;
+  if (fromDef.isActual) {
+    P1_kPa = toKPa(parseFloat(document.getElementById('fromP').value)||0, document.getElementById('fromPUnit').value);
+    T1_K   = toKelvin(parseFloat(document.getElementById('fromT').value)||0, document.getElementById('fromTUnit').value);
+    Z1     = parseFloat(document.getElementById('fromZ').value)||1;
+  } else {
+    P1_kPa = fromDef.refP;
+    T1_K   = fromDef.refT;
+    Z1     = fromDef.refZ;
+  }
+
+  // Target P, T, Z
+  let P2_kPa, T2_K, Z2;
+  if (toDef.isActual) {
+    P2_kPa = toKPa(parseFloat(document.getElementById('toP').value)||0, document.getElementById('toPUnit').value);
+    T2_K   = toKelvin(parseFloat(document.getElementById('toT').value)||0, document.getElementById('toTUnit').value);
+    Z2     = parseFloat(document.getElementById('toZ').value)||1;
+  } else {
+    P2_kPa = toDef.refP;
+    T2_K   = toDef.refT;
+    Z2     = toDef.refZ;
+  }
+
+  if (P1_kPa<=0||T1_K<=0||Z1<=0||P2_kPa<=0||T2_K<=0||Z2<=0) { clearResults(); return; }
+
+  // ─── Core calculation: PV = ZnRT ─────────────────────────────────────────
+  // V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)
+  const V1_m3h    = volume * fromDef.factor;
+  const V2_m3h    = V1_m3h * (P1_kPa / P2_kPa) * (T2_K / T1_K) * (Z2 / Z1);
+  const outputVol = V2_m3h / toDef.factor;
+
+  // ─── Warnings ────────────────────────────────────────────────────────────
+  const warnings = [];
+  if (fromDef.isActual && Math.abs(P1_kPa-ATM_KPA)<0.1 && Math.abs(T1_K-T_STANDARD_K)<1)
+    warnings.push('Source is actual-condition unit but P/T appear to be at reference conditions — confirm operating conditions are intended.');
+  if (toDef.isActual && Math.abs(P2_kPa-ATM_KPA)<0.1 && Math.abs(T2_K-T_STANDARD_K)<1)
+    warnings.push('Target is actual-condition unit but P/T appear to be at reference conditions — confirm target operating conditions are intended.');
+  if (Z1<0.5) warnings.push('Source Z-factor < 0.5 is unusually low — verify with EOS or property simulator.');
+  else if (Z1<0.8) warnings.push('Source Z-factor < 0.8 — significant real-gas departure; ensure Z is from a validated EOS.');
+  if (Z2<0.5) warnings.push('Target Z-factor < 0.5 is unusually low — verify with EOS or property simulator.');
+  else if (Z2<0.8) warnings.push('Target Z-factor < 0.8 — significant real-gas departure; ensure Z is from a validated EOS.');
+  if (Z1>1.2) warnings.push('Source Z-factor > 1.2 is unusually high — verify with equation of state.');
+  if (Z2>1.2) warnings.push('Target Z-factor > 1.2 is unusually high — verify with equation of state.');
+  if (T1_K<200) warnings.push('Source temperature below −73 °C — verify cryogenic conditions are intended.');
+  if (T2_K<200) warnings.push('Target temperature below −73 °C — verify cryogenic conditions are intended.');
+  const pRatio = Math.max(P1_kPa,P2_kPa)/Math.min(P1_kPa,P2_kPa);
+  if (pRatio>100) warnings.push(`High pressure ratio (${pRatio.toFixed(1)}×) — large volume change; Z-factor accuracy is critical.`);
+  else if (pRatio>20) warnings.push(`Significant pressure ratio (${pRatio.toFixed(1)}×) — verify Z-factors are appropriate for each condition independently.`);
+  if (P1_kPa>7000||P2_kPa>7000) warnings.push('Pressure exceeds 70 bar(a) — gas may be near-critical or supercritical. Rigorous EOS (PR, SRK) Z-factor strongly recommended.');
+
+  // ─── All-units table (Option A from portfolio-v1) ─────────────────────────
+  // Fixed-ref units: always shown, computed at their immutable ref conditions
+  // Actual-cond units: shown ONLY if selected as target unit
+  const allUnits = [];
+  for (const [key, def] of Object.entries(FLOW_UNITS)) {
+    if (def.isActual) {
+      if (key !== toKey) continue;
+      const v_m3h = V1_m3h * (P1_kPa/P2_kPa) * (T2_K/T1_K) * (Z2/Z1);
+      allUnits.push({ key, def, value: v_m3h/def.factor, isFixed:false,
+        note:`@ ${fmtNum(P2_kPa/100,3)} bara, ${(T2_K-273.15).toFixed(1)} °C, Z=${Z2}` });
+    } else {
+      const tP=def.refP, tT=def.refT, tZ=def.refZ;
+      const v_m3h = V1_m3h * (P1_kPa/tP) * (tT/T1_K) * (tZ/Z1);
+      allUnits.push({ key, def, value: v_m3h/def.factor, isFixed:true, note:'' });
+    }
+  }
+
+  // ─── Build trace steps ───────────────────────────────────────────────────
+  const trace = [];
+  trace.push(`Gas Law: V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)  [Real gas: PV = ZnRT]`);
+  trace.push(`─────────────────────────────────────────────────`);
+  trace.push(`V1 = ${fmtNum(volume)} ${fromKey}`);
+  if (fromDef.factor!==1) trace.push(`V1 (m³/h) = ${fmtNum(volume)} × ${fromDef.factor} = ${fmtNum(V1_m3h)}`);
+  else trace.push(`V1 (m³/h) = ${fmtNum(V1_m3h)}`);
+  trace.push(`─────────────────────────────────────────────────`);
+  const srcBasis = fromDef.isActual ? 'user-supplied operating conditions' : `fixed ref: ${fromDef.refDesc}`;
+  const tgtBasis = toDef.isActual   ? 'user-supplied operating conditions' : `fixed ref: ${toDef.refDesc}`;
+  trace.push(`P1 = ${fmtNum(P1_kPa,3)} kPa abs  (${srcBasis})`);
+  trace.push(`T1 = ${fmtNum(T1_K,3)} K  (${(T1_K-273.15).toFixed(2)} °C)`);
+  trace.push(`Z1 = ${Z1} (user-supplied)`);
+  trace.push(`P2 = ${fmtNum(P2_kPa,3)} kPa abs  (${tgtBasis})`);
+  trace.push(`T2 = ${fmtNum(T2_K,3)} K  (${(T2_K-273.15).toFixed(2)} °C)`);
+  trace.push(`Z2 = ${Z2} (user-supplied)`);
+  trace.push(`─────────────────────────────────────────────────`);
+  trace.push(`V2 = ${fmtNum(V1_m3h)} × (${fmtNum(P1_kPa,3)}/${fmtNum(P2_kPa,3)}) × (${fmtNum(T2_K,3)}/${fmtNum(T1_K,3)}) × (${Z2}/${Z1})`);
+  trace.push(`V2 (m³/h) = ${fmtNum(V2_m3h)}`);
+  if (toDef.factor!==1) trace.push(`V2 (${toKey}) = ${fmtNum(V2_m3h)} / ${toDef.factor} = ${fmtNum(outputVol)}`);
+  trace.push(`Result: ${fmtNum(outputVol)} ${toKey}`);
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+  document.getElementById('bigVal').textContent = fmtNum(outputVol, 4);
+  document.getElementById('bigUnit').textContent = toDef.label;
+  document.getElementById('bigEq').textContent =
+    `${fmtNum(volume)} ${fromKey}  →  ${fmtNum(outputVol)} ${toKey}`;
+
+  const wBox = document.getElementById('warningsBox');
+  if (warnings.length>0) {
+    wBox.style.display='flex';
+    document.getElementById('warningsText').innerHTML = warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
+    lucide.createIcons();
+  } else { wBox.style.display='none'; }
+
+  // All-units table
+  const tbody = document.getElementById('allUnitsTbody');
+  tbody.innerHTML = allUnits.map(r => {
+    const isTarget = r.key===toKey;
+    const dot = r.isFixed
+      ? '<span style="width:8px;height:8px;border-radius:50%;background:hsl(142,71%,50%);display:inline-block;margin-right:.4rem"></span>'
+      : '<span style="width:8px;height:8px;border-radius:50%;background:hsl(38,92%,55%);display:inline-block;margin-right:.4rem"></span>';
+    const basis = r.isFixed ? 'Fixed ref.' : 'Actual cond.';
+    return `<tr class="${isTarget?'highlight-row':''}">
+      <td>${dot}<strong>${r.key}</strong></td>
+      <td style="text-align:right" class="value-cell">${fmtNum(r.value,4)}</td>
+      <td>${basis}</td>
+      <td style="font-size:.62rem;color:var(--muted)">${r.note || r.def.refDesc}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('traceBox').textContent = trace.join('\n');
+}
+
+function clearResults() {
+  document.getElementById('bigVal').textContent = '—';
+  document.getElementById('bigUnit').textContent = '';
+  document.getElementById('bigEq').textContent = 'Enter source flow rate to calculate.';
+  document.getElementById('allUnitsTbody').innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1.25rem;color:var(--muted);font-size:.75rem">Enter source flow rate to calculate.</td></tr>';
+  document.getElementById('traceBox').textContent = '—';
+  document.getElementById('warningsBox').style.display='none';
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────
+document.getElementById('year').textContent = new Date().getFullYear();
+onFromUnitChange();
+onToUnitChange();
+calculate();
+lucide.createIcons();
+</script>
+</body>
+</html>
