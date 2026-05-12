@@ -324,11 +324,6 @@
         </div>
       </div>
     </div>
-
-    <div class="warn-box" style="margin-top:1.25rem">
-      <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
-      <p>Screening tool only. PR/SRK EoS uses Graboski-Daubert (1978) mixing rules. Vapor fraction uses simplified Wilson Ki; not a rigorous flash — do not use for final design. Wichert-Aziz correction NOT applied. Validate against HYSYS / UniSim for final design.</p>
-    </div>
   </div>
 
   <!-- RIGHT COLUMN: RESULTS -->
@@ -411,9 +406,6 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
-// COMPONENT DATABASE
-// MW(g/mol), Cp(kJ/kg·K @15°C,1atm), LHV(MJ/Nm³), Tc(K), Pc(bar), omega, gamma
-// ═══════════════════════════════════════════════════════════════════
 const DB = {
   'Methane':         { f:'CH₄',    MW:16.043,  Cp:2.226,  LHV:35.883, Tc:190.56, Pc:45.99, w:0.0115, g:1.307 },
   'Ethane':          { f:'C₂H₆',   MW:30.070,  Cp:1.744,  LHV:64.346, Tc:305.32, Pc:48.72, w:0.0995, g:1.187 },
@@ -440,8 +432,8 @@ const DB = {
 };
 
 const MW_AIR = 28.966;
-const R_U    = 8.31446; // kJ/(kmol·K)
-const R_J    = 8314.46; // J/(kmol·K)
+const R_U    = 8.31446;
+const R_J    = 8314.46;
 
 const COLORS = [
   'hsl(217,91%,60%)','hsl(142,71%,50%)','hsl(38,92%,55%)','hsl(271,81%,70%)',
@@ -473,7 +465,6 @@ const EOS_NOTES = {
 
 let rows = [], rowId = 0, eosMode = 'pitzer';
 
-// ─── UI helpers ─────────────────────────────────────────────────────
 function setEos(m) {
   eosMode = m;
   ['pitzer','pr','srk'].forEach(k => document.getElementById('eos'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('active', k===m));
@@ -503,7 +494,6 @@ window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
 });
 
-// ─── Rows ────────────────────────────────────────────────────────────
 function addRow(name, mol) {
   rows.push({ id: rowId++, name: name||'Methane', mol: mol!==undefined ? mol : '' });
   renderTable(); calculate();
@@ -528,7 +518,6 @@ function loadPreset(key) {
   renderTable(); calculate();
 }
 
-// ─── Render table ───────────────────────────────────────────────────
 function renderTable() {
   const names = Object.keys(DB);
   const tbody = document.getElementById('compBody');
@@ -550,7 +539,6 @@ function renderTable() {
   lucide.createIcons();
 }
 
-// ─── Unit conversions ───────────────────────────────────────────────
 function getTK() {
   const v=parseFloat(document.getElementById('inpT').value)||15;
   const u=document.getElementById('unitT').value;
@@ -569,7 +557,6 @@ function getPkPa() {
 }
 function getPbar() { return getPkPa()/100; }
 
-// ─── Z-factor (Pitzer simplified Lee-Kesler) ────────────────────────
 function pitzerZ(Tr, Pr, omega) {
   const B0 = 0.083 - 0.422/Math.pow(Tr,1.6);
   const C0 = 0.139 - 0.172/Math.pow(Tr,4.2);
@@ -581,12 +568,7 @@ function pitzerZ(Tr, Pr, omega) {
   return Math.max(0.05, Math.min(5.0, Z));
 }
 
-// ─── Cubic EoS solver (PR or SRK) ──────────────────────────────────
-// Returns: { Z_V, Z_L, fugCoeff_V, fugCoeff_L }
-// Uses van der Waals one-fluid mixing rules
 function solveCubicZ(A, B, isPR) {
-  // PR:  Z³ - (1-B)Z² + (A-3B²-2B)Z - (AB-B²-B³) = 0
-  // SRK: Z³ - Z² + (A-B-B²)Z - AB = 0
   let a2, a1, a0;
   if(isPR) {
     a2 = -(1-B);
@@ -597,13 +579,11 @@ function solveCubicZ(A, B, isPR) {
     a1 = A-B-B*B;
     a0 = -A*B;
   }
-  // Cardano / iterative
   const roots = cubicRoots(1, a2, a1, a0).filter(z=>z>B && z>0.0);
   roots.sort((a,b)=>a-b);
   return roots;
 }
 function cubicRoots(a,b,c,d) {
-  // Normalize
   b/=a; c/=a; d/=a;
   const p = c - b*b/3;
   const q = 2*b*b*b/27 - b*c/3 + d;
@@ -625,9 +605,8 @@ function cubicRoots(a,b,c,d) {
   return results;
 }
 
-// ─── PR EoS mixture properties ──────────────────────────────────────
 function prMixtureAB(fracs, T_K, P_bar) {
-  const R = 83.14462; // cm³·bar/(mol·K)
+  const R = 83.14462;
   const ai=[], bi=[];
   fracs.forEach(c => {
     const Tr = T_K/c.Tc;
@@ -670,27 +649,19 @@ function eosZ(fracs, T_K, P_bar, isPR) {
   return { roots, A, B };
 }
 
-// ─── Wilson Ki for flash ─────────────────────────────────────────────
-// Ki = (Pc_i/P) * exp(5.373*(1+wi)*(1 - Tc_i/T))
 function wilsonKi(fracs, T_K, P_bar) {
   return fracs.map(c => (c.Pc/P_bar)*Math.exp(5.373*(1+c.w)*(1-c.Tc/T_K)));
 }
 
-// ─── Rachford-Rice flash ─────────────────────────────────────────────
-// Solves: Σ zi*(Ki-1)/(1+β*(Ki-1)) = 0  for β (vapor fraction)
 function rachfordRice(zi, Ki) {
-  // Check if all vapor or all liquid
   const Kmin = Math.min(...Ki), Kmax = Math.max(...Ki);
-  if(Kmin >= 1.0) return 1.0;   // all vapor (dew point exceeded)
-  if(Kmax <= 1.0) return 0.0;   // all liquid (bubble point exceeded)
-
+  if(Kmin >= 1.0) return 1.0;
+  if(Kmax <= 1.0) return 0.0;
   const beta_min = 1/(1-Kmax)+1e-8;
   const beta_max = 1/(1-Kmin)-1e-8;
-
   function F(beta) {
     return zi.reduce((s,z,i)=>s + z*(Ki[i]-1)/(1+beta*(Ki[i]-1)), 0);
   }
-  // Bisection
   let lo = Math.max(0.0, beta_min), hi = Math.min(1.0, beta_max);
   if(lo >= hi) return F(0.5)>0 ? 1.0 : 0.0;
   for(let iter=0; iter<80; iter++) {
@@ -702,7 +673,6 @@ function rachfordRice(zi, Ki) {
   return beta;
 }
 
-// ─── Lee-Gonzalez-Eakin viscosity ───────────────────────────────────
 function lgeViscosity(T_K, rho_kgm3, MW) {
   const T_R = T_K*1.8;
   const rho_gcm3 = rho_kgm3/1000;
@@ -713,20 +683,16 @@ function lgeViscosity(T_K, rho_kgm3, MW) {
   return (isFinite(mu)&&mu>0&&mu<1)?mu:0.010;
 }
 
-// ─── Format helper ───────────────────────────────────────────────────
 function fmt(v,d) { return (v===null||v===undefined||isNaN(v)) ? '—' : v.toFixed(d); }
 
-// ─── Main calculate ──────────────────────────────────────────────────
 function calculate() {
   const active = rows.filter(r=>(parseFloat(r.mol)||0)>0);
   const total = active.reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
 
-  // Total display
   const totEl = document.getElementById('totalMol');
   totEl.value = total.toFixed(2);
   totEl.style.color = Math.abs(total-100)<0.01 ? 'var(--primary)' : 'hsl(0,72%,65%)';
 
-  // Norm bar
   const bar = document.getElementById('normBar');
   if(active.length>0) {
     bar.style.display='flex';
@@ -751,31 +717,24 @@ function calculate() {
     return;
   }
 
-  // Mole fractions
   const fracs = active.map(r=>({ ...DB[r.name]||{}, name:r.name, yi:(parseFloat(r.mol)||0)/total }));
 
-  // ─── Basic mixture props ─────────────────────────────────────────
   const MW_mix = fracs.reduce((s,c)=>s+c.yi*(c.MW||0),0);
   const Tpc = fracs.every(c=>c.Tc) ? fracs.reduce((s,c)=>s+c.yi*c.Tc,0) : null;
   const Ppc = fracs.every(c=>c.Pc) ? fracs.reduce((s,c)=>s+c.yi*c.Pc,0) : null;
   const omega_mix = fracs.every(c=>c.w!=null) ? fracs.reduce((s,c)=>s+c.yi*c.w,0) : null;
   const gamma_mix = fracs.every(c=>c.g) ? fracs.reduce((s,c)=>s+c.yi*c.g,0) : null;
-  const Cp_mix = fracs.every(c=>c.Cp) ? fracs.reduce((s,c)=>{
-    // mass-fraction weighted Cp
-    return s + (c.yi*c.MW/MW_mix)*c.Cp;
-  },0) : null;
+  const Cp_mix = fracs.every(c=>c.Cp) ? fracs.reduce((s,c)=>{ return s + (c.yi*c.MW/MW_mix)*c.Cp; },0) : null;
   const LHV_mol = fracs.reduce((s,c)=>s+c.yi*(c.LHV||0),0);
   const LHV_mass = MW_mix>0 ? LHV_mol/MW_mix*1000 : null;
   const SG = MW_mix/MW_AIR;
   const Wobbe = SG>0 ? LHV_mol/Math.sqrt(SG) : null;
 
-  // ─── Conditions ──────────────────────────────────────────────────
   const T_K = getTK();
   const P_kPa = getPkPa();
   const P_bar = P_kPa/100;
   const P_Pa = P_kPa*1000;
 
-  // ─── Z-factor & density ──────────────────────────────────────────
   let Z=1, trace=[];
   const flags=[], warnings=[];
   let Tr=null, Pr=null;
@@ -809,17 +768,14 @@ function calculate() {
   trace.push(`ρ = P·MW/(Z·R·T) = ${rho.toFixed(4)} kg/m³`);
   trace.push(`ρ_N = ${rho_N.toFixed(4)} kg/Nm³`);
 
-  // ─── Viscosity (Lee-Gonzalez-Eakin) ──────────────────────────────
   const visc = lgeViscosity(T_K, rho, MW_mix);
   trace.push(`μ (Lee-Gonzalez-Eakin) = ${visc.toFixed(4)} cP`);
 
-  // ─── Speed of sound & JT ─────────────────────────────────────────
   let sos=null, JT=null;
   if(gamma_mix!=null&&gamma_mix>1) {
-    const Rsp = R_U/MW_mix*1000; // J/(kg·K)
+    const Rsp = R_U/MW_mix*1000;
     sos = Math.sqrt(gamma_mix*Z*Rsp*T_K);
     trace.push(`a = √(γ·Z·R·T/MW) = ${sos.toFixed(2)} m/s`);
-    // JT simplified virial
     if(Tpc&&Ppc) {
       const Tr_v = T_K/Tpc, Pr_v = P_bar/Ppc;
       const B0 = 0.083-0.422/Math.pow(Tr_v,1.6);
@@ -831,7 +787,6 @@ function calculate() {
     }
   }
 
-  // ─── Flags (composition) ─────────────────────────────────────────
   const h2s = fracs.find(c=>c.name==='Hydrogen Sulfide');
   const co2 = fracs.find(c=>c.name==='Carbon Dioxide');
   if(h2s&&h2s.yi>0.0001){flags.push('SOUR GAS');warnings.push(`H₂S = ${(h2s.yi*100).toFixed(2)} mol%. Apply Wichert-Aziz correction for Tc_pc/Pc_pc if H₂S > 4 mol%.`);}
@@ -839,7 +794,6 @@ function calculate() {
   if(MW_mix<2){flags.push('LOW MW');warnings.push('MW < 2 — verify component data.');}
   if(MW_mix>100){flags.push('HIGH MW');warnings.push('MW > 100 — unusually heavy for a gas stream.');}
 
-  // ─── Vapor fraction (Rachford-Rice with Wilson Ki) ────────────────
   let vf=null, phaseLabel='', phaseClass='phase-vapor', vfWarnings=[];
   if(fracs.every(c=>c.Tc&&c.Pc&&c.w!=null)) {
     const Ki = wilsonKi(fracs, T_K, P_bar);
@@ -850,7 +804,6 @@ function calculate() {
     if(vf>=0.9999){phaseLabel='All Vapor';phaseClass='phase-vapor';}
     else if(vf<=0.0001){phaseLabel='All Liquid';phaseClass='phase-liquid';vfWarnings.push('Mixture is fully liquid at these conditions — all EoS gas-phase properties above are for the vapor phase only.');}
     else{phaseLabel='Two-Phase';phaseClass='phase-two';flags.push('TWO-PHASE');vfWarnings.push(`Two-phase region detected. Vapor fraction β = ${(vf*100).toFixed(1)} mol%. Gas-phase properties above apply to vapor portion only.`);}
-    // Supercritical check
     if(Tpc&&Ppc&&T_K>Tpc&&P_bar>Ppc){
       phaseLabel='Supercritical';phaseClass='phase-super';
       flags.push('SUPERCRITICAL');vfWarnings.push('T > Tpc and P > Ppc — supercritical region. Single phase but dense fluid; EoS Z applies.');
@@ -859,7 +812,6 @@ function calculate() {
   }
   warnings.push(...vfWarnings);
 
-  // ─── Display results ──────────────────────────────────────────────
   set('resMW',   fmt(MW_mix,3));
   set('resSG',   fmt(SG,4));
   set('resDens', fmt(rho,3));
@@ -878,22 +830,18 @@ function calculate() {
   set('resLHVmass',LHV_mass!=null?fmt(LHV_mass,2):'—');
   set('resWobbe',Wobbe!=null?fmt(Wobbe,3):'—');
 
-  // Flags
   const flagsRow = document.getElementById('flagsRow');
   const flagClasses = {'SOUR GAS':'flag-sour','TWO-PHASE':'flag-warn','NEAR_CRITICAL':'flag-warn','HIGH_Pr':'flag-warn','SUPERCRITICAL':'flag-info','INVERSION':'flag-warn','HIGH MW':'flag-warn','LOW MW':'flag-warn','HIGH CO₂':'flag-warn'};
   flagsRow.innerHTML = flags.map(f=>`<span class="flag-pill ${flagClasses[f]||'flag-info'}">${f}</span>`).join('');
 
-  // Warnings
   if(warnings.length>0) {
     document.getElementById('warningsBox').style.display='flex';
     document.getElementById('warningsText').innerHTML = warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
     lucide.createIcons();
   } else { document.getElementById('warningsBox').style.display='none'; }
 
-  // Trace
   document.getElementById('traceBox').textContent = trace.join('\n');
 
-  // Phase panel
   const pp = document.getElementById('phasePanel');
   if(phaseLabel) {
     const vfPct = vf!=null ? (vf*100).toFixed(2) : null;
@@ -930,7 +878,6 @@ function calculate() {
     pp.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Vapor fraction requires Tc, Pc and ω for all components. Check composition contains only listed components.</div>';
   }
 
-  // Composition bars
   const barsEl = document.getElementById('compBars');
   barsEl.innerHTML = fracs.map((c,i)=>`
     <div class="comp-bar-row">
@@ -942,7 +889,6 @@ function calculate() {
 
 function set(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
 
-// ─── Init ────────────────────────────────────────────────────────────
 document.getElementById('year').textContent = new Date().getFullYear();
 loadPreset('lean');
 lucide.createIcons();
