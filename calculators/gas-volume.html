@@ -18,7 +18,6 @@
     body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
     a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
     ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-    /* ── NAVBAR ── */
     #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -35,7 +34,6 @@
     .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
     .mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
     .mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
-    /* ── PAGE HEADER ── */
     .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
     .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
     .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
@@ -44,7 +42,6 @@
     .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
     .page-desc{color:var(--muted);font-size:.8rem;max-width:40rem;line-height:1.6}
     .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
-    /* ── LAYOUT ── */
     .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
     @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 420px;align-items:start}}
     .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
@@ -52,7 +49,6 @@
     .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
     .card-title{font-size:.8rem;font-weight:600}
     .card-body{padding:1.25rem}
-    /* ── FORM ── */
     .field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem;font-weight:500}
     .field-note{font-size:.62rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
     input[type=number],select{font-family:var(--font);padding:.45rem .65rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);outline:none;transition:border-color .15s;width:100%}
@@ -65,7 +61,6 @@
     .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
     @media(max-width:600px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
     .section-sep{height:1px;background:var(--border);margin:1rem 0}
-    /* ── UNIT SECTION ── */
     .unit-section{padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--secondary-bg)}
     .unit-section-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
     .conditions-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-top:.6rem}
@@ -74,14 +69,12 @@
     .ref-badge{display:inline-flex;align-items:center;padding:.2rem .55rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid;margin-left:.5rem}
     .ref-fixed{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
     .ref-actual{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
-    /* ── BUTTONS ── */
     .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.5rem 1.1rem;border-radius:var(--radius);font-size:.78rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
     .btn-sm{padding:.3rem .7rem;font-size:.7rem}
     .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
-    /* ── RESULTS ── */
     .big-result{text-align:center;padding:1.25rem 1rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25);border-radius:var(--radius);margin-bottom:.75rem}
     .big-result-label{font-size:.68rem;color:var(--muted);margin-bottom:.3rem}
     .big-result-eq{font-size:.72rem;color:var(--muted);margin-top:.25rem}
@@ -97,29 +90,23 @@
     tbody tr:hover td{background:var(--secondary-bg)}
     .value-cell{font-weight:600;color:var(--foreground)}
     .highlight-row .value-cell{color:var(--primary)}
-    /* ── TRACE ── */
     .trace-box{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;font-size:.68rem;color:var(--muted);font-family:'Courier New',monospace;line-height:2;max-height:260px;overflow-y:auto}
-    /* ── WARNINGS ── */
     .warn-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
     .warn-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
-    /* ── INFO BOX ── */
     .info-box{display:flex;align-items:flex-start;gap:.6rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
     .info-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
-    /* ── FOOTER ── */
     footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
     .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
     .footer-links{display:flex;align-items:center;gap:.75rem}
     .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
     .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
     .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
-    /* ── SWAP ARROW ── */
     .swap-btn{display:flex;align-items:center;justify-content:center;gap:.35rem;padding:.45rem .9rem;font-size:.72rem;color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);background:none;cursor:pointer;transition:all .15s;margin:0 auto}
     .swap-btn:hover{background:var(--secondary-bg);color:var(--foreground)}
   </style>
 </head>
 <body>
 
-<!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════════ -->
 <header id="navbar">
   <div class="navbar-inner">
     <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
@@ -149,7 +136,6 @@
   </div>
 </header>
 
-<!-- ═══ PAGE HEADER ══════════════════════════════════════════════════════════ -->
 <div class="page-header">
   <div class="page-header-inner">
     <div>
@@ -173,13 +159,12 @@
   </div>
 </div>
 
-<!-- ═══ MAIN CONTENT ════════════════════════════════════════════════════════ -->
 <div class="calc-layout">
 
-  <!-- ── LEFT: INPUT ── -->
+  <!-- LEFT: INPUT -->
   <div>
 
-    <!-- SOURCE unit + value -->
+    <!-- SOURCE -->
     <div class="card">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="arrow-right-to-line" style="width:15px;height:15px"></i></div>
@@ -207,7 +192,6 @@
           </div>
         </div>
 
-        <!-- Source conditions (shown only for actual units) -->
         <div id="fromCondPanel" style="display:none;margin-top:.75rem">
           <div class="unit-section">
             <div class="unit-section-title"><i data-lucide="settings-2" style="width:13px;height:13px"></i>Source Operating Conditions</div>
@@ -248,7 +232,6 @@
           </div>
         </div>
 
-        <!-- Fixed reference note (shown for non-actual units) -->
         <div id="fromRefPanel" style="margin-top:.75rem">
           <div class="info-box">
             <i data-lucide="info" style="width:14px;height:14px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
@@ -266,7 +249,7 @@
       </button>
     </div>
 
-    <!-- TARGET unit -->
+    <!-- TARGET -->
     <div class="card" style="margin-top:.25rem">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="arrow-right-from-line" style="width:15px;height:15px"></i></div>
@@ -287,7 +270,6 @@
           </select>
         </div>
 
-        <!-- Target conditions (shown only for actual units) -->
         <div id="toCondPanel" style="margin-top:.75rem">
           <div class="unit-section">
             <div class="unit-section-title"><i data-lucide="settings-2" style="width:13px;height:13px"></i>Target Operating Conditions</div>
@@ -328,7 +310,6 @@
           </div>
         </div>
 
-        <!-- Fixed reference note (shown for non-actual units) -->
         <div id="toRefPanel" style="display:none;margin-top:.75rem">
           <div class="info-box">
             <i data-lucide="info" style="width:14px;height:14px;color:var(--primary);flex-shrink:0;margin-top:2px"></i>
@@ -338,17 +319,11 @@
       </div>
     </div>
 
-    <!-- DISCLAIMER -->
-    <div class="warn-box" style="margin-top:1.25rem">
-      <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
-      <p>Z-factors are user-supplied and not calculated internally. Use PR/SRK EoS or a validated correlation (Papay, Hall-Yarborough, Dranchuk-Abou-Kassem) for high-pressure streams. Actual-condition units (Am³/h, Am³/s, ACFM) require explicit operating P, T and Z — no surrogate basis is assumed for the all-units table.</p>
-    </div>
   </div>
 
-  <!-- ── RIGHT: RESULTS ── -->
+  <!-- RIGHT: RESULTS -->
   <div>
 
-    <!-- PRIMARY RESULT -->
     <div class="card">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="zap" style="width:15px;height:15px"></i></div>
@@ -360,7 +335,6 @@
           <div><span class="big-val" id="bigVal">—</span><span class="big-unit" id="bigUnit"></span></div>
           <div class="big-result-eq" id="bigEq">Enter source flow rate to calculate.</div>
         </div>
-
         <div id="warningsBox" style="display:none" class="warn-box">
           <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
           <p id="warningsText"></p>
@@ -368,7 +342,6 @@
       </div>
     </div>
 
-    <!-- ALL-UNITS TABLE -->
     <div class="card" style="margin-top:1.25rem">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="table-2" style="width:15px;height:15px"></i></div>
@@ -397,7 +370,6 @@
       </div>
     </div>
 
-    <!-- CALC TRACE -->
     <div class="card" style="margin-top:1.25rem">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="file-code" style="width:15px;height:15px"></i></div>
@@ -411,7 +383,6 @@
       </div>
     </div>
 
-    <!-- REFERENCE TABLE -->
     <div class="card" style="margin-top:1.25rem">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="book-open" style="width:15px;height:15px"></i></div>
@@ -443,7 +414,6 @@
 
 </div>
 
-<!-- ═══ FOOTER ══════════════════════════════════════════════════════════════ -->
 <footer>
   <div class="footer-inner">
     <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
@@ -459,29 +429,22 @@
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════════════════════
-// CONSTANTS — exact match with portfolio-v1 gasVolume.ts
-// ═══════════════════════════════════════════════════════════════════════════
 const ATM_KPA      = 101.325;
-const T_NORMAL_K   = 273.15;   // 0 °C  — ISO 13443 Normal
-const T_STANDARD_K = 288.15;   // 15 °C — ISO 13443 Standard
-const T_60F_K      = 288.706;  // 60 °F — GPA 2172 / US standard
+const T_NORMAL_K   = 273.15;
+const T_STANDARD_K = 288.15;
+const T_60F_K      = 288.706;
 const FT3_TO_M3    = 0.028316846592;
 
-// FLOW_UNITS[key] = { label, factor (→ m³/h), refP_kPa, refT_K, refZ, isActual }
 const FLOW_UNITS = {
-  'Nm3/h':  { label:'Nm³/h',  factor:1,                      refP:ATM_KPA, refT:T_NORMAL_K,   refZ:1.0, isActual:false, refDesc:'0 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
-  'Sm3/h':  { label:'Sm³/h',  factor:1,                      refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:false, refDesc:'15 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
-  'Am3/h':  { label:'Am³/h',  factor:1,                      refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
-  'Am3/s':  { label:'Am³/s',  factor:3600,                   refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
-  'SCFM':   { label:'SCFM',   factor:FT3_TO_M3*60,           refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
-  'MMSCFD': { label:'MMSCFD', factor:1e6*FT3_TO_M3/24,       refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
-  'ACFM':   { label:'ACFM',   factor:FT3_TO_M3*60,           refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+  'Nm3/h':  { label:'Nm³/h',  factor:1,                refP:ATM_KPA, refT:T_NORMAL_K,   refZ:1.0, isActual:false, refDesc:'0 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
+  'Sm3/h':  { label:'Sm³/h',  factor:1,                refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:false, refDesc:'15 °C, 101.325 kPa abs, Z=1.000 (ISO 13443)' },
+  'Am3/h':  { label:'Am³/h',  factor:1,                refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+  'Am3/s':  { label:'Am³/s',  factor:3600,             refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
+  'SCFM':   { label:'SCFM',   factor:FT3_TO_M3*60,     refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
+  'MMSCFD': { label:'MMSCFD', factor:1e6*FT3_TO_M3/24, refP:ATM_KPA, refT:T_60F_K,      refZ:1.0, isActual:false, refDesc:'60 °F, 14.696 psia, Z=1.000 (GPA 2172)' },
+  'ACFM':   { label:'ACFM',   factor:FT3_TO_M3*60,     refP:ATM_KPA, refT:T_STANDARD_K, refZ:1.0, isActual:true,  refDesc:'User-supplied operating conditions' },
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
 function fmtNum(n, d=4) {
   if (!isFinite(n)) return '—';
   if (Math.abs(n) >= 1e6) return n.toExponential(3);
@@ -502,7 +465,7 @@ function toKPa(val, unit) {
 function toKelvin(val, unit) {
   if (unit==='K') return val;
   if (unit==='F') return (val-32)*5/9+273.15;
-  return val+273.15; // °C
+  return val+273.15;
 }
 function toggleTheme() {
   const t = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
@@ -524,9 +487,6 @@ function toggleTrace() {
 }
 window.addEventListener('scroll', ()=>{ document.getElementById('navbar').classList.toggle('scrolled', window.scrollY>10); });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// UI: show/hide condition panels based on unit selection
-// ═══════════════════════════════════════════════════════════════════════════
 function onFromUnitChange() {
   const u = document.getElementById('fromUnit').value;
   const def = FLOW_UNITS[u];
@@ -554,7 +514,6 @@ function onToUnitChange() {
 function swapUnits() {
   const fu = document.getElementById('fromUnit'), tu = document.getElementById('toUnit');
   const tmp = fu.value; fu.value = tu.value; tu.value = tmp;
-  // swap conditions
   ['P','T','Z'].forEach(f => {
     const a = document.getElementById('from'+f), b = document.getElementById('to'+f);
     if(a&&b){ const v=a.value; a.value=b.value; b.value=v; }
@@ -566,9 +525,6 @@ function swapUnits() {
   onFromUnitChange(); onToUnitChange();
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// MAIN CALCULATE — exact port of gasVolume.ts logic
-// ═══════════════════════════════════════════════════════════════════════════
 function calculate() {
   const volume = parseFloat(document.getElementById('inpVolume').value);
   const fromKey = document.getElementById('fromUnit').value;
@@ -576,7 +532,6 @@ function calculate() {
   const fromDef = FLOW_UNITS[fromKey];
   const toDef   = FLOW_UNITS[toKey];
 
-  // Validation
   const errEl = document.getElementById('errVolume');
   if (!isFinite(volume) || volume <= 0) {
     errEl.style.display='block';
@@ -584,7 +539,6 @@ function calculate() {
   }
   errEl.style.display='none';
 
-  // Source P, T, Z
   let P1_kPa, T1_K, Z1;
   if (fromDef.isActual) {
     P1_kPa = toKPa(parseFloat(document.getElementById('fromP').value)||0, document.getElementById('fromPUnit').value);
@@ -596,7 +550,6 @@ function calculate() {
     Z1     = fromDef.refZ;
   }
 
-  // Target P, T, Z
   let P2_kPa, T2_K, Z2;
   if (toDef.isActual) {
     P2_kPa = toKPa(parseFloat(document.getElementById('toP').value)||0, document.getElementById('toPUnit').value);
@@ -610,13 +563,10 @@ function calculate() {
 
   if (P1_kPa<=0||T1_K<=0||Z1<=0||P2_kPa<=0||T2_K<=0||Z2<=0) { clearResults(); return; }
 
-  // ─── Core calculation: PV = ZnRT ─────────────────────────────────────────
-  // V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)
   const V1_m3h    = volume * fromDef.factor;
   const V2_m3h    = V1_m3h * (P1_kPa / P2_kPa) * (T2_K / T1_K) * (Z2 / Z1);
   const outputVol = V2_m3h / toDef.factor;
 
-  // ─── Warnings ────────────────────────────────────────────────────────────
   const warnings = [];
   if (fromDef.isActual && Math.abs(P1_kPa-ATM_KPA)<0.1 && Math.abs(T1_K-T_STANDARD_K)<1)
     warnings.push('Source is actual-condition unit but P/T appear to be at reference conditions — confirm operating conditions are intended.');
@@ -635,9 +585,6 @@ function calculate() {
   else if (pRatio>20) warnings.push(`Significant pressure ratio (${pRatio.toFixed(1)}×) — verify Z-factors are appropriate for each condition independently.`);
   if (P1_kPa>7000||P2_kPa>7000) warnings.push('Pressure exceeds 70 bar(a) — gas may be near-critical or supercritical. Rigorous EOS (PR, SRK) Z-factor strongly recommended.');
 
-  // ─── All-units table (Option A from portfolio-v1) ─────────────────────────
-  // Fixed-ref units: always shown, computed at their immutable ref conditions
-  // Actual-cond units: shown ONLY if selected as target unit
   const allUnits = [];
   for (const [key, def] of Object.entries(FLOW_UNITS)) {
     if (def.isActual) {
@@ -652,7 +599,6 @@ function calculate() {
     }
   }
 
-  // ─── Build trace steps ───────────────────────────────────────────────────
   const trace = [];
   trace.push(`Gas Law: V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)  [Real gas: PV = ZnRT]`);
   trace.push(`─────────────────────────────────────────────────`);
@@ -674,7 +620,6 @@ function calculate() {
   if (toDef.factor!==1) trace.push(`V2 (${toKey}) = ${fmtNum(V2_m3h)} / ${toDef.factor} = ${fmtNum(outputVol)}`);
   trace.push(`Result: ${fmtNum(outputVol)} ${toKey}`);
 
-  // ─── Render ───────────────────────────────────────────────────────────────
   document.getElementById('bigVal').textContent = fmtNum(outputVol, 4);
   document.getElementById('bigUnit').textContent = toDef.label;
   document.getElementById('bigEq').textContent =
@@ -687,7 +632,6 @@ function calculate() {
     lucide.createIcons();
   } else { wBox.style.display='none'; }
 
-  // All-units table
   const tbody = document.getElementById('allUnitsTbody');
   tbody.innerHTML = allUnits.map(r => {
     const isTarget = r.key===toKey;
@@ -715,7 +659,6 @@ function clearResults() {
   document.getElementById('warningsBox').style.display='none';
 }
 
-// ─── Init ──────────────────────────────────────────────────────────────────
 document.getElementById('year').textContent = new Date().getFullYear();
 onFromUnitChange();
 onToUnitChange();
