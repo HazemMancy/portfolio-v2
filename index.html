@@ -30,6 +30,7 @@
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
     .btn-ghost{background:transparent;color:var(--foreground)} .btn-ghost:hover{background:var(--secondary-bg)}
+    /* NAVBAR */
     #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -45,10 +46,12 @@
     .mobile-controls{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mobile-controls{display:none}}
     .mobile-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
     .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
-    .mobile-menu button,.mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
-    .mobile-menu button:hover,.mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mobile-menu a:hover,.mobile-menu button:hover{background:var(--secondary-bg);color:var(--foreground)}
     .mobile-menu .calc-link{display:flex;align-items:center;gap:.4rem;color:var(--primary);font-weight:500;margin-top:.5rem}
-    section[id]{scroll-margin-top:var(--navbar-h)}
+    /* SECTION SCROLL OFFSET — accounts for sticky navbar */
+    section[id]{scroll-margin-top:calc(var(--navbar-h) + 8px)}
+    /* SECTIONS */
     #home{position:relative;min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1rem;overflow:hidden}
     .hero-glow{position:absolute;inset:0;background:var(--hero-glow);pointer-events:none}
     .hero-radial{position:absolute;inset:0;background:radial-gradient(circle 500px at 50% 50%,hsl(222 41% 14%/.8),transparent);pointer-events:none}
@@ -107,14 +110,14 @@
 <body>
 <header id="navbar">
   <div class="navbar-inner">
-    <a href="/" class="logo"><span class="text-primary">H</span><span>E</span></a>
+    <a href="#home" class="logo"><span class="text-primary">H</span><span>E</span></a>
     <nav class="desktop">
-      <button class="nav-link" onclick="scrollToSection('home')">HOME</button>
-      <button class="nav-link" onclick="scrollToSection('about')">ABOUT</button>
-      <button class="nav-link" onclick="scrollToSection('experience')">EXPERIENCE</button>
-      <button class="nav-link" onclick="scrollToSection('projects')">PROJECTS</button>
-      <button class="nav-link" onclick="scrollToSection('skills')">SKILLS</button>
-      <button class="nav-link" onclick="scrollToSection('contact')">CONTACT</button>
+      <a href="#home"   class="nav-link">HOME</a>
+      <a href="#about"  class="nav-link">ABOUT</a>
+      <a href="#experience" class="nav-link">EXPERIENCE</a>
+      <a href="#projects"   class="nav-link">PROJECTS</a>
+      <a href="#skills"     class="nav-link">SKILLS</a>
+      <a href="#contact"    class="nav-link">CONTACT</a>
       <a href="calculators/index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
       <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:16px;height:16px"></i></button>
     </nav>
@@ -124,13 +127,13 @@
     </div>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <button onclick="scrollToSection('home');toggleMenu()">HOME</button>
-    <button onclick="scrollToSection('about');toggleMenu()">ABOUT</button>
-    <button onclick="scrollToSection('experience');toggleMenu()">EXPERIENCE</button>
-    <button onclick="scrollToSection('projects');toggleMenu()">PROJECTS</button>
-    <button onclick="scrollToSection('skills');toggleMenu()">SKILLS</button>
-    <button onclick="scrollToSection('contact');toggleMenu()">CONTACT</button>
-    <a href="calculators/index.html" class="calc-link" onclick="toggleMenu()"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+    <a href="#home"       onclick="closeMenu()">HOME</a>
+    <a href="#about"      onclick="closeMenu()">ABOUT</a>
+    <a href="#experience" onclick="closeMenu()">EXPERIENCE</a>
+    <a href="#projects"   onclick="closeMenu()">PROJECTS</a>
+    <a href="#skills"     onclick="closeMenu()">SKILLS</a>
+    <a href="#contact"    onclick="closeMenu()">CONTACT</a>
+    <a href="calculators/index.html" class="calc-link"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
   </div>
 </header>
 <main>
@@ -142,12 +145,13 @@
     <p class="hero-sub">Transforming complex petroleum processes into <strong style="color:var(--foreground)">efficient engineering solutions</strong></p>
     <div class="hero-location"><i data-lucide="map-pin" style="width:14px;height:14px;color:var(--primary)"></i><span>Cairo, Egypt</span><span style="color:var(--border)">|</span><span>Process Engineer</span></div>
     <div class="hero-actions">
-      <button class="btn btn-primary" onclick="scrollToSection('projects')">View My Projects</button>
-      <button class="btn btn-outline" onclick="scrollToSection('contact')">Contact Me</button>
+      <a href="#projects" class="btn btn-primary">View My Projects</a>
+      <a href="#contact"  class="btn btn-outline">Contact Me</a>
     </div>
   </div>
-  <button class="scroll-hint" onclick="scrollToSection('about')"><span>Scroll</span><i data-lucide="chevron-down" class="bounce" style="width:16px;height:16px"></i></button>
+  <a href="#about" class="scroll-hint"><span>Scroll</span><i data-lucide="chevron-down" class="bounce" style="width:16px;height:16px"></i></a>
 </section>
+
 <section id="about" class="section">
   <div class="container-md">
     <div class="section-header"><p class="section-label mb-3">ABOUT ME</p><h2 class="section-title">Professional Summary</h2></div>
@@ -178,6 +182,7 @@
     </div>
   </div>
 </section>
+
 <section id="experience" class="section">
   <div class="container-md">
     <div class="section-header"><p class="section-label mb-3">CAREER</p><h2 class="section-title">Professional Experience</h2></div>
@@ -209,12 +214,14 @@
     </div>
   </div>
 </section>
+
 <section id="projects" class="section">
   <div class="container">
     <div class="section-header"><p class="section-label mb-3">PORTFOLIO</p><h2 class="section-title mb-2">Projects &amp; Achievements</h2><p class="section-desc">A showcase of petroleum engineering projects across Egypt, UAE, Iraq, Congo, and Yemen</p></div>
     <div class="projects-grid" id="projectsGrid"></div>
   </div>
 </section>
+
 <section id="skills" class="section">
   <div class="container-md">
     <div class="section-header"><p class="section-label mb-3">EXPERTISE</p><h2 class="section-title">Skills &amp; Competencies</h2></div>
@@ -222,6 +229,7 @@
     <div class="skills-grid" id="skillsGrid"></div>
   </div>
 </section>
+
 <section class="section">
   <div class="container-md">
     <div class="section-header"><p class="section-label mb-3">TOOLS</p><h2 class="section-title">Engineering Calculators</h2><p class="section-desc">42 process engineering screening tools built on industry-standard equations</p></div>
@@ -235,6 +243,7 @@
     </div>
   </div>
 </section>
+
 <section id="contact" class="section">
   <div class="container-md">
     <div class="section-header"><p class="section-label mb-3">GET IN TOUCH</p><h2 class="section-title mb-2">Contact Me</h2><p class="section-desc">Feel free to reach out for collaborations, opportunities, or just to say hello!</p></div>
@@ -262,6 +271,7 @@
   </div>
 </section>
 </main>
+
 <footer>
   <div class="footer-inner">
     <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
@@ -273,6 +283,7 @@
     <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
   </div>
 </footer>
+
 <script>
 const responsibilities = [
   'Process design and optimization for petroleum facilities',
@@ -294,20 +305,90 @@ const skillCategories = [
   { icon:'globe',    title:'Languages', tags:['Arabic (Native)','English (Full Professional)'], tagColor:'col-orange' },
 ];
 const projects = [
-  { category:'FEED - International', catClass:'col-red', client:'Eni Congo', location:'Congo', title:'Nené WHP3 & AEP Platforms Revamping', desc:'FEED process deliverables for brownfield offshore platforms revamp covering flare/vent system upgrade, power generation, utilities, and safety systems. Issued BOD, P&ID updates, and provided support to HAZID/HAZOP studies.', tags:['BOD','P&ID','Flare/Vent System','HAZID/HAZOP'], extra:2 },
-  { category:'FEED', catClass:'col-red', client:'PhPC', location:'Port Said, Egypt', title:"Atoll Crossover for Pressurizing Ha'py Subsea Pipeline", desc:"Pressurization study of the 30\" Ha'py subsea pipeline using Atoll gas via 10\" crossover. Developed Pressurization Philosophy and Design Basis, including MDMT assessment, AIV/FIV screening, P&IDs, and transient hydraulic simulation.", tags:['BOD','Hydraulic Calculations','AIV/FIV Analysis','P&ID'], extra:1 },
-  { category:'FEED', catClass:'col-red', client:'WASCO', location:'Damietta, Egypt', title:'North El-Basant-1 Well Tie-in to Azhar-1 Manifold', desc:'Prepared Basis of Design for tie-in of North El-Basant-1 well to Azhar-1 manifold within the WASCO production system. Covered wellhead hook-up, spill back unit, pneumatic control panel gas supply, underground pipeline, and tie-in philosophy.', tags:['BOD','Process Design','Hydraulic Design','P&ID'], extra:0 },
-  { category:'Pre-FEED', catClass:'col-orange', client:'GEMSA', location:'Gulf of Suez, Egypt', title:'Offshore Oil Processing Platform & FSO Development', desc:'Pre-FEED for a new offshore production platform with oil processing topsides and new FSO for storage and export. Scope includes preliminary sizing of separators, pumps, desalter, heater treater, tanks, chemical injection skids, and produced water treatment.', tags:['Equipment Sizing','Oil Treating','Produced Water Treatment'], extra:2 },
-  { category:'Rehabilitation', catClass:'col-green', client:'NORPETCO', location:'Egypt', title:'Abrar Station Rehabilitation', desc:'Engineering verification and process rehabilitation studies for Abrar Production Station. Developed Process Simulation Report, PFD, P&IDs, UFD, and Gap Analysis.', tags:['Aspen HYSYS','P&ID Development','PFD Design'], extra:1 },
-  { category:'Study', catClass:'col-blue', client:'PhPC', location:'Egypt', title:'KOD Level Transmitters Bottleneck Study', desc:'Engineering bottleneck assessment for Wet Flare Knock-Out Drum at West Harbor Plant. Evaluated solutions including radar transmitters and electric heating.', tags:['Troubleshooting','Engineering Assessment'], extra:2 },
-  { category:'FEED', catClass:'col-red', client:'UGDC', location:'Damietta, Egypt', title:'Propane/LPG Export/Import Facility', desc:'Developed process concept for new 14" Propane export and 12" LPG import lines. Managed Process Philosophy, Pipeline Hydraulic Calculations, P&ID, and Control Philosophy.', tags:['Pipeline Design','Hydraulic Calculations'], extra:2 },
-  { category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt', title:'West Harbor Heat Exchanger', desc:'Concept Study for Shell and Tube Heat Exchanger to optimize plant energy consumption. Issued BOD, Steady State Simulation (Aspen HYSYS & HTRI), PFD, and equipment datasheets.', tags:['Aspen HYSYS','HTRI','Heat Exchanger Design'], extra:1 },
-  { category:'Detailed Engineering', catClass:'col-purple', client:'GEMSA', location:'Suez Gulf, Egypt', title:'Fuel Gas Power Generators', desc:'Detailed Engineering for 16 Km fuel gas pipeline feeding WARDA Platform. Issued Process Design Criteria, PSV sizing, P&IDs, UFDs, and Shutdown Philosophy.', tags:['Pipeline Design','PSV Sizing','P&ID'], extra:1 },
-  { category:'FEED - International', catClass:'col-red', client:'ADNOC OFFSHORE', location:'Das Island, Abu Dhabi', title:'Produced Water Injection Facility', desc:'FEED Works for additional produced water injection facility. Responsible for BOD, PFD, P&IDs, C&E, Line List, and Equipment List.', tags:['FEED','BOD','C&E Diagram'], extra:2 },
-  { category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt', title:'Flashed Gas Compressor', desc:'Concept Study for new flashed Gas Compressor to boost gas pressure up to 90 barg. Issued BOD, PFD, P&IDs, Utilities Description, and Equipment List.', tags:['Compressor Design','High Pressure Systems'], extra:2 },
-  { category:'FEED', catClass:'col-red', client:'Indorama', location:'Ain Sokhna, Egypt', title:'Ammonia Pipeline', desc:'FEED Works for 13 KM Ammonia transportation pipeline. Issued comprehensive Process Philosophies, C&E, Line List, and Equipment List.', tags:['FEED','Pipeline Design','C&E Diagram'], extra:1 },
-  { category:'Proposal - International', catClass:'col-orange', client:'PETROMASILA', location:'Yemen', title:'Crude Topping Unit', desc:'Proposal development for 10,000 BOPD crude distillation unit. Issued PFD, UFD, Process Description Report, and Equipment List.', tags:['Distillation','PFD','UFD'], extra:1 },
-  { category:'Detailed Engineering - International', catClass:'col-purple', client:'Rumaila', location:'Iraq', title:'Crude Oil Tank', desc:'Detailed Engineering of 25,000 m³ crude oil tank at Degassing Stations. Managed P&ID, tank datasheet, storage calculations, and PVSV calculations.', tags:['Storage Tank','P&ID','PVSV'], extra:1 },
+  {
+    category:'FEED - International', catClass:'col-red', client:'Eni Congo', location:'Congo',
+    title:'Nené WHP3 & AEP Platforms Revamping',
+    desc:'Developed FEED process deliverables for brownfield offshore platforms revamp covering flare/vent system upgrade, power generation, utilities, and safety systems. Issued BOD, P&ID updates, and provided support to HAZID/HAZOP studies.',
+    tags:['BOD','P&ID','Flare/Vent System','HAZID/HAZOP'], extra:2
+  },
+  {
+    category:'FEED', catClass:'col-red', client:'PhPC', location:'Port Said, Egypt',
+    title:"Atoll Crossover for Pressurizing Ha'py Subsea Pipeline",
+    desc:"Pressurization study of the 30\" Ha'py subsea pipeline using Atoll gas via 10\" crossover. Developed Pressurization Philosophy and Design Basis, including MDMT assessment, AIV/FIV screening, P&IDs, and transient hydraulic simulation.",
+    tags:['BOD','Hydraulic Calculations','AIV/FIV Analysis','P&ID'], extra:1
+  },
+  {
+    category:'FEED', catClass:'col-red', client:'WASCO', location:'Damietta, Egypt',
+    title:'North El-Basant-1 Well Tie-in to Azhar-1 Manifold',
+    desc:'Prepared Basis of Design for tie-in of North El-Basant-1 well to Azhar-1 manifold within the WASCO production system. Covered wellhead hook-up, spill back unit, pneumatic control panel gas supply, underground pipeline, and tie-in philosophy.',
+    tags:['BOD','Process Design','Hydraulic Design','P&ID'], extra:0
+  },
+  {
+    category:'Pre-FEED', catClass:'col-orange', client:'GEMSA', location:'Gulf of Suez, Egypt',
+    title:'Offshore Oil Processing Platform & FSO Development',
+    desc:'Pre-FEED for a new offshore production platform with oil processing topsides and new FSO for storage and export. Scope includes preliminary sizing of separators, pumps, desalter, heater treater, tanks, chemical injection skids, and produced water treatment.',
+    tags:['Equipment Sizing','Oil Treating','Produced Water Treatment'], extra:2
+  },
+  {
+    category:'Rehabilitation', catClass:'col-green', client:'NORPETCO', location:'Egypt',
+    title:'Abrar Station Rehabilitation',
+    desc:'Engineering verification and process rehabilitation studies for Abrar Production Station. Developed Process Simulation Report, PFD, P&IDs, UFD, and Gap Analysis.',
+    tags:['Aspen HYSYS','P&ID Development','PFD Design'], extra:1
+  },
+  {
+    category:'Study', catClass:'col-blue', client:'PhPC', location:'Egypt',
+    title:'KOD Level Transmitters Bottleneck Study',
+    desc:'Engineering bottleneck assessment for Wet Flare Knock-Out Drum at West Harbor Plant. Evaluated solutions including radar transmitters and electric heating.',
+    tags:['Troubleshooting','Engineering Assessment'], extra:2
+  },
+  {
+    category:'FEED', catClass:'col-red', client:'UGDC', location:'Damietta, Egypt',
+    title:'Propane/LPG Export/Import Facility',
+    desc:'Developed process concept for new 14" Propane export and 12" LPG import lines. Managed Process Philosophy, Pipeline Hydraulic Calculations, P&ID, and Control Philosophy.',
+    tags:['Pipeline Design','Hydraulic Calculations'], extra:2
+  },
+  {
+    category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt',
+    title:'West Harbor Heat Exchanger',
+    desc:'Concept Study for Shell and Tube Heat Exchanger to optimize plant energy consumption. Issued BOD, Steady State Simulation (Aspen HYSYS & HTRI), PFD, and equipment datasheets.',
+    tags:['Aspen HYSYS','HTRI','Heat Exchanger Design'], extra:1
+  },
+  {
+    category:'Detailed Engineering', catClass:'col-purple', client:'GEMSA', location:'Suez Gulf, Egypt',
+    title:'Fuel Gas Power Generators',
+    desc:'Detailed Engineering for 16 Km fuel gas pipeline feeding WARDA Platform. Issued Process Design Criteria, PSV sizing, P&IDs, UFDs, and Shutdown Philosophy.',
+    tags:['Pipeline Design','PSV Sizing','P&ID'], extra:1
+  },
+  {
+    category:'FEED - International', catClass:'col-red', client:'ADNOC OFFSHORE', location:'Das Island, Abu Dhabi',
+    title:'Produced Water Injection Facility',
+    desc:'FEED Works for additional produced water injection facility. Responsible for BOD, PFD, P&IDs, C&E, Line List, and Equipment List.',
+    tags:['FEED','BOD','C&E Diagram'], extra:2
+  },
+  {
+    category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt',
+    title:'Flashed Gas Compressor',
+    desc:'Concept Study for new flashed Gas Compressor to boost gas pressure up to 90 barg. Issued BOD, PFD, P&IDs, Utilities Description, and Equipment List.',
+    tags:['Compressor Design','High Pressure Systems'], extra:2
+  },
+  {
+    category:'FEED', catClass:'col-red', client:'Indorama', location:'Ain Sokhna, Egypt',
+    title:'Ammonia Pipeline',
+    desc:'FEED Works for 13 KM Ammonia transportation pipeline. Issued comprehensive Process Philosophies, C&E, Line List, and Equipment List.',
+    tags:['FEED','Pipeline Design','C&E Diagram'], extra:1
+  },
+  {
+    category:'Proposal - International', catClass:'col-orange', client:'PETROMASILA', location:'Yemen',
+    title:'Crude Topping Unit',
+    desc:'Proposal development for 10,000 BOPD crude distillation unit. Issued PFD, UFD, Process Description Report, and Equipment List.',
+    tags:['Distillation','PFD','UFD'], extra:1
+  },
+  {
+    category:'Detailed Engineering - International', catClass:'col-purple', client:'Rumaila', location:'Iraq',
+    title:'Crude Oil Tank',
+    desc:'Detailed Engineering of 25,000 m³ crude oil tank at Degassing Stations. Managed P&ID, tank datasheet, storage calculations, and PVSV calculations.',
+    tags:['Storage Tank','P&ID','PVSV'], extra:1
+  },
 ];
 const calcPreview = [
   { cat:'Fluids', items:[
@@ -369,12 +450,11 @@ function toggleMenu() {
   const el = document.getElementById('menuIcon');
   if (el) { el.setAttribute('data-lucide', menuOpen ? 'x' : 'menu'); lucide.createIcons(); }
 }
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const navbarH = document.getElementById('navbar').offsetHeight;
-  const top = el.getBoundingClientRect().top + window.pageYOffset - navbarH;
-  window.scrollTo({ top: top, behavior: 'smooth' });
+function closeMenu() {
+  menuOpen = false;
+  document.getElementById('mobileMenu').classList.remove('open');
+  const el = document.getElementById('menuIcon');
+  if (el) { el.setAttribute('data-lucide', 'menu'); lucide.createIcons(); }
 }
 document.getElementById('year').textContent = new Date().getFullYear();
 renderResponsibilities('resp-dg');
