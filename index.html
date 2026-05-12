@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif}
+    :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
     [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--bg-card-hover:hsl(222,41%,13%);--border:hsl(222,30%,18%);--foreground:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,0.1);--secondary-bg:hsl(222,41%,16%);--hero-glow:radial-gradient(ellipse 80% 60% at 50% -10%,hsl(217 91% 60%/.18),transparent)}
     [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--bg-card-hover:hsl(0,0%,95%);--border:hsl(214,32%,88%);--foreground:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,0.08);--secondary-bg:hsl(210,40%,94%);--hero-glow:radial-gradient(ellipse 80% 60% at 50% -10%,hsl(217 91% 50%/.10),transparent)}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -30,9 +30,10 @@
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
     .btn-ghost{background:transparent;color:var(--foreground)} .btn-ghost:hover{background:var(--secondary-bg)}
-    #navbar{position:sticky;top:0;z-index:50;width:100%;transition:background .25s,border-color .25s}
+    /* NAVBAR */
+    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:3.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
     .logo{display:flex;align-items:center;flex-shrink:0} .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
     nav.desktop{display:none;align-items:center;gap:.25rem} @media(min-width:1024px){nav.desktop{display:flex}}
     .nav-link{padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s;background:none}
@@ -48,6 +49,9 @@
     .mobile-menu button,.mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
     .mobile-menu button:hover,.mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
     .mobile-menu .calc-link{display:flex;align-items:center;gap:.4rem;color:var(--primary);font-weight:500;margin-top:.5rem}
+    /* SCROLL OFFSET — prevents sticky navbar from hiding section headings */
+    section[id]{scroll-margin-top:var(--navbar-h)}
+    /* HERO */
     #home{position:relative;min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1rem;overflow:hidden}
     .hero-glow{position:absolute;inset:0;background:var(--hero-glow);pointer-events:none}
     .hero-radial{position:absolute;inset:0;background:radial-gradient(circle 500px at 50% 50%,hsl(222 41% 14%/.8),transparent);pointer-events:none}
@@ -60,6 +64,7 @@
     .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem}
     .scroll-hint{position:absolute;bottom:2rem;display:flex;flex-direction:column;align-items:center;gap:.25rem;color:var(--muted);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;background:none;border:none}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}} .bounce{animation:bounce 1.5s ease-in-out infinite}
+    /* SECTIONS */
     .section{padding:5rem 1rem} .section-header{text-align:center;margin-bottom:2.5rem}
     .section-title{font-size:clamp(1.75rem,4vw,2.5rem);font-weight:700} .section-desc{color:var(--muted);font-size:.875rem;margin-top:.5rem}
     .about-grid{display:grid;gap:1rem} @media(min-width:768px){.about-grid{grid-template-columns:repeat(3,1fr)}}
