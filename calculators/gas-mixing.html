@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gas Mixing Calculator — Hazem ElMancy</title>
+  <meta name="description" content="Gas mixture MW, density, Cp, LHV and composition calculator using mole-fraction weighted averaging." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
+    [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--bg-card-hover:hsl(222,41%,13%);--border:hsl(222,30%,18%);--foreground:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,0.1);--secondary-bg:hsl(222,41%,16%);--input-bg:hsl(222,47%,9%)}
+    [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--bg-card-hover:hsl(0,0%,95%);--border:hsl(214,32%,88%);--foreground:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,0.08);--secondary-bg:hsl(210,40%,94%);--input-bg:hsl(0,0%,100%)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+    a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    /* NAVBAR */
+    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
+    #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .logo{display:flex;align-items:center;flex-shrink:0} .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+    nav.desktop{display:none;align-items:center;gap:.25rem} @media(min-width:1024px){nav.desktop{display:flex}}
+    .nav-link{padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s;background:none}
+    .nav-link:hover{color:var(--foreground);background:var(--secondary-bg)}
+    .nav-link-calc{display:flex;align-items:center;gap:.4rem;padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
+    .theme-toggle{width:2.25rem;height:2.25rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;background:none;border:none;cursor:pointer}
+    .theme-toggle:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .desktop-th{display:none} @media(min-width:1024px){.desktop-th{display:flex}}
+    .mobile-controls{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mobile-controls{display:none}}
+    .mobile-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
+    .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
+    .mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mobile-menu a:hover,.mobile-menu button:hover{background:var(--secondary-bg);color:var(--foreground)}
+    /* PAGE HEADER */
+    .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
+    .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
+    .breadcrumb a:hover{color:var(--primary)}
+    .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.5rem}
+    .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
+    .page-desc{color:var(--muted);font-size:.8rem;max-width:36rem;line-height:1.6}
+    .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
+    /* LAYOUT */
+    .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
+    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 380px;align-items:start}}
+    /* CARD */
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+    .card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+    .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+    .card-title{font-size:.8rem;font-weight:600}
+    .card-body{padding:1.25rem}
+    /* TABLE INPUT */
+    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;font-size:.75rem}
+    thead th{padding:.5rem .6rem;text-align:left;font-size:.65rem;font-weight:600;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+    tbody td{padding:.35rem .4rem;border-bottom:1px solid hsl(222,30%,14%);vertical-align:middle}
+    [data-theme="light"] tbody td{border-bottom:1px solid hsl(214,32%,93%)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:var(--secondary-bg)}
+    .comp-name{font-size:.72rem;font-weight:500;color:var(--foreground);white-space:nowrap}
+    .comp-formula{font-size:.62rem;color:var(--muted)}
+    input[type=number]{width:100%;padding:.3rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield}
+    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input[type=number]:focus{border-color:var(--primary)}
+    input[type=number]:read-only{background:var(--secondary-bg);color:var(--muted);cursor:default}
+    .mol-input{width:72px}
+    .prop-cell{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.7rem}
+    .total-row td{background:var(--secondary-bg);font-weight:600}
+    .total-row .prop-cell{color:var(--primary)}
+    /* CONTROLS */
+    .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
+    .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .btn-danger{background:transparent;border:1px solid hsl(0,72%,40%);color:hsl(0,72%,65%)} .btn-danger:hover{background:hsl(0,72%,40%,.15)}
+    /* NORMALISE INDICATOR */
+    .norm-bar{margin-top:.75rem;padding:.5rem .75rem;border-radius:var(--radius);font-size:.72rem;display:flex;align-items:center;gap:.5rem;transition:background .2s}
+    .norm-ok{background:hsl(142,71%,45%,.08);border:1px solid hsl(142,71%,45%,.25);color:hsl(142,71%,55%)}
+    .norm-warn{background:hsl(38,92%,50%,.08);border:1px solid hsl(38,92%,50%,.3);color:hsl(38,92%,60%)}
+    .norm-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    /* RESULTS */
+    .results-grid{display:grid;gap:.6rem}
+    .res-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--secondary-bg);border-radius:var(--radius);gap:.5rem}
+    .res-label{font-size:.7rem;color:var(--muted)}
+    .res-value{font-size:.95rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .res-unit{font-size:.65rem;color:var(--muted);font-weight:400;margin-left:.25rem}
+    .res-divider{height:1px;background:var(--border);margin:.25rem 0}
+    /* COMPOSITION PIE (CSS only) */
+    .pie-section{margin-top:1rem}
+    .comp-bars{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
+    .comp-bar-row{display:flex;align-items:center;gap:.6rem}
+    .comp-bar-label{font-size:.65rem;color:var(--muted);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .comp-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .comp-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+    .comp-bar-pct{font-size:.65rem;color:var(--muted);width:36px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+    /* DISCLAIMER */
+    .disclaimer{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:1.25rem}
+    .disclaimer p{font-size:.65rem;color:var(--muted);line-height:1.6}
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
+    .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+    .footer-links{display:flex;align-items:center;gap:.75rem}
+    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
+    .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
+  </style>
+</head>
+<body>
+<header id="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
+    <nav class="desktop">
+      <a href="../index.html" class="nav-link">HOME</a>
+      <a href="../index.html#about" class="nav-link">ABOUT</a>
+      <a href="../index.html#experience" class="nav-link">EXPERIENCE</a>
+      <a href="../index.html#projects" class="nav-link">PROJECTS</a>
+      <a href="../index.html#skills" class="nav-link">SKILLS</a>
+      <a href="../index.html#contact" class="nav-link">CONTACT</a>
+      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:16px;height:16px"></i></button>
+    </nav>
+    <div class="mobile-controls">
+      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:16px;height:16px"></i></button>
+      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:16px;height:16px"></i></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../index.html">HOME</a>
+    <a href="../index.html#about">ABOUT</a>
+    <a href="../index.html#experience">EXPERIENCE</a>
+    <a href="../index.html#projects">PROJECTS</a>
+    <a href="../index.html#skills">SKILLS</a>
+    <a href="../index.html#contact">CONTACT</a>
+    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.4rem;margin-top:.5rem"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <a href="index.html">Calculators</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <span style="color:var(--foreground)">Gas Mixing</span>
+      </div>
+      <p class="section-label">FLUID PROPERTIES</p>
+      <h1 class="page-title">Gas Mixing Calculator</h1>
+      <p class="page-desc">Determine mixture molecular weight, specific gravity, density, Cp, LHV, and Wobbe Index from component mole fractions. Auto-normalisation ensures fractions sum to 1.000.</p>
+      <div class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Mole fraction weighted averaging &nbsp;|&nbsp; GPSA Engineering Data Book</div>
+    </div>
+    <a href="index.html" class="btn btn-outline" style="margin-top:auto"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>All Calculators</a>
+  </div>
+</div>
+
+<div class="calc-layout">
+  <!-- LEFT: INPUT TABLE -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="table" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Component Composition</span>
+        <span style="margin-left:auto;font-size:.65rem;color:var(--muted)">Enter mole % or mole fractions</span>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="tbl-wrap">
+          <table id="compTable">
+            <thead>
+              <tr>
+                <th style="width:140px">Component</th>
+                <th style="width:50px">Formula</th>
+                <th style="width:80px">Mole %</th>
+                <th class="prop-cell" style="width:55px">MW<br><span style="font-weight:400;font-size:.6rem">(g/mol)</span></th>
+                <th class="prop-cell" style="width:55px">Cp<br><span style="font-weight:400;font-size:.6rem">(kJ/kg·K)</span></th>
+                <th class="prop-cell" style="width:65px">LHV<br><span style="font-weight:400;font-size:.6rem">(MJ/Nm³)</span></th>
+                <th style="width:32px"></th>
+              </tr>
+            </thead>
+            <tbody id="compBody"></tbody>
+            <tfoot>
+              <tr class="total-row" id="totalRow">
+                <td colspan="2" style="padding:.5rem .6rem;font-size:.72rem">TOTAL</td>
+                <td style="padding:.5rem .4rem"><input type="number" id="totalMol" value="100.00" readonly style="width:72px;font-weight:700;font-size:.75rem;background:var(--secondary-bg);border:1px solid var(--border);border-radius:.3rem;padding:.3rem .5rem;color:var(--primary);font-family:var(--font);outline:none;-moz-appearance:textfield"></td>
+                <td class="prop-cell" id="totalMW" style="padding:.5rem .4rem">—</td>
+                <td colspan="3"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div id="normBar" class="norm-bar norm-ok" style="display:none">
+          <span class="norm-dot" id="normDot" style="background:hsl(142,71%,50%)"></span>
+          <span id="normMsg">Mole fractions normalised — total = 100.00 %</span>
+        </div>
+        <div class="ctrl-row">
+          <button class="btn btn-primary" onclick="addComponent()"><i data-lucide="plus" style="width:13px;height:13px"></i>Add Component</button>
+          <button class="btn btn-outline" onclick="normalise()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i>Normalise</button>
+          <button class="btn btn-outline" onclick="loadDefault()"><i data-lucide="flask-conical" style="width:13px;height:13px"></i>Load Example</button>
+          <button class="btn btn-ghost" onclick="clearAll()"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONDITIONS -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="thermometer" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Reference Conditions</span>
+      </div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div>
+            <label style="font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem">Temperature</label>
+            <div style="display:flex;gap:.4rem;align-items:center">
+              <input type="number" id="inpT" value="15" step="any" style="flex:1;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield" oninput="calculate()">
+              <select id="unitT" onchange="calculate()" style="padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none">
+                <option value="C">°C</option>
+                <option value="K">K</option>
+                <option value="F">°F</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem">Pressure</label>
+            <div style="display:flex;gap:.4rem;align-items:center">
+              <input type="number" id="inpP" value="101.325" step="any" style="flex:1;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield" oninput="calculate()">
+              <select id="unitP" onchange="calculate()" style="padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none">
+                <option value="kPa">kPa (abs)</option>
+                <option value="bara">bara</option>
+                <option value="psia">psia</option>
+                <option value="barg">barg</option>
+                <option value="psig">psig</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
+      <p>Screening tool only. MW, SG and density use ideal-gas law at reference conditions. Cp values are at 15 °C / 1 atm. LHV from GPSA Table 23-2. Wobbe Index = LHV / √SG<sub>rel</sub>. Validate against process simulation for final design.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: RESULTS -->
+  <div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="bar-chart-2" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Mixture Properties</span>
+      </div>
+      <div class="card-body">
+        <div class="results-grid" id="resultsGrid">
+          <div class="res-item">
+            <span class="res-label">Molecular Weight</span>
+            <span><span class="res-value" id="resMW">—</span><span class="res-unit">g/mol</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Specific Gravity (rel. air)</span>
+            <span><span class="res-value" id="resSG">—</span><span class="res-unit">—</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Density @ conditions</span>
+            <span><span class="res-value" id="resDens">—</span><span class="res-unit">kg/m³</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Density @ Nm³ (0 °C, 1 atm)</span>
+            <span><span class="res-value" id="resDensN">—</span><span class="res-unit">kg/Nm³</span></span>
+          </div>
+          <div class="res-divider"></div>
+          <div class="res-item">
+            <span class="res-label">Mixture Cp</span>
+            <span><span class="res-value" id="resCp">—</span><span class="res-unit">kJ/kg·K</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Cp/Cv (γ) — ideal</span>
+            <span><span class="res-value" id="resGamma">—</span><span class="res-unit">—</span></span>
+          </div>
+          <div class="res-divider"></div>
+          <div class="res-item">
+            <span class="res-label">LHV (molar basis)</span>
+            <span><span class="res-value" id="resLHVmol">—</span><span class="res-unit">MJ/Nm³</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">LHV (mass basis)</span>
+            <span><span class="res-value" id="resLHVmass">—</span><span class="res-unit">MJ/kg</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Wobbe Index</span>
+            <span><span class="res-value" id="resWobbe">—</span><span class="res-unit">MJ/Nm³</span></span>
+          </div>
+          <div class="res-divider"></div>
+          <div class="res-item">
+            <span class="res-label">Z-factor (est.)</span>
+            <span><span class="res-value" id="resZ">—</span><span class="res-unit">—</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Pseudo-critical Tc</span>
+            <span><span class="res-value" id="resTpc">—</span><span class="res-unit">K</span></span>
+          </div>
+          <div class="res-item">
+            <span class="res-label">Pseudo-critical Pc</span>
+            <span><span class="res-value" id="resPpc">—</span><span class="res-unit">MPa</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPOSITION BARS -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="align-left" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Composition Profile</span>
+      </div>
+      <div class="card-body">
+        <div class="comp-bars" id="compBars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
+    <div class="footer-links">
+      <a href="tel:+201096597449" class="footer-icon"><i data-lucide="phone" style="width:14px;height:14px"></i></a>
+      <a href="mailto:hazemmancy@outlook.com" class="footer-icon"><i data-lucide="mail" style="width:14px;height:14px"></i></a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="footer-icon"><svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+    </div>
+    <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ─── COMPONENT DATABASE ───────────────────────────────────────────────────────
+// MW(g/mol), Cp(kJ/kg·K @15°C), LHV(MJ/Nm³), Tc(K), Pc(MPa)
+const DB = {
+  'Methane':       { f:'CH₄',   MW:16.043, Cp:2.226, LHV:35.883, Tc:190.6, Pc:4.600 },
+  'Ethane':        { f:'C₂H₆',  MW:30.070, Cp:1.744, LHV:64.346, Tc:305.4, Pc:4.884 },
+  'Propane':       { f:'C₃H₈',  MW:44.097, Cp:1.669, LHV:93.212, Tc:369.8, Pc:4.246 },
+  'i-Butane':      { f:'iC₄H₁₀',MW:58.124, Cp:1.648, LHV:121.81, Tc:408.1, Pc:3.648 },
+  'n-Butane':      { f:'nC₄H₁₀',MW:58.124, Cp:1.694, LHV:123.57, Tc:425.1, Pc:3.796 },
+  'i-Pentane':     { f:'iC₅H₁₂',MW:72.151, Cp:1.620, LHV:152.23, Tc:460.4, Pc:3.381 },
+  'n-Pentane':     { f:'nC₅H₁₂',MW:72.151, Cp:1.664, LHV:154.00, Tc:469.7, Pc:3.370 },
+  'n-Hexane':      { f:'nC₆H₁₄',MW:86.178, Cp:1.615, LHV:183.07, Tc:507.6, Pc:3.025 },
+  'n-Heptane':     { f:'nC₇H₁₆',MW:100.205,Cp:1.617, LHV:212.00, Tc:540.2, Pc:2.740 },
+  'Nitrogen':      { f:'N₂',    MW:28.014, Cp:1.040, LHV:0.000,  Tc:126.2, Pc:3.390 },
+  'Carbon Dioxide':{ f:'CO₂',   MW:44.010, Cp:0.837, LHV:0.000,  Tc:304.2, Pc:7.390 },
+  'Hydrogen Sulfide':{ f:'H₂S', MW:34.082, Cp:1.003, LHV:23.359, Tc:373.2, Pc:8.963 },
+  'Hydrogen':      { f:'H₂',    MW:2.016,  Cp:14.307,LHV:10.784, Tc:33.2,  Pc:1.297 },
+  'Oxygen':        { f:'O₂',    MW:31.999, Cp:0.919, LHV:0.000,  Tc:154.6, Pc:5.046 },
+  'Water':         { f:'H₂O',   MW:18.015, Cp:1.864, LHV:0.000,  Tc:647.1, Pc:22.064 },
+  'Argon':         { f:'Ar',    MW:39.948, Cp:0.520, LHV:0.000,  Tc:150.8, Pc:4.874 },
+};
+const COMP_COLORS = [
+  'hsl(217,91%,60%)','hsl(142,71%,50%)','hsl(38,92%,55%)','hsl(271,81%,70%)',
+  'hsl(0,72%,65%)','hsl(187,71%,55%)','hsl(48,96%,53%)','hsl(25,95%,58%)',
+  'hsl(330,80%,65%)','hsl(100,60%,55%)','hsl(200,80%,60%)','hsl(60,90%,55%)',
+];
+const MW_AIR = 28.966;
+const R = 8.314; // J/mol·K
+
+let rows = [];
+let rowId = 0;
+
+function getCompNames() { return Object.keys(DB); }
+
+function addRow(name, mol) {
+  const id = rowId++;
+  rows.push({ id, name: name || 'Methane', mol: mol !== undefined ? mol : '' });
+  renderTable();
+  calculate();
+}
+
+function removeRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  renderTable();
+  calculate();
+}
+
+function onNameChange(id, val) {
+  const r = rows.find(r => r.id === id);
+  if (r) { r.name = val; calculate(); }
+}
+
+function onMolChange(id, val) {
+  const r = rows.find(r => r.id === id);
+  if (r) { r.mol = parseFloat(val) || 0; calculate(); }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('compBody');
+  const names = getCompNames();
+  tbody.innerHTML = rows.map(r => {
+    const d = DB[r.name] || {};
+    const opts = names.map(n => `<option value="${n}" ${n===r.name?'selected':''}>${n}</option>`).join('');
+    return `<tr>
+      <td><select onchange="onNameChange(${r.id},this.value)" style="width:100%;padding:.28rem .35rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.72rem;color:var(--foreground);font-family:var(--font);outline:none">${opts}</select></td>
+      <td><span class="comp-formula">${d.f||''}</span></td>
+      <td><input type="number" class="mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onMolChange(${r.id},this.value)" /></td>
+      <td class="prop-cell">${d.MW?d.MW.toFixed(3):''}</td>
+      <td class="prop-cell">${d.Cp?d.Cp.toFixed(3):''}</td>
+      <td class="prop-cell">${d.LHV!==undefined?d.LHV.toFixed(2):''}</td>
+      <td><button onclick="removeRow(${r.id})" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:.3rem;color:var(--muted);background:none;border:none;cursor:pointer" title="Remove"><i data-lucide="x" style="width:13px;height:13px"></i></button></td>
+    </tr>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function addComponent() { addRow('Methane', ''); }
+
+function loadDefault() {
+  rows = [];
+  rowId = 0;
+  const defaults = [
+    ['Methane',85.0],['Ethane',7.0],['Propane',3.0],
+    ['i-Butane',0.5],['n-Butane',0.5],['Nitrogen',2.5],['Carbon Dioxide',1.5],
+  ];
+  defaults.forEach(([n,m]) => { rows.push({ id: rowId++, name: n, mol: m }); });
+  renderTable();
+  calculate();
+}
+
+function clearAll() {
+  rows = [];
+  renderTable();
+  calculate();
+}
+
+function normalise() {
+  const total = rows.reduce((s,r) => s + (parseFloat(r.mol)||0), 0);
+  if (total <= 0) return;
+  rows.forEach(r => { r.mol = parseFloat(((parseFloat(r.mol)||0) / total * 100).toFixed(4)); });
+  renderTable();
+  calculate();
+}
+
+function getTK() {
+  const v = parseFloat(document.getElementById('inpT').value) || 15;
+  const u = document.getElementById('unitT').value;
+  if (u==='K') return v;
+  if (u==='F') return (v - 32) * 5/9 + 273.15;
+  return v + 273.15;
+}
+
+function getPkPa() {
+  const v = parseFloat(document.getElementById('inpP').value) || 101.325;
+  const u = document.getElementById('unitP').value;
+  if (u==='kPa') return v;
+  if (u==='bara') return v * 100;
+  if (u==='psia') return v * 6.89476;
+  if (u==='barg') return (v + 1.01325) * 100;
+  if (u==='psig') return (v + 14.696) * 6.89476;
+  return v;
+}
+
+function fmt(v, dec) {
+  if (v === null || isNaN(v)) return '—';
+  return v.toFixed(dec);
+}
+
+function calculate() {
+  const active = rows.filter(r => (parseFloat(r.mol)||0) > 0);
+  const total = active.reduce((s,r) => s + (parseFloat(r.mol)||0), 0);
+
+  // Update total display
+  const totEl = document.getElementById('totalMol');
+  if (totEl) {
+    totEl.value = total.toFixed(2);
+    totEl.style.color = Math.abs(total - 100) < 0.01 ? 'var(--primary)' : 'hsl(0,72%,65%)';
+  }
+
+  // Normalise indicator
+  const bar = document.getElementById('normBar');
+  if (active.length > 0) {
+    bar.style.display = 'flex';
+    const ok = Math.abs(total - 100) < 0.01;
+    bar.className = 'norm-bar ' + (ok ? 'norm-ok' : 'norm-warn');
+    document.getElementById('normDot').style.background = ok ? 'hsl(142,71%,50%)' : 'hsl(38,92%,55%)';
+    document.getElementById('normMsg').textContent = ok
+      ? `Composition total = ${total.toFixed(2)} % ✓`
+      : `Total = ${total.toFixed(2)} % — click Normalise to adjust`;
+  } else {
+    bar.style.display = 'none';
+  }
+
+  if (active.length === 0 || total <= 0) {
+    ['resMW','resSG','resDens','resDensN','resCp','resGamma','resLHVmol','resLHVmass','resWobbe','resZ','resTpc','resPpc','totalMW']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+    document.getElementById('compBars').innerHTML = '';
+    return;
+  }
+
+  // Convert to mole fractions
+  const fracs = active.map(r => ({ ...DB[r.name], name: r.name, yi: (parseFloat(r.mol)||0) / total }));
+
+  // Mixture MW (mole-fraction weighted)
+  const MW_mix = fracs.reduce((s,c) => s + c.yi * c.MW, 0);
+
+  // Pseudo-critical props (Kay's rule)
+  const Tpc = fracs.reduce((s,c) => s + c.yi * c.Tc, 0);
+  const Ppc = fracs.reduce((s,c) => s + c.yi * c.Pc, 0); // MPa
+
+  // Conditions
+  const T = getTK();
+  const P_kPa = getPkPa();
+  const P_MPa = P_kPa / 1000;
+
+  // Reduced properties
+  const Tr = T / Tpc;
+  const Pr = P_MPa / Ppc;
+
+  // Z-factor — Pitzer correlation (simple)
+  const B = 0.083 - 0.422/Math.pow(Tr,1.6);
+  const omega_mix = fracs.reduce((s,c) => {
+    // approximate acentric factor from Tc,Pc (not in DB, use 0.01 for lean gases)
+    return s + c.yi * 0.01;
+  }, 0);
+  const Z = 1 + (B + omega_mix * (0.139 - 0.172/Math.pow(Tr,4.2))) * Pr / Tr;
+  const Z_safe = Math.max(0.5, Math.min(1.5, Z));
+
+  // Density @ conditions
+  const rho = (P_kPa * 1000 * MW_mix) / (Z_safe * R * 1000 * T); // kg/m³  (P in Pa, MW in kg/kmol)
+  // Density @ Normal (0°C, 101.325 kPa)
+  const rho_N = (101325 * MW_mix) / (R * 1000 * 273.15); // ideal at normal
+
+  // SG relative to air
+  const SG = MW_mix / MW_AIR;
+
+  // Cp (mass-fraction weighted)
+  // mass fraction: xi = yi*MWi / MW_mix
+  const Cp_mix = fracs.reduce((s,c) => s + (c.yi * c.MW / MW_mix) * c.Cp, 0); // kJ/kg·K
+  // Gamma (ideal diatomic approx: Cv = Cp - R/MW)
+  const R_sp = R / MW_mix; // kJ/kg·K  (R in J/mol·K, MW in g/mol → R/MW gives J/g·K = kJ/kg·K)
+  const Cv = Cp_mix - R_sp / 1000 * 1000; // kJ/kg·K
+  const gamma = Cp_mix / Math.max(0.01, Cv);
+
+  // LHV — mole-fraction weighted on volumetric basis (MJ/Nm³)
+  const LHV_vol = fracs.reduce((s,c) => s + c.yi * c.LHV, 0); // MJ/Nm³
+  // LHV mass basis: MJ/kg
+  const LHV_mass = LHV_vol / rho_N; // MJ/Nm³ ÷ kg/Nm³
+
+  // Wobbe Index
+  const WI = LHV_vol / Math.sqrt(SG);
+
+  // Populate results
+  document.getElementById('resMW').textContent    = fmt(MW_mix, 3);
+  document.getElementById('totalMW').textContent  = fmt(MW_mix, 3);
+  document.getElementById('resSG').textContent    = fmt(SG, 4);
+  document.getElementById('resDens').textContent  = fmt(rho, 4);
+  document.getElementById('resDensN').textContent = fmt(rho_N, 4);
+  document.getElementById('resCp').textContent    = fmt(Cp_mix, 3);
+  document.getElementById('resGamma').textContent = fmt(gamma, 3);
+  document.getElementById('resLHVmol').textContent = fmt(LHV_vol, 2);
+  document.getElementById('resLHVmass').textContent= fmt(LHV_mass, 2);
+  document.getElementById('resWobbe').textContent  = fmt(WI, 2);
+  document.getElementById('resZ').textContent     = fmt(Z_safe, 4);
+  document.getElementById('resTpc').textContent   = fmt(Tpc, 1);
+  document.getElementById('resPpc').textContent   = fmt(Ppc, 3);
+
+  // Composition bars
+  const sorted = [...fracs].sort((a,b) => b.yi - a.yi);
+  document.getElementById('compBars').innerHTML = sorted.map((c,i) => {
+    const pct = (c.yi * 100).toFixed(2);
+    const color = COMP_COLORS[i % COMP_COLORS.length];
+    return `<div class="comp-bar-row">
+      <span class="comp-bar-label" title="${c.name}">${c.name}</span>
+      <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${Math.min(100,c.yi*100)}%;background:${color}"></div></div>
+      <span class="comp-bar-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── THEME & NAV ──────────────────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  const icon = t==='dark' ? 'sun' : 'moon';
+  ['themeIconD','themeIconM'].forEach(id => { const el=document.getElementById(id); if(el) el.setAttribute('data-lucide',icon); });
+  if (window.lucide) lucide.createIcons();
+}
+function toggleTheme() { applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); }
+applyTheme(localStorage.getItem('theme')||'dark');
+window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
+let menuOpen = false;
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('mobileMenu').classList.toggle('open', menuOpen);
+  const el = document.getElementById('menuIcon'); if (el) { el.setAttribute('data-lucide', menuOpen?'x':'menu'); lucide.createIcons(); }
+}
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadDefault();
+</script>
+</body>
+</html>
