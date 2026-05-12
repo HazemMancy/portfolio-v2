@@ -30,7 +30,6 @@
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
     .btn-ghost{background:transparent;color:var(--foreground)} .btn-ghost:hover{background:var(--secondary-bg)}
-    /* NAVBAR */
     #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -49,9 +48,7 @@
     .mobile-menu button,.mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
     .mobile-menu button:hover,.mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
     .mobile-menu .calc-link{display:flex;align-items:center;gap:.4rem;color:var(--primary);font-weight:500;margin-top:.5rem}
-    /* SCROLL OFFSET — prevents sticky navbar from hiding section headings */
     section[id]{scroll-margin-top:var(--navbar-h)}
-    /* HERO */
     #home{position:relative;min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1rem;overflow:hidden}
     .hero-glow{position:absolute;inset:0;background:var(--hero-glow);pointer-events:none}
     .hero-radial{position:absolute;inset:0;background:radial-gradient(circle 500px at 50% 50%,hsl(222 41% 14%/.8),transparent);pointer-events:none}
@@ -64,7 +61,6 @@
     .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem}
     .scroll-hint{position:absolute;bottom:2rem;display:flex;flex-direction:column;align-items:center;gap:.25rem;color:var(--muted);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;background:none;border:none}
     @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}} .bounce{animation:bounce 1.5s ease-in-out infinite}
-    /* SECTIONS */
     .section{padding:5rem 1rem} .section-header{text-align:center;margin-bottom:2.5rem}
     .section-title{font-size:clamp(1.75rem,4vw,2.5rem);font-weight:700} .section-desc{color:var(--muted);font-size:.875rem;margin-top:.5rem}
     .about-grid{display:grid;gap:1rem} @media(min-width:768px){.about-grid{grid-template-columns:repeat(3,1fr)}}
@@ -215,7 +211,7 @@
 </section>
 <section id="projects" class="section">
   <div class="container">
-    <div class="section-header"><p class="section-label mb-3">PORTFOLIO</p><h2 class="section-title mb-2">Projects &amp; Achievements</h2><p class="section-desc">A showcase of petroleum engineering projects across Egypt, UAE, Iraq, and Yemen</p></div>
+    <div class="section-header"><p class="section-label mb-3">PORTFOLIO</p><h2 class="section-title mb-2">Projects &amp; Achievements</h2><p class="section-desc">A showcase of petroleum engineering projects across Egypt, UAE, Iraq, Congo, and Yemen</p></div>
     <div class="projects-grid" id="projectsGrid"></div>
   </div>
 </section>
@@ -298,6 +294,7 @@ const skillCategories = [
   { icon:'globe',    title:'Languages', tags:['Arabic (Native)','English (Full Professional)'], tagColor:'col-orange' },
 ];
 const projects = [
+  { category:'FEED - International', catClass:'col-red', client:'Eni Congo', location:'Congo', title:'Nené WHP3 & AEP Platforms Revamping', desc:'FEED process deliverables for brownfield offshore platforms revamp covering flare/vent system upgrade, power generation, utilities, and safety systems. Issued BOD, P&ID updates, and provided support to HAZID/HAZOP studies.', tags:['BOD','P&ID','Flare/Vent System','HAZID/HAZOP'], extra:2 },
   { category:'FEED', catClass:'col-red', client:'PhPC', location:'Port Said, Egypt', title:"Atoll Crossover for Pressurizing Ha'py Subsea Pipeline", desc:"Pressurization study of the 30\" Ha'py subsea pipeline using Atoll gas via 10\" crossover. Developed Pressurization Philosophy and Design Basis, including MDMT assessment, AIV/FIV screening, P&IDs, and transient hydraulic simulation.", tags:['BOD','Hydraulic Calculations','AIV/FIV Analysis','P&ID'], extra:1 },
   { category:'FEED', catClass:'col-red', client:'WASCO', location:'Damietta, Egypt', title:'North El-Basant-1 Well Tie-in to Azhar-1 Manifold', desc:'Prepared Basis of Design for tie-in of North El-Basant-1 well to Azhar-1 manifold within the WASCO production system. Covered wellhead hook-up, spill back unit, pneumatic control panel gas supply, underground pipeline, and tie-in philosophy.', tags:['BOD','Process Design','Hydraulic Design','P&ID'], extra:0 },
   { category:'Pre-FEED', catClass:'col-orange', client:'GEMSA', location:'Gulf of Suez, Egypt', title:'Offshore Oil Processing Platform & FSO Development', desc:'Pre-FEED for a new offshore production platform with oil processing topsides and new FSO for storage and export. Scope includes preliminary sizing of separators, pumps, desalter, heater treater, tanks, chemical injection skids, and produced water treatment.', tags:['Equipment Sizing','Oil Treating','Produced Water Treatment'], extra:2 },
@@ -374,7 +371,10 @@ function toggleMenu() {
 }
 function scrollToSection(id) {
   const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  if (!el) return;
+  const navbarH = document.getElementById('navbar').offsetHeight;
+  const top = el.getBoundingClientRect().top + window.pageYOffset - navbarH;
+  window.scrollTo({ top: top, behavior: 'smooth' });
 }
 document.getElementById('year').textContent = new Date().getFullYear();
 renderResponsibilities('resp-dg');
