@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gas Mixing Calculator — Hazem ElMancy</title>
-  <meta name="description" content="Gas mixture MW, density, Cp, LHV and composition calculator using mole-fraction weighted averaging." />
+  <meta name="description" content="Gas mixture MW, density, Cp, Z-factor, vapor fraction and composition calculator with PR/SRK EoS and Rachford-Rice flash." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -18,7 +18,6 @@
     body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
     a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
     ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-    /* NAVBAR */
     #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
@@ -35,25 +34,21 @@
     .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
     .mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
     .mobile-menu a:hover,.mobile-menu button:hover{background:var(--secondary-bg);color:var(--foreground)}
-    /* PAGE HEADER */
     .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
     .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
     .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
     .breadcrumb a:hover{color:var(--primary)}
     .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.5rem}
     .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
-    .page-desc{color:var(--muted);font-size:.8rem;max-width:36rem;line-height:1.6}
+    .page-desc{color:var(--muted);font-size:.8rem;max-width:40rem;line-height:1.6}
     .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
-    /* LAYOUT */
     .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
-    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 380px;align-items:start}}
-    /* CARD */
+    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 400px;align-items:start}}
     .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
     .card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
     .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
     .card-title{font-size:.8rem;font-weight:600}
     .card-body{padding:1.25rem}
-    /* TABLE INPUT */
     .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
     table{width:100%;border-collapse:collapse;font-size:.75rem}
     thead th{padding:.5rem .6rem;text-align:left;font-size:.65rem;font-weight:600;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
@@ -61,46 +56,70 @@
     [data-theme="light"] tbody td{border-bottom:1px solid hsl(214,32%,93%)}
     tbody tr:last-child td{border-bottom:none}
     tbody tr:hover td{background:var(--secondary-bg)}
-    .comp-name{font-size:.72rem;font-weight:500;color:var(--foreground);white-space:nowrap}
     .comp-formula{font-size:.62rem;color:var(--muted)}
     input[type=number]{width:100%;padding:.3rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield}
     input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
     input[type=number]:focus{border-color:var(--primary)}
     input[type=number]:read-only{background:var(--secondary-bg);color:var(--muted);cursor:default}
-    .mol-input{width:72px}
+    .mol-input{width:74px}
     .prop-cell{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.7rem}
     .total-row td{background:var(--secondary-bg);font-weight:600}
     .total-row .prop-cell{color:var(--primary)}
-    /* CONTROLS */
     .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
     .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
     .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
     .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
-    .btn-danger{background:transparent;border:1px solid hsl(0,72%,40%);color:hsl(0,72%,65%)} .btn-danger:hover{background:hsl(0,72%,40%,.15)}
-    /* NORMALISE INDICATOR */
+    .btn-sm{padding:.3rem .65rem;font-size:.7rem}
     .norm-bar{margin-top:.75rem;padding:.5rem .75rem;border-radius:var(--radius);font-size:.72rem;display:flex;align-items:center;gap:.5rem;transition:background .2s}
     .norm-ok{background:hsl(142,71%,45%,.08);border:1px solid hsl(142,71%,45%,.25);color:hsl(142,71%,55%)}
     .norm-warn{background:hsl(38,92%,50%,.08);border:1px solid hsl(38,92%,50%,.3);color:hsl(38,92%,60%)}
     .norm-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    /* TABS */
+    .tab-bar{display:flex;gap:.25rem;padding:.5rem .75rem;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:wrap}
+    .tab-btn{padding:.35rem .8rem;font-size:.72rem;font-weight:500;border-radius:.35rem;color:var(--muted);background:none;border:none;cursor:pointer;transition:color .15s,background .15s}
+    .tab-btn.active{color:var(--primary);background:var(--primary-bg)}
+    .tab-panel{display:none} .tab-panel.active{display:block}
+    /* EoS SELECTOR */
+    .eos-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap}
+    .eos-btn{padding:.3rem .75rem;font-size:.72rem;font-weight:500;border-radius:.35rem;border:1px solid var(--border);color:var(--muted);background:none;cursor:pointer;transition:all .15s}
+    .eos-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
     /* RESULTS */
     .results-grid{display:grid;gap:.6rem}
     .res-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--secondary-bg);border-radius:var(--radius);gap:.5rem}
-    .res-label{font-size:.7rem;color:var(--muted)}
+    .res-label{font-size:.7rem;color:var(--muted);flex:1}
     .res-value{font-size:.95rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;white-space:nowrap}
     .res-unit{font-size:.65rem;color:var(--muted);font-weight:400;margin-left:.25rem}
     .res-divider{height:1px;background:var(--border);margin:.25rem 0}
-    /* COMPOSITION PIE (CSS only) */
-    .pie-section{margin-top:1rem}
+    /* PHASE BADGE */
+    .phase-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border-radius:9999px;font-size:.72rem;font-weight:600}
+    .phase-vapor{background:hsl(217,91%,60%,.1);border:1px solid hsl(217,91%,60%,.3);color:hsl(217,91%,70%)}
+    .phase-liquid{background:hsl(271,81%,60%,.1);border:1px solid hsl(271,81%,60%,.3);color:hsl(271,81%,70%)}
+    .phase-two{background:hsl(38,92%,50%,.1);border:1px solid hsl(38,92%,50%,.3);color:hsl(38,92%,60%)}
+    .phase-super{background:hsl(142,71%,45%,.08);border:1px solid hsl(142,71%,45%,.3);color:hsl(142,71%,55%)}
+    /* VAPOR FRACTION GAUGE */
+    .vf-gauge-wrap{margin:.75rem 0}
+    .vf-gauge-track{height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+    .vf-gauge-fill{height:100%;border-radius:5px;transition:width .4s}
+    .vf-gauge-labels{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-top:.3rem}
+    /* COMPOSITION BARS */
     .comp-bars{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
     .comp-bar-row{display:flex;align-items:center;gap:.6rem}
-    .comp-bar-label{font-size:.65rem;color:var(--muted);width:70px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .comp-bar-label{font-size:.65rem;color:var(--muted);width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .comp-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
     .comp-bar-fill{height:100%;border-radius:3px;transition:width .3s}
-    .comp-bar-pct{font-size:.65rem;color:var(--muted);width:36px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
-    /* DISCLAIMER */
-    .disclaimer{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:1.25rem}
-    .disclaimer p{font-size:.65rem;color:var(--muted);line-height:1.6}
+    .comp-bar-pct{font-size:.65rem;color:var(--muted);width:40px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+    /* WARNINGS */
+    .warn-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
+    .warn-box p{font-size:.65rem;color:var(--muted);line-height:1.6}
+    .flag-pill{display:inline-flex;align-items:center;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid;margin:.15rem}
+    .flag-sour{border-color:hsl(0,72%,50%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,50%,.07)}
+    .flag-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+    .flag-info{border-color:var(--border);color:var(--muted);background:var(--secondary-bg)}
+    /* PRESET DROPDOWN */
+    .preset-select{padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none;max-width:220px}
+    /* CALC TRACE */
+    .trace-box{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;font-size:.68rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.8;margin-top:.75rem;max-height:220px;overflow-y:auto}
     /* FOOTER */
     footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
     .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
@@ -108,6 +127,13 @@
     .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
     .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
     .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
+    select{font-family:var(--font)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:640px){.grid-2{grid-template-columns:1fr}}
+    label.field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem}
+    .field-row{display:flex;gap:.4rem;align-items:center}
+    .field-row input{flex:1}
+    .field-row select{padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);outline:none}
   </style>
 </head>
 <body>
@@ -152,73 +178,112 @@
       </div>
       <p class="section-label">FLUID PROPERTIES</p>
       <h1 class="page-title">Gas Mixing Calculator</h1>
-      <p class="page-desc">Determine mixture molecular weight, specific gravity, density, Cp, LHV, and Wobbe Index from component mole fractions. Auto-normalisation ensures fractions sum to 1.000.</p>
-      <div class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Mole fraction weighted averaging &nbsp;|&nbsp; GPSA Engineering Data Book</div>
+      <p class="page-desc">Full mixture property calculator with PR / SRK EoS, Rachford-Rice vapor fraction flash, Lee-Gonzalez-Eakin viscosity, Joule-Thomson coefficient, speed of sound, and 13 industry presets.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem">
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Peng-Robinson (1976) &amp; SRK (Soave 1972)</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>GPSA Engineering Data Book</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Lee-Gonzalez-Eakin (1966)</span>
+      </div>
     </div>
     <a href="index.html" class="btn btn-outline" style="margin-top:auto"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>All Calculators</a>
   </div>
 </div>
 
 <div class="calc-layout">
-  <!-- LEFT: INPUT TABLE -->
+  <!-- LEFT COLUMN -->
   <div>
+    <!-- COMPOSITION -->
     <div class="card">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="table" style="width:15px;height:15px"></i></div>
         <span class="card-title">Component Composition</span>
-        <span style="margin-left:auto;font-size:.65rem;color:var(--muted)">Enter mole % or mole fractions</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem">
+          <select class="preset-select" id="presetSelect" onchange="loadPreset(this.value)">
+            <option value="">Load Preset...</option>
+            <optgroup label="Natural Gas">
+              <option value="lean">Lean Natural Gas</option>
+              <option value="rich">Rich Natural Gas</option>
+              <option value="lpg">LPG Vapor</option>
+            </optgroup>
+            <optgroup label="Acid / Sour">
+              <option value="sour">Sour Natural Gas</option>
+              <option value="acidgas">Acid Gas (Amine Off-Gas)</option>
+              <option value="tailgas">Tail Gas (SRU)</option>
+            </optgroup>
+            <optgroup label="Refinery">
+              <option value="fuelgas">Fuel Gas (Refinery)</option>
+              <option value="fcc">FCC Off-Gas</option>
+              <option value="h2rich">H₂-Rich (Reformer)</option>
+              <option value="syngas">Synthesis Gas (SMR)</option>
+            </optgroup>
+            <optgroup label="Flare / Relief">
+              <option value="flare">Flare Gas (Emergency)</option>
+            </optgroup>
+            <optgroup label="Utility">
+              <option value="n2">Nitrogen Blanket Gas</option>
+              <option value="air">Instrument Air (Dry)</option>
+            </optgroup>
+          </select>
+        </div>
       </div>
       <div class="card-body" style="padding:.75rem">
         <div class="tbl-wrap">
           <table id="compTable">
             <thead>
               <tr>
-                <th style="width:140px">Component</th>
+                <th style="width:145px">Component</th>
                 <th style="width:50px">Formula</th>
                 <th style="width:80px">Mole %</th>
                 <th class="prop-cell" style="width:55px">MW<br><span style="font-weight:400;font-size:.6rem">(g/mol)</span></th>
-                <th class="prop-cell" style="width:55px">Cp<br><span style="font-weight:400;font-size:.6rem">(kJ/kg·K)</span></th>
-                <th class="prop-cell" style="width:65px">LHV<br><span style="font-weight:400;font-size:.6rem">(MJ/Nm³)</span></th>
+                <th class="prop-cell" style="width:52px">Tc<br><span style="font-weight:400;font-size:.6rem">(K)</span></th>
+                <th class="prop-cell" style="width:52px">Pc<br><span style="font-weight:400;font-size:.6rem">(bar)</span></th>
+                <th class="prop-cell" style="width:42px">ω<br><span style="font-weight:400;font-size:.6rem">—</span></th>
+                <th class="prop-cell" style="width:60px">LHV<br><span style="font-weight:400;font-size:.6rem">(MJ/Nm³)</span></th>
                 <th style="width:32px"></th>
               </tr>
             </thead>
             <tbody id="compBody"></tbody>
             <tfoot>
-              <tr class="total-row" id="totalRow">
+              <tr class="total-row">
                 <td colspan="2" style="padding:.5rem .6rem;font-size:.72rem">TOTAL</td>
-                <td style="padding:.5rem .4rem"><input type="number" id="totalMol" value="100.00" readonly style="width:72px;font-weight:700;font-size:.75rem;background:var(--secondary-bg);border:1px solid var(--border);border-radius:.3rem;padding:.3rem .5rem;color:var(--primary);font-family:var(--font);outline:none;-moz-appearance:textfield"></td>
+                <td style="padding:.5rem .4rem"><input type="number" id="totalMol" value="100.00" readonly style="width:74px;font-weight:700;font-size:.75rem;background:var(--secondary-bg);border:1px solid var(--border);border-radius:.3rem;padding:.3rem .5rem;color:var(--primary);font-family:var(--font);outline:none;-moz-appearance:textfield"></td>
                 <td class="prop-cell" id="totalMW" style="padding:.5rem .4rem">—</td>
-                <td colspan="3"></td>
+                <td colspan="5"></td>
               </tr>
             </tfoot>
           </table>
         </div>
         <div id="normBar" class="norm-bar norm-ok" style="display:none">
           <span class="norm-dot" id="normDot" style="background:hsl(142,71%,50%)"></span>
-          <span id="normMsg">Mole fractions normalised — total = 100.00 %</span>
+          <span id="normMsg">Composition total = 100.00 %</span>
         </div>
         <div class="ctrl-row">
           <button class="btn btn-primary" onclick="addComponent()"><i data-lucide="plus" style="width:13px;height:13px"></i>Add Component</button>
           <button class="btn btn-outline" onclick="normalise()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i>Normalise</button>
-          <button class="btn btn-outline" onclick="loadDefault()"><i data-lucide="flask-conical" style="width:13px;height:13px"></i>Load Example</button>
           <button class="btn btn-ghost" onclick="clearAll()"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Clear</button>
         </div>
       </div>
     </div>
 
-    <!-- CONDITIONS -->
+    <!-- CONDITIONS + EoS -->
     <div class="card" style="margin-top:1.25rem">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="thermometer" style="width:15px;height:15px"></i></div>
-        <span class="card-title">Reference Conditions</span>
+        <span class="card-title">Operating Conditions &amp; EoS</span>
       </div>
       <div class="card-body">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="eos-row">
+          <span style="font-size:.7rem;color:var(--muted);margin-right:.25rem">Model:</span>
+          <button class="eos-btn active" id="eosPitzer" onclick="setEos('pitzer')">Pitzer (ideal)</button>
+          <button class="eos-btn" id="eosPR" onclick="setEos('pr')">Peng-Robinson</button>
+          <button class="eos-btn" id="eosSRK" onclick="setEos('srk')">SRK</button>
+        </div>
+        <div class="grid-2">
           <div>
-            <label style="font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem">Temperature</label>
-            <div style="display:flex;gap:.4rem;align-items:center">
-              <input type="number" id="inpT" value="15" step="any" style="flex:1;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield" oninput="calculate()">
-              <select id="unitT" onchange="calculate()" style="padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none">
+            <label class="field-label">Temperature</label>
+            <div class="field-row">
+              <input type="number" id="inpT" value="15" step="any" oninput="calculate()">
+              <select id="unitT" onchange="calculate()">
                 <option value="C">°C</option>
                 <option value="K">K</option>
                 <option value="F">°F</option>
@@ -226,88 +291,95 @@
             </div>
           </div>
           <div>
-            <label style="font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem">Pressure</label>
-            <div style="display:flex;gap:.4rem;align-items:center">
-              <input type="number" id="inpP" value="101.325" step="any" style="flex:1;padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield" oninput="calculate()">
-              <select id="unitP" onchange="calculate()" style="padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none">
+            <label class="field-label">Pressure</label>
+            <div class="field-row">
+              <input type="number" id="inpP" value="101.325" step="any" oninput="calculate()">
+              <select id="unitP" onchange="calculate()">
                 <option value="kPa">kPa (abs)</option>
                 <option value="bara">bara</option>
                 <option value="psia">psia</option>
                 <option value="barg">barg</option>
                 <option value="psig">psig</option>
+                <option value="MPa">MPa</option>
               </select>
             </div>
           </div>
         </div>
+        <div style="margin-top:.75rem;padding:.5rem .75rem;background:var(--secondary-bg);border-radius:var(--radius);font-size:.68rem;color:var(--muted)" id="eosNote">
+          Pitzer (simplified Lee-Kesler): Z⁰ + ω·Z¹. Valid for Pr &lt; 10, Tr &gt; 0.7. Switch to PR or SRK for accurate real-gas properties.
+        </div>
       </div>
     </div>
 
-    <div class="disclaimer">
+    <!-- VAPOR FRACTION -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="droplets" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Vapor Fraction &amp; Phase State</span>
+        <span style="margin-left:auto;font-size:.6rem;color:var(--muted)">Rachford-Rice flash (PR/SRK Ki)</span>
+      </div>
+      <div class="card-body">
+        <div id="phasePanel">
+          <div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.75rem">Enter composition and conditions to calculate phase state.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top:1.25rem">
       <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
-      <p>Screening tool only. MW, SG and density use ideal-gas law at reference conditions. Cp values are at 15 °C / 1 atm. LHV from GPSA Table 23-2. Wobbe Index = LHV / √SG<sub>rel</sub>. Validate against process simulation for final design.</p>
+      <p>Screening tool only. PR/SRK EoS uses Graboski-Daubert (1978) mixing rules. Vapor fraction uses simplified Wilson Ki; not a rigorous flash — do not use for final design. Wichert-Aziz correction NOT applied. Validate against HYSYS / UniSim for final design.</p>
     </div>
   </div>
 
-  <!-- RIGHT: RESULTS -->
+  <!-- RIGHT COLUMN: RESULTS -->
   <div>
+    <!-- MIXTURE PROPERTIES -->
     <div class="card">
       <div class="card-header">
         <div class="card-header-icon"><i data-lucide="bar-chart-2" style="width:15px;height:15px"></i></div>
         <span class="card-title">Mixture Properties</span>
+        <span id="eosLabel" style="margin-left:auto;font-size:.6rem;color:var(--muted);padding:.15rem .5rem;border-radius:9999px;border:1px solid var(--border)">Pitzer</span>
       </div>
       <div class="card-body">
         <div class="results-grid" id="resultsGrid">
-          <div class="res-item">
-            <span class="res-label">Molecular Weight</span>
-            <span><span class="res-value" id="resMW">—</span><span class="res-unit">g/mol</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Specific Gravity (rel. air)</span>
-            <span><span class="res-value" id="resSG">—</span><span class="res-unit">—</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Density @ conditions</span>
-            <span><span class="res-value" id="resDens">—</span><span class="res-unit">kg/m³</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Density @ Nm³ (0 °C, 1 atm)</span>
-            <span><span class="res-value" id="resDensN">—</span><span class="res-unit">kg/Nm³</span></span>
-          </div>
+          <div class="res-item"><span class="res-label">Molecular Weight</span><span><span class="res-value" id="resMW">—</span><span class="res-unit">g/mol</span></span></div>
+          <div class="res-item"><span class="res-label">Specific Gravity (rel. air)</span><span><span class="res-value" id="resSG">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Density @ conditions</span><span><span class="res-value" id="resDens">—</span><span class="res-unit">kg/m³</span></span></div>
+          <div class="res-item"><span class="res-label">Density @ Nm³ (0 °C, 1 atm)</span><span><span class="res-value" id="resDensN">—</span><span class="res-unit">kg/Nm³</span></span></div>
           <div class="res-divider"></div>
-          <div class="res-item">
-            <span class="res-label">Mixture Cp</span>
-            <span><span class="res-value" id="resCp">—</span><span class="res-unit">kJ/kg·K</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Cp/Cv (γ) — ideal</span>
-            <span><span class="res-value" id="resGamma">—</span><span class="res-unit">—</span></span>
-          </div>
+          <div class="res-item"><span class="res-label">Compressibility Factor (Z)</span><span><span class="res-value" id="resZ">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Pseudo-critical Tc</span><span><span class="res-value" id="resTpc">—</span><span class="res-unit">K</span></span></div>
+          <div class="res-item"><span class="res-label">Pseudo-critical Pc</span><span><span class="res-value" id="resPpc">—</span><span class="res-unit">bar</span></span></div>
+          <div class="res-item"><span class="res-label">Acentric Factor (ω)</span><span><span class="res-value" id="resOmega">—</span><span class="res-unit">—</span></span></div>
           <div class="res-divider"></div>
-          <div class="res-item">
-            <span class="res-label">LHV (molar basis)</span>
-            <span><span class="res-value" id="resLHVmol">—</span><span class="res-unit">MJ/Nm³</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">LHV (mass basis)</span>
-            <span><span class="res-value" id="resLHVmass">—</span><span class="res-unit">MJ/kg</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Wobbe Index</span>
-            <span><span class="res-value" id="resWobbe">—</span><span class="res-unit">MJ/Nm³</span></span>
-          </div>
+          <div class="res-item"><span class="res-label">Mixture Cp (ideal)</span><span><span class="res-value" id="resCp">—</span><span class="res-unit">kJ/(kg·K)</span></span></div>
+          <div class="res-item"><span class="res-label">Cp/Cv (γ) — ideal gas</span><span><span class="res-value" id="resGamma">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Speed of Sound</span><span><span class="res-value" id="resSos">—</span><span class="res-unit">m/s</span></span></div>
+          <div class="res-item"><span class="res-label">Dynamic Viscosity</span><span><span class="res-value" id="resVisc">—</span><span class="res-unit">cP</span></span></div>
+          <div class="res-item"><span class="res-label">Joule-Thomson Coeff.</span><span><span class="res-value" id="resJT">—</span><span class="res-unit">K/bar</span></span></div>
           <div class="res-divider"></div>
-          <div class="res-item">
-            <span class="res-label">Z-factor (est.)</span>
-            <span><span class="res-value" id="resZ">—</span><span class="res-unit">—</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Pseudo-critical Tc</span>
-            <span><span class="res-value" id="resTpc">—</span><span class="res-unit">K</span></span>
-          </div>
-          <div class="res-item">
-            <span class="res-label">Pseudo-critical Pc</span>
-            <span><span class="res-value" id="resPpc">—</span><span class="res-unit">MPa</span></span>
-          </div>
+          <div class="res-item"><span class="res-label">LHV (molar basis)</span><span><span class="res-value" id="resLHVmol">—</span><span class="res-unit">MJ/Nm³</span></span></div>
+          <div class="res-item"><span class="res-label">LHV (mass basis)</span><span><span class="res-value" id="resLHVmass">—</span><span class="res-unit">MJ/kg</span></span></div>
+          <div class="res-item"><span class="res-label">Wobbe Index</span><span><span class="res-value" id="resWobbe">—</span><span class="res-unit">MJ/Nm³</span></span></div>
+        </div>
+        <div id="flagsRow" style="margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.25rem"></div>
+        <div id="warningsBox" style="display:none" class="warn-box">
+          <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
+          <p id="warningsText" style="font-size:.65rem;color:var(--muted);line-height:1.8"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC TRACE -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="file-code" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Calculation Trace</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleTrace()">Toggle</button>
+      </div>
+      <div id="tracePanel" style="display:none">
+        <div class="card-body" style="padding:.75rem">
+          <div class="trace-box" id="traceBox">—</div>
         </div>
       </div>
     </div>
@@ -338,266 +410,542 @@
 </footer>
 
 <script>
-// ─── COMPONENT DATABASE ───────────────────────────────────────────────────────
-// MW(g/mol), Cp(kJ/kg·K @15°C), LHV(MJ/Nm³), Tc(K), Pc(MPa)
+// ═══════════════════════════════════════════════════════════════════
+// COMPONENT DATABASE
+// MW(g/mol), Cp(kJ/kg·K @15°C,1atm), LHV(MJ/Nm³), Tc(K), Pc(bar), omega, gamma
+// ═══════════════════════════════════════════════════════════════════
 const DB = {
-  'Methane':       { f:'CH₄',   MW:16.043, Cp:2.226, LHV:35.883, Tc:190.6, Pc:4.600 },
-  'Ethane':        { f:'C₂H₆',  MW:30.070, Cp:1.744, LHV:64.346, Tc:305.4, Pc:4.884 },
-  'Propane':       { f:'C₃H₈',  MW:44.097, Cp:1.669, LHV:93.212, Tc:369.8, Pc:4.246 },
-  'i-Butane':      { f:'iC₄H₁₀',MW:58.124, Cp:1.648, LHV:121.81, Tc:408.1, Pc:3.648 },
-  'n-Butane':      { f:'nC₄H₁₀',MW:58.124, Cp:1.694, LHV:123.57, Tc:425.1, Pc:3.796 },
-  'i-Pentane':     { f:'iC₅H₁₂',MW:72.151, Cp:1.620, LHV:152.23, Tc:460.4, Pc:3.381 },
-  'n-Pentane':     { f:'nC₅H₁₂',MW:72.151, Cp:1.664, LHV:154.00, Tc:469.7, Pc:3.370 },
-  'n-Hexane':      { f:'nC₆H₁₄',MW:86.178, Cp:1.615, LHV:183.07, Tc:507.6, Pc:3.025 },
-  'n-Heptane':     { f:'nC₇H₁₆',MW:100.205,Cp:1.617, LHV:212.00, Tc:540.2, Pc:2.740 },
-  'Nitrogen':      { f:'N₂',    MW:28.014, Cp:1.040, LHV:0.000,  Tc:126.2, Pc:3.390 },
-  'Carbon Dioxide':{ f:'CO₂',   MW:44.010, Cp:0.837, LHV:0.000,  Tc:304.2, Pc:7.390 },
-  'Hydrogen Sulfide':{ f:'H₂S', MW:34.082, Cp:1.003, LHV:23.359, Tc:373.2, Pc:8.963 },
-  'Hydrogen':      { f:'H₂',    MW:2.016,  Cp:14.307,LHV:10.784, Tc:33.2,  Pc:1.297 },
-  'Oxygen':        { f:'O₂',    MW:31.999, Cp:0.919, LHV:0.000,  Tc:154.6, Pc:5.046 },
-  'Water':         { f:'H₂O',   MW:18.015, Cp:1.864, LHV:0.000,  Tc:647.1, Pc:22.064 },
-  'Argon':         { f:'Ar',    MW:39.948, Cp:0.520, LHV:0.000,  Tc:150.8, Pc:4.874 },
+  'Methane':         { f:'CH₄',    MW:16.043,  Cp:2.226,  LHV:35.883, Tc:190.56, Pc:45.99, w:0.0115, g:1.307 },
+  'Ethane':          { f:'C₂H₆',   MW:30.070,  Cp:1.744,  LHV:64.346, Tc:305.32, Pc:48.72, w:0.0995, g:1.187 },
+  'Propane':         { f:'C₃H₈',   MW:44.097,  Cp:1.669,  LHV:93.212, Tc:369.83, Pc:42.48, w:0.1523, g:1.131 },
+  'i-Butane':        { f:'iC₄H₁₀', MW:58.124,  Cp:1.648,  LHV:121.81, Tc:408.14, Pc:36.48, w:0.1808, g:1.101 },
+  'n-Butane':        { f:'nC₄H₁₀', MW:58.124,  Cp:1.694,  LHV:123.57, Tc:425.12, Pc:37.96, w:0.2002, g:1.094 },
+  'i-Pentane':       { f:'iC₅H₁₂', MW:72.151,  Cp:1.620,  LHV:152.23, Tc:460.43, Pc:33.81, w:0.2275, g:1.074 },
+  'n-Pentane':       { f:'nC₅H₁₂', MW:72.151,  Cp:1.664,  LHV:154.00, Tc:469.70, Pc:33.70, w:0.2515, g:1.073 },
+  'n-Hexane':        { f:'nC₆H₁₄', MW:86.178,  Cp:1.615,  LHV:183.07, Tc:507.60, Pc:30.25, w:0.3013, g:1.062 },
+  'n-Heptane':       { f:'nC₇H₁₆', MW:100.205, Cp:1.617,  LHV:212.00, Tc:540.20, Pc:27.40, w:0.3495, g:1.053 },
+  'n-Octane':        { f:'nC₈H₁₈', MW:114.232, Cp:1.641,  LHV:240.83, Tc:568.70, Pc:24.90, w:0.3996, g:1.044 },
+  'Nitrogen':        { f:'N₂',     MW:28.014,  Cp:1.040,  LHV:0.000,  Tc:126.20, Pc:33.98, w:0.0372, g:1.400 },
+  'Carbon Dioxide':  { f:'CO₂',    MW:44.010,  Cp:0.837,  LHV:0.000,  Tc:304.13, Pc:73.77, w:0.2239, g:1.289 },
+  'Hydrogen Sulfide':{ f:'H₂S',    MW:34.082,  Cp:1.003,  LHV:23.359, Tc:373.20, Pc:89.63, w:0.0942, g:1.320 },
+  'Hydrogen':        { f:'H₂',     MW:2.016,   Cp:14.307, LHV:10.784, Tc:33.19,  Pc:13.13, w:-0.2160,g:1.405 },
+  'Oxygen':          { f:'O₂',     MW:31.999,  Cp:0.919,  LHV:0.000,  Tc:154.58, Pc:50.46, w:0.0222, g:1.394 },
+  'Water Vapor':     { f:'H₂O',    MW:18.015,  Cp:1.864,  LHV:0.000,  Tc:647.10, Pc:220.64,w:0.3449, g:1.329 },
+  'Argon':           { f:'Ar',     MW:39.948,  Cp:0.520,  LHV:0.000,  Tc:150.86, Pc:48.74, w:-0.0022,g:1.667 },
+  'Carbon Monoxide': { f:'CO',     MW:28.010,  Cp:1.040,  LHV:11.965, Tc:132.85, Pc:34.53, w:0.0481, g:1.400 },
+  'Ethylene':        { f:'C₂H₄',   MW:28.054,  Cp:1.528,  LHV:59.464, Tc:282.34, Pc:50.41, w:0.0862, g:1.240 },
+  'Propylene':       { f:'C₃H₆',   MW:42.081,  Cp:1.510,  LHV:87.593, Tc:364.90, Pc:46.00, w:0.1420, g:1.155 },
+  'Sulfur Dioxide':  { f:'SO₂',    MW:64.065,  Cp:0.622,  LHV:0.000,  Tc:430.80, Pc:78.84, w:0.2557, g:1.264 },
+  'Carbonyl Sulfide':{ f:'COS',    MW:60.075,  Cp:0.621,  LHV:19.657, Tc:378.80, Pc:63.49, w:0.0978, g:1.262 },
 };
-const COMP_COLORS = [
+
+const MW_AIR = 28.966;
+const R_U    = 8.31446; // kJ/(kmol·K)
+const R_J    = 8314.46; // J/(kmol·K)
+
+const COLORS = [
   'hsl(217,91%,60%)','hsl(142,71%,50%)','hsl(38,92%,55%)','hsl(271,81%,70%)',
   'hsl(0,72%,65%)','hsl(187,71%,55%)','hsl(48,96%,53%)','hsl(25,95%,58%)',
   'hsl(330,80%,65%)','hsl(100,60%,55%)','hsl(200,80%,60%)','hsl(60,90%,55%)',
 ];
-const MW_AIR = 28.966;
-const R = 8.314; // J/mol·K
 
-let rows = [];
-let rowId = 0;
+const PRESETS = {
+  lean:    [['Methane',91.00],['Ethane',4.50],['Propane',1.20],['i-Butane',0.25],['n-Butane',0.30],['i-Pentane',0.10],['n-Pentane',0.08],['Carbon Dioxide',1.50],['Nitrogen',1.00],['n-Hexane',0.07]],
+  rich:    [['Methane',75.00],['Ethane',10.00],['Propane',6.00],['i-Butane',1.50],['n-Butane',2.00],['i-Pentane',0.80],['n-Pentane',0.60],['n-Hexane',0.50],['n-Heptane',0.30],['Carbon Dioxide',2.00],['Nitrogen',0.80],['Hydrogen Sulfide',0.50]],
+  lpg:     [['Propane',60.00],['i-Butane',15.00],['n-Butane',22.00],['Ethane',2.00],['i-Pentane',1.00]],
+  sour:    [['Methane',72.00],['Ethane',5.00],['Propane',2.50],['i-Butane',0.50],['n-Butane',0.60],['Carbon Dioxide',8.00],['Hydrogen Sulfide',10.00],['Nitrogen',1.00],['Water Vapor',0.40]],
+  acidgas: [['Hydrogen Sulfide',65.00],['Carbon Dioxide',32.00],['Methane',1.50],['Water Vapor',1.50]],
+  tailgas: [['Nitrogen',55.00],['Water Vapor',25.00],['Carbon Dioxide',8.00],['Hydrogen Sulfide',1.50],['Sulfur Dioxide',0.50],['Hydrogen',4.00],['Carbon Monoxide',2.00],['Carbonyl Sulfide',0.50],['Methane',3.50]],
+  fuelgas: [['Methane',50.00],['Hydrogen',25.00],['Ethane',10.00],['Propane',5.00],['Ethylene',4.00],['Nitrogen',3.00],['Carbon Dioxide',2.00],['n-Butane',1.00]],
+  fcc:     [['Nitrogen',78.00],['Carbon Dioxide',12.00],['Oxygen',3.00],['Carbon Monoxide',4.00],['Water Vapor',2.00],['Sulfur Dioxide',1.00]],
+  h2rich:  [['Hydrogen',80.00],['Methane',10.00],['Ethane',5.00],['Propane',2.50],['n-Butane',1.50],['n-Pentane',1.00]],
+  syngas:  [['Hydrogen',74.00],['Carbon Monoxide',8.00],['Carbon Dioxide',10.00],['Methane',4.00],['Nitrogen',2.00],['Water Vapor',2.00]],
+  flare:   [['Methane',40.00],['Ethane',15.00],['Propane',12.00],['n-Butane',8.00],['n-Pentane',4.00],['Hydrogen',5.00],['Nitrogen',10.00],['Carbon Dioxide',4.00],['Hydrogen Sulfide',2.00]],
+  n2:      [['Nitrogen',99.50],['Oxygen',0.30],['Argon',0.10],['Water Vapor',0.10]],
+  air:     [['Nitrogen',78.08],['Oxygen',20.95],['Argon',0.93],['Carbon Dioxide',0.04]],
+};
 
-function getCompNames() { return Object.keys(DB); }
+const EOS_NOTES = {
+  pitzer: 'Pitzer (simplified Lee-Kesler): Z = Z⁰ + ω·Z¹. Valid for Pr < 10, Tr > 0.7. Switch to PR or SRK for accurate real-gas properties.',
+  pr: 'Peng-Robinson (1976/1978): cubic EoS with van der Waals mixing rules. Best for hydrocarbons. Vapor fraction via Wilson Ki + Rachford-Rice.',
+  srk: 'Soave-Redlich-Kwong (1972): cubic EoS. Good for H₂S, CO₂ streams. Vapor fraction via Wilson Ki + Rachford-Rice.',
+};
 
+let rows = [], rowId = 0, eosMode = 'pitzer';
+
+// ─── UI helpers ─────────────────────────────────────────────────────
+function setEos(m) {
+  eosMode = m;
+  ['pitzer','pr','srk'].forEach(k => document.getElementById('eos'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('active', k===m));
+  document.getElementById('eosNote').textContent = EOS_NOTES[m];
+  document.getElementById('eosLabel').textContent = m==='pitzer' ? 'Pitzer' : m==='pr' ? 'PR EoS' : 'SRK EoS';
+  calculate();
+}
+function toggleTrace() {
+  const p = document.getElementById('tracePanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+}
+function toggleTheme() {
+  const t = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  ['themeIconD','themeIconM'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.setAttribute('data-lucide', t==='dark'?'moon':'sun');
+  });
+  lucide.createIcons();
+}
+function toggleMenu() {
+  const m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open')?'x':'menu');
+  lucide.createIcons();
+}
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+});
+
+// ─── Rows ────────────────────────────────────────────────────────────
 function addRow(name, mol) {
-  const id = rowId++;
-  rows.push({ id, name: name || 'Methane', mol: mol !== undefined ? mol : '' });
-  renderTable();
-  calculate();
+  rows.push({ id: rowId++, name: name||'Methane', mol: mol!==undefined ? mol : '' });
+  renderTable(); calculate();
+}
+function removeRow(id) { rows = rows.filter(r=>r.id!==id); renderTable(); calculate(); }
+function onNameChange(id,val) { const r=rows.find(r=>r.id===id); if(r){r.name=val;calculate();} }
+function onMolChange(id,val) { const r=rows.find(r=>r.id===id); if(r){r.mol=parseFloat(val)||0;renderTable();calculate();} }
+function addComponent() { addRow('Methane',''); }
+function clearAll() { rows=[]; renderTable(); calculate(); }
+function normalise() {
+  const total = rows.reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
+  if(total<=0) return;
+  rows.forEach(r=>{ r.mol=parseFloat(((parseFloat(r.mol)||0)/total*100).toFixed(4)); });
+  renderTable(); calculate();
+}
+function loadPreset(key) {
+  if(!key) return;
+  const data = PRESETS[key]; if(!data) return;
+  rows=[]; rowId=0;
+  data.forEach(([n,m])=>rows.push({id:rowId++,name:n,mol:m}));
+  document.getElementById('presetSelect').value='';
+  renderTable(); calculate();
 }
 
-function removeRow(id) {
-  rows = rows.filter(r => r.id !== id);
-  renderTable();
-  calculate();
-}
-
-function onNameChange(id, val) {
-  const r = rows.find(r => r.id === id);
-  if (r) { r.name = val; calculate(); }
-}
-
-function onMolChange(id, val) {
-  const r = rows.find(r => r.id === id);
-  if (r) { r.mol = parseFloat(val) || 0; calculate(); }
-}
-
+// ─── Render table ───────────────────────────────────────────────────
 function renderTable() {
+  const names = Object.keys(DB);
   const tbody = document.getElementById('compBody');
-  const names = getCompNames();
   tbody.innerHTML = rows.map(r => {
-    const d = DB[r.name] || {};
-    const opts = names.map(n => `<option value="${n}" ${n===r.name?'selected':''}>${n}</option>`).join('');
+    const d = DB[r.name]||{};
+    const opts = names.map(n=>`<option value="${n}"${n===r.name?' selected':''}>${n}</option>`).join('');
     return `<tr>
       <td><select onchange="onNameChange(${r.id},this.value)" style="width:100%;padding:.28rem .35rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.72rem;color:var(--foreground);font-family:var(--font);outline:none">${opts}</select></td>
       <td><span class="comp-formula">${d.f||''}</span></td>
       <td><input type="number" class="mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onMolChange(${r.id},this.value)" /></td>
       <td class="prop-cell">${d.MW?d.MW.toFixed(3):''}</td>
-      <td class="prop-cell">${d.Cp?d.Cp.toFixed(3):''}</td>
-      <td class="prop-cell">${d.LHV!==undefined?d.LHV.toFixed(2):''}</td>
-      <td><button onclick="removeRow(${r.id})" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:.3rem;color:var(--muted);background:none;border:none;cursor:pointer" title="Remove"><i data-lucide="x" style="width:13px;height:13px"></i></button></td>
+      <td class="prop-cell">${d.Tc?d.Tc.toFixed(1):''}</td>
+      <td class="prop-cell">${d.Pc?d.Pc.toFixed(2):''}</td>
+      <td class="prop-cell">${d.w!=null?d.w.toFixed(4):''}</td>
+      <td class="prop-cell">${d.LHV!=null?d.LHV.toFixed(2):''}</td>
+      <td><button onclick="removeRow(${r.id})" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:.3rem;color:var(--muted);background:none;border:none;cursor:pointer"><i data-lucide="x" style="width:13px;height:13px"></i></button></td>
     </tr>`;
   }).join('');
   lucide.createIcons();
 }
 
-function addComponent() { addRow('Methane', ''); }
-
-function loadDefault() {
-  rows = [];
-  rowId = 0;
-  const defaults = [
-    ['Methane',85.0],['Ethane',7.0],['Propane',3.0],
-    ['i-Butane',0.5],['n-Butane',0.5],['Nitrogen',2.5],['Carbon Dioxide',1.5],
-  ];
-  defaults.forEach(([n,m]) => { rows.push({ id: rowId++, name: n, mol: m }); });
-  renderTable();
-  calculate();
-}
-
-function clearAll() {
-  rows = [];
-  renderTable();
-  calculate();
-}
-
-function normalise() {
-  const total = rows.reduce((s,r) => s + (parseFloat(r.mol)||0), 0);
-  if (total <= 0) return;
-  rows.forEach(r => { r.mol = parseFloat(((parseFloat(r.mol)||0) / total * 100).toFixed(4)); });
-  renderTable();
-  calculate();
-}
-
+// ─── Unit conversions ───────────────────────────────────────────────
 function getTK() {
-  const v = parseFloat(document.getElementById('inpT').value) || 15;
-  const u = document.getElementById('unitT').value;
-  if (u==='K') return v;
-  if (u==='F') return (v - 32) * 5/9 + 273.15;
-  return v + 273.15;
+  const v=parseFloat(document.getElementById('inpT').value)||15;
+  const u=document.getElementById('unitT').value;
+  return u==='K'?v : u==='F'?(v-32)*5/9+273.15 : v+273.15;
 }
-
 function getPkPa() {
-  const v = parseFloat(document.getElementById('inpP').value) || 101.325;
-  const u = document.getElementById('unitP').value;
-  if (u==='kPa') return v;
-  if (u==='bara') return v * 100;
-  if (u==='psia') return v * 6.89476;
-  if (u==='barg') return (v + 1.01325) * 100;
-  if (u==='psig') return (v + 14.696) * 6.89476;
+  const v=parseFloat(document.getElementById('inpP').value)||101.325;
+  const u=document.getElementById('unitP').value;
+  if(u==='kPa') return v;
+  if(u==='bara') return v*100;
+  if(u==='psia') return v*6.89476;
+  if(u==='barg') return (v+1.01325)*100;
+  if(u==='psig') return (v+14.696)*6.89476;
+  if(u==='MPa')  return v*1000;
   return v;
 }
+function getPbar() { return getPkPa()/100; }
 
-function fmt(v, dec) {
-  if (v === null || isNaN(v)) return '—';
-  return v.toFixed(dec);
+// ─── Z-factor (Pitzer simplified Lee-Kesler) ────────────────────────
+function pitzerZ(Tr, Pr, omega) {
+  const B0 = 0.083 - 0.422/Math.pow(Tr,1.6);
+  const C0 = 0.139 - 0.172/Math.pow(Tr,4.2);
+  const Z0 = 1 + B0*Pr/Tr + C0*Math.pow(Pr/Tr,2);
+  const B1 = 0.139 - 0.172/Math.pow(Tr,4.2);
+  const C1 = 0.008 + 0.043/Math.pow(Tr,2);
+  const Z1 = B1*Pr/Tr + C1*Math.pow(Pr/Tr,2);
+  let Z = Z0 + omega*Z1;
+  return Math.max(0.05, Math.min(5.0, Z));
 }
 
-function calculate() {
-  const active = rows.filter(r => (parseFloat(r.mol)||0) > 0);
-  const total = active.reduce((s,r) => s + (parseFloat(r.mol)||0), 0);
-
-  // Update total display
-  const totEl = document.getElementById('totalMol');
-  if (totEl) {
-    totEl.value = total.toFixed(2);
-    totEl.style.color = Math.abs(total - 100) < 0.01 ? 'var(--primary)' : 'hsl(0,72%,65%)';
-  }
-
-  // Normalise indicator
-  const bar = document.getElementById('normBar');
-  if (active.length > 0) {
-    bar.style.display = 'flex';
-    const ok = Math.abs(total - 100) < 0.01;
-    bar.className = 'norm-bar ' + (ok ? 'norm-ok' : 'norm-warn');
-    document.getElementById('normDot').style.background = ok ? 'hsl(142,71%,50%)' : 'hsl(38,92%,55%)';
-    document.getElementById('normMsg').textContent = ok
-      ? `Composition total = ${total.toFixed(2)} % ✓`
-      : `Total = ${total.toFixed(2)} % — click Normalise to adjust`;
+// ─── Cubic EoS solver (PR or SRK) ──────────────────────────────────
+// Returns: { Z_V, Z_L, fugCoeff_V, fugCoeff_L }
+// Uses van der Waals one-fluid mixing rules
+function solveCubicZ(A, B, isPR) {
+  // PR:  Z³ - (1-B)Z² + (A-3B²-2B)Z - (AB-B²-B³) = 0
+  // SRK: Z³ - Z² + (A-B-B²)Z - AB = 0
+  let a2, a1, a0;
+  if(isPR) {
+    a2 = -(1-B);
+    a1 = A-3*B*B-2*B;
+    a0 = -(A*B-B*B-B*B*B);
   } else {
-    bar.style.display = 'none';
+    a2 = -1;
+    a1 = A-B-B*B;
+    a0 = -A*B;
   }
+  // Cardano / iterative
+  const roots = cubicRoots(1, a2, a1, a0).filter(z=>z>B && z>0.0);
+  roots.sort((a,b)=>a-b);
+  return roots;
+}
+function cubicRoots(a,b,c,d) {
+  // Normalize
+  b/=a; c/=a; d/=a;
+  const p = c - b*b/3;
+  const q = 2*b*b*b/27 - b*c/3 + d;
+  const D = q*q/4 + p*p*p/27;
+  const results=[];
+  if(D>1e-12) {
+    const sqD=Math.sqrt(D);
+    const u=Math.cbrt(-q/2+sqD), v=Math.cbrt(-q/2-sqD);
+    results.push(u+v-b/3);
+  } else if(D<-1e-12) {
+    const r=Math.sqrt(-p*p*p/27);
+    const theta=Math.acos(Math.max(-1,Math.min(1,-q/(2*r))));
+    const m=2*Math.cbrt(r);
+    [0,1,2].forEach(k=>results.push(m*Math.cos((theta+2*Math.PI*k)/3)-b/3));
+  } else {
+    const u=Math.cbrt(-q/2);
+    results.push(2*u-b/3, -u-b/3);
+  }
+  return results;
+}
 
-  if (active.length === 0 || total <= 0) {
-    ['resMW','resSG','resDens','resDensN','resCp','resGamma','resLHVmol','resLHVmass','resWobbe','resZ','resTpc','resPpc','totalMW']
-      .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
-    document.getElementById('compBars').innerHTML = '';
+// ─── PR EoS mixture properties ──────────────────────────────────────
+function prMixtureAB(fracs, T_K, P_bar) {
+  const R = 83.14462; // cm³·bar/(mol·K)
+  const ai=[], bi=[];
+  fracs.forEach(c => {
+    const Tr = T_K/c.Tc;
+    const kappa = 0.37464+1.54226*c.w-0.26992*c.w*c.w;
+    const alpha = Math.pow(1+kappa*(1-Math.sqrt(Tr)),2);
+    ai.push(0.45724*R*R*c.Tc*c.Tc/c.Pc * alpha);
+    bi.push(0.07780*R*c.Tc/c.Pc);
+  });
+  let a_mix=0, b_mix=0;
+  fracs.forEach((ci,i)=>{
+    b_mix += ci.yi*bi[i];
+    fracs.forEach((cj,j)=>{ a_mix += ci.yi*cj.yi*Math.sqrt(ai[i]*ai[j]); });
+  });
+  const A = a_mix*P_bar/(R*T_K)/(R*T_K);
+  const B = b_mix*P_bar/(R*T_K);
+  return {A,B,ai,bi,a_mix,b_mix};
+}
+function srkMixtureAB(fracs, T_K, P_bar) {
+  const R = 83.14462;
+  const ai=[], bi=[];
+  fracs.forEach(c => {
+    const Tr = T_K/c.Tc;
+    const m = 0.48+1.574*c.w-0.176*c.w*c.w;
+    const alpha = Math.pow(1+m*(1-Math.sqrt(Tr)),2);
+    ai.push(0.42748*R*R*c.Tc*c.Tc/c.Pc * alpha);
+    bi.push(0.08664*R*c.Tc/c.Pc);
+  });
+  let a_mix=0, b_mix=0;
+  fracs.forEach((ci,i)=>{
+    b_mix += ci.yi*bi[i];
+    fracs.forEach((cj,j)=>{ a_mix += ci.yi*cj.yi*Math.sqrt(ai[i]*ai[j]); });
+  });
+  const A = a_mix*P_bar/(R*T_K)/(R*T_K);
+  const B = b_mix*P_bar/(R*T_K);
+  return {A,B,ai,bi,a_mix,b_mix};
+}
+function eosZ(fracs, T_K, P_bar, isPR) {
+  const {A,B} = isPR ? prMixtureAB(fracs,T_K,P_bar) : srkMixtureAB(fracs,T_K,P_bar);
+  const roots = solveCubicZ(A,B,isPR);
+  return { roots, A, B };
+}
+
+// ─── Wilson Ki for flash ─────────────────────────────────────────────
+// Ki = (Pc_i/P) * exp(5.373*(1+wi)*(1 - Tc_i/T))
+function wilsonKi(fracs, T_K, P_bar) {
+  return fracs.map(c => (c.Pc/P_bar)*Math.exp(5.373*(1+c.w)*(1-c.Tc/T_K)));
+}
+
+// ─── Rachford-Rice flash ─────────────────────────────────────────────
+// Solves: Σ zi*(Ki-1)/(1+β*(Ki-1)) = 0  for β (vapor fraction)
+function rachfordRice(zi, Ki) {
+  // Check if all vapor or all liquid
+  const Kmin = Math.min(...Ki), Kmax = Math.max(...Ki);
+  if(Kmin >= 1.0) return 1.0;   // all vapor (dew point exceeded)
+  if(Kmax <= 1.0) return 0.0;   // all liquid (bubble point exceeded)
+
+  const beta_min = 1/(1-Kmax)+1e-8;
+  const beta_max = 1/(1-Kmin)-1e-8;
+
+  function F(beta) {
+    return zi.reduce((s,z,i)=>s + z*(Ki[i]-1)/(1+beta*(Ki[i]-1)), 0);
+  }
+  // Bisection
+  let lo = Math.max(0.0, beta_min), hi = Math.min(1.0, beta_max);
+  if(lo >= hi) return F(0.5)>0 ? 1.0 : 0.0;
+  for(let iter=0; iter<80; iter++) {
+    const mid=(lo+hi)/2;
+    if(F(mid)>0) lo=mid; else hi=mid;
+    if(hi-lo<1e-8) break;
+  }
+  const beta=Math.max(0,Math.min(1,(lo+hi)/2));
+  return beta;
+}
+
+// ─── Lee-Gonzalez-Eakin viscosity ───────────────────────────────────
+function lgeViscosity(T_K, rho_kgm3, MW) {
+  const T_R = T_K*1.8;
+  const rho_gcm3 = rho_kgm3/1000;
+  const K = (9.379+0.01607*MW)*Math.pow(T_R,1.5)/(209.2+19.26*MW+T_R);
+  const X = 3.448+986.4/T_R+0.01009*MW;
+  const Y = 2.447-0.2224*X;
+  const mu = K*Math.exp(X*Math.pow(rho_gcm3,Y))*1e-4;
+  return (isFinite(mu)&&mu>0&&mu<1)?mu:0.010;
+}
+
+// ─── Format helper ───────────────────────────────────────────────────
+function fmt(v,d) { return (v===null||v===undefined||isNaN(v)) ? '—' : v.toFixed(d); }
+
+// ─── Main calculate ──────────────────────────────────────────────────
+function calculate() {
+  const active = rows.filter(r=>(parseFloat(r.mol)||0)>0);
+  const total = active.reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
+
+  // Total display
+  const totEl = document.getElementById('totalMol');
+  totEl.value = total.toFixed(2);
+  totEl.style.color = Math.abs(total-100)<0.01 ? 'var(--primary)' : 'hsl(0,72%,65%)';
+
+  // Norm bar
+  const bar = document.getElementById('normBar');
+  if(active.length>0) {
+    bar.style.display='flex';
+    const ok=Math.abs(total-100)<0.01;
+    bar.className='norm-bar '+(ok?'norm-ok':'norm-warn');
+    document.getElementById('normDot').style.background=ok?'hsl(142,71%,50%)':'hsl(38,92%,55%)';
+    document.getElementById('normMsg').textContent=ok
+      ?`Composition total = ${total.toFixed(2)} % ✓`
+      :`Total = ${total.toFixed(2)} % — click Normalise`;
+  } else { bar.style.display='none'; }
+
+  const CLEAR=['resMW','resSG','resDens','resDensN','resCp','resGamma','resSos','resVisc','resJT',
+               'resLHVmol','resLHVmass','resWobbe','resZ','resTpc','resPpc','resOmega','totalMW'];
+
+  if(active.length===0||total<=0) {
+    CLEAR.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    document.getElementById('compBars').innerHTML='';
+    document.getElementById('phasePanel').innerHTML='<div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.75rem">Enter composition and conditions to calculate phase state.</div>';
+    document.getElementById('traceBox').textContent='—';
+    document.getElementById('flagsRow').innerHTML='';
+    document.getElementById('warningsBox').style.display='none';
     return;
   }
 
-  // Convert to mole fractions
-  const fracs = active.map(r => ({ ...DB[r.name], name: r.name, yi: (parseFloat(r.mol)||0) / total }));
+  // Mole fractions
+  const fracs = active.map(r=>({ ...DB[r.name]||{}, name:r.name, yi:(parseFloat(r.mol)||0)/total }));
 
-  // Mixture MW (mole-fraction weighted)
-  const MW_mix = fracs.reduce((s,c) => s + c.yi * c.MW, 0);
+  // ─── Basic mixture props ─────────────────────────────────────────
+  const MW_mix = fracs.reduce((s,c)=>s+c.yi*(c.MW||0),0);
+  const Tpc = fracs.every(c=>c.Tc) ? fracs.reduce((s,c)=>s+c.yi*c.Tc,0) : null;
+  const Ppc = fracs.every(c=>c.Pc) ? fracs.reduce((s,c)=>s+c.yi*c.Pc,0) : null;
+  const omega_mix = fracs.every(c=>c.w!=null) ? fracs.reduce((s,c)=>s+c.yi*c.w,0) : null;
+  const gamma_mix = fracs.every(c=>c.g) ? fracs.reduce((s,c)=>s+c.yi*c.g,0) : null;
+  const Cp_mix = fracs.every(c=>c.Cp) ? fracs.reduce((s,c)=>{
+    // mass-fraction weighted Cp
+    return s + (c.yi*c.MW/MW_mix)*c.Cp;
+  },0) : null;
+  const LHV_mol = fracs.reduce((s,c)=>s+c.yi*(c.LHV||0),0);
+  const LHV_mass = MW_mix>0 ? LHV_mol/MW_mix*1000 : null;
+  const SG = MW_mix/MW_AIR;
+  const Wobbe = SG>0 ? LHV_mol/Math.sqrt(SG) : null;
 
-  // Pseudo-critical props (Kay's rule)
-  const Tpc = fracs.reduce((s,c) => s + c.yi * c.Tc, 0);
-  const Ppc = fracs.reduce((s,c) => s + c.yi * c.Pc, 0); // MPa
-
-  // Conditions
-  const T = getTK();
+  // ─── Conditions ──────────────────────────────────────────────────
+  const T_K = getTK();
   const P_kPa = getPkPa();
-  const P_MPa = P_kPa / 1000;
+  const P_bar = P_kPa/100;
+  const P_Pa = P_kPa*1000;
 
-  // Reduced properties
-  const Tr = T / Tpc;
-  const Pr = P_MPa / Ppc;
+  // ─── Z-factor & density ──────────────────────────────────────────
+  let Z=1, trace=[];
+  const flags=[], warnings=[];
+  let Tr=null, Pr=null;
 
-  // Z-factor — Pitzer correlation (simple)
-  const B = 0.083 - 0.422/Math.pow(Tr,1.6);
-  const omega_mix = fracs.reduce((s,c) => {
-    // approximate acentric factor from Tc,Pc (not in DB, use 0.01 for lean gases)
-    return s + c.yi * 0.01;
-  }, 0);
-  const Z = 1 + (B + omega_mix * (0.139 - 0.172/Math.pow(Tr,4.2))) * Pr / Tr;
-  const Z_safe = Math.max(0.5, Math.min(1.5, Z));
+  if(eosMode==='pitzer') {
+    if(Tpc&&Ppc&&omega_mix!=null) {
+      Tr = T_K/Tpc; Pr = P_bar/Ppc;
+      Z  = pitzerZ(Tr, Pr, omega_mix);
+      trace.push(`EoS: Pitzer (Lee-Kesler simplified)`);
+      trace.push(`Tpc = ${Tpc.toFixed(2)} K  |  Ppc = ${Ppc.toFixed(3)} bar`);
+      trace.push(`Tr = ${Tr.toFixed(4)}  |  Pr = ${Pr.toFixed(4)}  |  ω = ${omega_mix.toFixed(4)}`);
+      trace.push(`Z = Z⁰ + ω·Z¹ = ${Z.toFixed(5)}`);
+      if(Tr<1.0){flags.push('NEAR_CRITICAL');warnings.push(`Tr=${Tr.toFixed(3)} < 1.0 — below pseudocritical T. Possible condensation. Pitzer accuracy degrades.`);}
+      if(Pr>10){flags.push('HIGH_Pr');warnings.push(`Pr=${Pr.toFixed(2)} > 10 — use PR or SRK for accurate Z.`);}
+    } else { trace.push('Pitzer: missing Tc/Pc/ω — Z = 1 (ideal gas)'); }
+  } else {
+    const isPR = eosMode==='pr';
+    if(fracs.every(c=>c.Tc&&c.Pc&&c.w!=null)) {
+      const {roots,A,B} = eosZ(fracs, T_K, P_bar, isPR);
+      const Zv = roots.length>0 ? roots[roots.length-1] : 1;
+      Z = Zv;
+      trace.push(`EoS: ${isPR?'Peng-Robinson (1976/1978)':'SRK (Soave 1972)'}`);
+      trace.push(`A = ${A.toFixed(6)}  |  B = ${B.toFixed(6)}`);
+      trace.push(`Cubic roots: ${roots.map(r=>r.toFixed(5)).join(', ')}`);
+      trace.push(`Z (vapor root) = ${Z.toFixed(5)}`);
+    } else { trace.push(`${eosMode.toUpperCase()} EoS: missing Tc/Pc/ω for some components — Z = 1`); }
+  }
 
-  // Density @ conditions
-  const rho = (P_kPa * 1000 * MW_mix) / (Z_safe * R * 1000 * T); // kg/m³  (P in Pa, MW in kg/kmol)
-  // Density @ Normal (0°C, 101.325 kPa)
-  const rho_N = (101325 * MW_mix) / (R * 1000 * 273.15); // ideal at normal
+  const rho = (P_Pa*MW_mix)/(Z*R_J*T_K);
+  const rho_N = (101325*MW_mix)/(R_J*273.15);
+  trace.push(`ρ = P·MW/(Z·R·T) = ${rho.toFixed(4)} kg/m³`);
+  trace.push(`ρ_N = ${rho_N.toFixed(4)} kg/Nm³`);
 
-  // SG relative to air
-  const SG = MW_mix / MW_AIR;
+  // ─── Viscosity (Lee-Gonzalez-Eakin) ──────────────────────────────
+  const visc = lgeViscosity(T_K, rho, MW_mix);
+  trace.push(`μ (Lee-Gonzalez-Eakin) = ${visc.toFixed(4)} cP`);
 
-  // Cp (mass-fraction weighted)
-  // mass fraction: xi = yi*MWi / MW_mix
-  const Cp_mix = fracs.reduce((s,c) => s + (c.yi * c.MW / MW_mix) * c.Cp, 0); // kJ/kg·K
-  // Gamma (ideal diatomic approx: Cv = Cp - R/MW)
-  const R_sp = R / MW_mix; // kJ/kg·K  (R in J/mol·K, MW in g/mol → R/MW gives J/g·K = kJ/kg·K)
-  const Cv = Cp_mix - R_sp / 1000 * 1000; // kJ/kg·K
-  const gamma = Cp_mix / Math.max(0.01, Cv);
+  // ─── Speed of sound & JT ─────────────────────────────────────────
+  let sos=null, JT=null;
+  if(gamma_mix!=null&&gamma_mix>1) {
+    const Rsp = R_U/MW_mix*1000; // J/(kg·K)
+    sos = Math.sqrt(gamma_mix*Z*Rsp*T_K);
+    trace.push(`a = √(γ·Z·R·T/MW) = ${sos.toFixed(2)} m/s`);
+    // JT simplified virial
+    if(Tpc&&Ppc) {
+      const Tr_v = T_K/Tpc, Pr_v = P_bar/Ppc;
+      const B0 = 0.083-0.422/Math.pow(Tr_v,1.6);
+      const dB0 = 0.422*1.6/Math.pow(Tr_v,2.6);
+      const Cp_k = gamma_mix/(gamma_mix-1)*(R_U/MW_mix);
+      JT = (Tpc/(Ppc*100))*(dB0*Tr_v-B0)/Cp_k;
+      trace.push(`μ_JT (virial) = ${JT.toFixed(4)} K/bar`);
+      if(JT<0){flags.push('INVERSION');warnings.push('Negative JT coefficient — above inversion temperature (heating on expansion).');}
+    }
+  }
 
-  // LHV — mole-fraction weighted on volumetric basis (MJ/Nm³)
-  const LHV_vol = fracs.reduce((s,c) => s + c.yi * c.LHV, 0); // MJ/Nm³
-  // LHV mass basis: MJ/kg
-  const LHV_mass = LHV_vol / rho_N; // MJ/Nm³ ÷ kg/Nm³
+  // ─── Flags (composition) ─────────────────────────────────────────
+  const h2s = fracs.find(c=>c.name==='Hydrogen Sulfide');
+  const co2 = fracs.find(c=>c.name==='Carbon Dioxide');
+  if(h2s&&h2s.yi>0.0001){flags.push('SOUR GAS');warnings.push(`H₂S = ${(h2s.yi*100).toFixed(2)} mol%. Apply Wichert-Aziz correction for Tc_pc/Pc_pc if H₂S > 4 mol%.`);}
+  if(co2&&co2.yi>0.05){flags.push('HIGH CO₂');warnings.push(`CO₂ = ${(co2.yi*100).toFixed(1)} mol% — verify pseudocriticals with Wichert-Aziz correction.`);}
+  if(MW_mix<2){flags.push('LOW MW');warnings.push('MW < 2 — verify component data.');}
+  if(MW_mix>100){flags.push('HIGH MW');warnings.push('MW > 100 — unusually heavy for a gas stream.');}
 
-  // Wobbe Index
-  const WI = LHV_vol / Math.sqrt(SG);
+  // ─── Vapor fraction (Rachford-Rice with Wilson Ki) ────────────────
+  let vf=null, phaseLabel='', phaseClass='phase-vapor', vfWarnings=[];
+  if(fracs.every(c=>c.Tc&&c.Pc&&c.w!=null)) {
+    const Ki = wilsonKi(fracs, T_K, P_bar);
+    const zi = fracs.map(c=>c.yi);
+    vf = rachfordRice(zi, Ki);
+    trace.push(`Wilson Ki = [${Ki.map(k=>k.toFixed(4)).join(', ')}]`);
+    trace.push(`Vapor fraction β (Rachford-Rice) = ${vf.toFixed(5)}`);
+    if(vf>=0.9999){phaseLabel='All Vapor';phaseClass='phase-vapor';}
+    else if(vf<=0.0001){phaseLabel='All Liquid';phaseClass='phase-liquid';vfWarnings.push('Mixture is fully liquid at these conditions — all EoS gas-phase properties above are for the vapor phase only.');}
+    else{phaseLabel='Two-Phase';phaseClass='phase-two';flags.push('TWO-PHASE');vfWarnings.push(`Two-phase region detected. Vapor fraction β = ${(vf*100).toFixed(1)} mol%. Gas-phase properties above apply to vapor portion only.`);}
+    // Supercritical check
+    if(Tpc&&Ppc&&T_K>Tpc&&P_bar>Ppc){
+      phaseLabel='Supercritical';phaseClass='phase-super';
+      flags.push('SUPERCRITICAL');vfWarnings.push('T > Tpc and P > Ppc — supercritical region. Single phase but dense fluid; EoS Z applies.');
+      vf=null;
+    }
+  }
+  warnings.push(...vfWarnings);
 
-  // Populate results
-  document.getElementById('resMW').textContent    = fmt(MW_mix, 3);
-  document.getElementById('totalMW').textContent  = fmt(MW_mix, 3);
-  document.getElementById('resSG').textContent    = fmt(SG, 4);
-  document.getElementById('resDens').textContent  = fmt(rho, 4);
-  document.getElementById('resDensN').textContent = fmt(rho_N, 4);
-  document.getElementById('resCp').textContent    = fmt(Cp_mix, 3);
-  document.getElementById('resGamma').textContent = fmt(gamma, 3);
-  document.getElementById('resLHVmol').textContent = fmt(LHV_vol, 2);
-  document.getElementById('resLHVmass').textContent= fmt(LHV_mass, 2);
-  document.getElementById('resWobbe').textContent  = fmt(WI, 2);
-  document.getElementById('resZ').textContent     = fmt(Z_safe, 4);
-  document.getElementById('resTpc').textContent   = fmt(Tpc, 1);
-  document.getElementById('resPpc').textContent   = fmt(Ppc, 3);
+  // ─── Display results ──────────────────────────────────────────────
+  set('resMW',   fmt(MW_mix,3));
+  set('resSG',   fmt(SG,4));
+  set('resDens', fmt(rho,3));
+  set('resDensN',fmt(rho_N,4));
+  set('resZ',    fmt(Z,5));
+  set('resTpc',  Tpc?fmt(Tpc,2):'—');
+  set('resPpc',  Ppc?fmt(Ppc,3):'—');
+  set('resOmega',omega_mix!=null?fmt(omega_mix,4):'—');
+  set('totalMW', fmt(MW_mix,3));
+  set('resCp',   Cp_mix!=null?fmt(Cp_mix,3):'—');
+  set('resGamma',gamma_mix!=null?fmt(gamma_mix,3):'—');
+  set('resSos',  sos!=null?fmt(sos,1):'—');
+  set('resVisc', fmt(visc,4));
+  set('resJT',   JT!=null?fmt(JT,4):'—');
+  set('resLHVmol',fmt(LHV_mol,3));
+  set('resLHVmass',LHV_mass!=null?fmt(LHV_mass,2):'—');
+  set('resWobbe',Wobbe!=null?fmt(Wobbe,3):'—');
+
+  // Flags
+  const flagsRow = document.getElementById('flagsRow');
+  const flagClasses = {'SOUR GAS':'flag-sour','TWO-PHASE':'flag-warn','NEAR_CRITICAL':'flag-warn','HIGH_Pr':'flag-warn','SUPERCRITICAL':'flag-info','INVERSION':'flag-warn','HIGH MW':'flag-warn','LOW MW':'flag-warn','HIGH CO₂':'flag-warn'};
+  flagsRow.innerHTML = flags.map(f=>`<span class="flag-pill ${flagClasses[f]||'flag-info'}">${f}</span>`).join('');
+
+  // Warnings
+  if(warnings.length>0) {
+    document.getElementById('warningsBox').style.display='flex';
+    document.getElementById('warningsText').innerHTML = warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
+    lucide.createIcons();
+  } else { document.getElementById('warningsBox').style.display='none'; }
+
+  // Trace
+  document.getElementById('traceBox').textContent = trace.join('\n');
+
+  // Phase panel
+  const pp = document.getElementById('phasePanel');
+  if(phaseLabel) {
+    const vfPct = vf!=null ? (vf*100).toFixed(2) : null;
+    const liqPct = vf!=null ? ((1-vf)*100).toFixed(2) : null;
+    pp.innerHTML = `
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+        <span class="phase-badge ${phaseClass}">${phaseLabel}</span>
+        ${vf!=null?`<span style="font-size:.72rem;color:var(--muted)">@ T=${document.getElementById('inpT').value} ${document.getElementById('unitT').value==='C'?'°C':document.getElementById('unitT').value} · P=${document.getElementById('inpP').value} ${document.getElementById('unitP').value}</span>`:''}
+      </div>
+      ${vf!=null ? `
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem">Vapor Fraction (β) — Rachford-Rice / Wilson Ki</div>
+      <div style="font-size:1.3rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums">${(vf*100).toFixed(3)} <span style="font-size:.75rem;font-weight:400">mol%</span></div>
+      <div class="vf-gauge-wrap">
+        <div class="vf-gauge-track"><div class="vf-gauge-fill" style="width:${vfPct}%;background:${vf<0.001?'hsl(271,81%,65%)':vf>0.999?'hsl(217,91%,60%)':'linear-gradient(90deg,hsl(271,81%,65%),hsl(217,91%,60%)'}"></div></div>
+        <div class="vf-gauge-labels"><span>Liquid 0%</span><span>Vapor 100%</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.6rem">
+        <div style="padding:.5rem .75rem;background:hsl(217,91%,60%,.08);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius)">
+          <div style="font-size:.65rem;color:var(--muted)">Vapor Phase</div>
+          <div style="font-size:.95rem;font-weight:700;color:hsl(217,91%,60%)">${vfPct} mol%</div>
+        </div>
+        <div style="padding:.5rem .75rem;background:hsl(271,81%,60%,.08);border:1px solid hsl(271,81%,60%,.2);border-radius:var(--radius)">
+          <div style="font-size:.65rem;color:var(--muted)">Liquid Phase</div>
+          <div style="font-size:.95rem;font-weight:700;color:hsl(271,81%,70%)">${liqPct} mol%</div>
+        </div>
+      </div>
+      <div style="margin-top:.65rem;font-size:.65rem;color:var(--muted);line-height:1.6">
+        Method: Wilson equilibrium constants Ki = (Pc_i/P)·exp[5.373·(1+ωi)·(1−Tc_i/T)]<br>
+        Rachford-Rice: Σ z_i·(K_i−1)/(1+β·(K_i−1)) = 0 &nbsp;[bisection, 80 iter, ε=1×10⁻⁸]
+      </div>` : `
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">${phaseLabel==='Supercritical'?'Above both Tpc and Ppc — dense supercritical fluid. No distinct vapor/liquid phases.':''}</div>`}
+      `;
+  } else if(fracs.some(c=>!c.Tc||!c.Pc||c.w==null)) {
+    pp.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Vapor fraction requires Tc, Pc and ω for all components. Check composition contains only listed components.</div>';
+  }
 
   // Composition bars
-  const sorted = [...fracs].sort((a,b) => b.yi - a.yi);
-  document.getElementById('compBars').innerHTML = sorted.map((c,i) => {
-    const pct = (c.yi * 100).toFixed(2);
-    const color = COMP_COLORS[i % COMP_COLORS.length];
-    return `<div class="comp-bar-row">
+  const barsEl = document.getElementById('compBars');
+  barsEl.innerHTML = fracs.map((c,i)=>`
+    <div class="comp-bar-row">
       <span class="comp-bar-label" title="${c.name}">${c.name}</span>
-      <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${Math.min(100,c.yi*100)}%;background:${color}"></div></div>
-      <span class="comp-bar-pct">${pct}%</span>
-    </div>`;
-  }).join('');
+      <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${(c.yi*100).toFixed(2)}%;background:${COLORS[i%COLORS.length]}"></div></div>
+      <span class="comp-bar-pct">${(c.yi*100).toFixed(2)}%</span>
+    </div>`).join('');
 }
 
-// ─── THEME & NAV ──────────────────────────────────────────────────────────────
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  const icon = t==='dark' ? 'sun' : 'moon';
-  ['themeIconD','themeIconM'].forEach(id => { const el=document.getElementById(id); if(el) el.setAttribute('data-lucide',icon); });
-  if (window.lucide) lucide.createIcons();
-}
-function toggleTheme() { applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); }
-applyTheme(localStorage.getItem('theme')||'dark');
-window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20));
-let menuOpen = false;
-function toggleMenu() {
-  menuOpen = !menuOpen;
-  document.getElementById('mobileMenu').classList.toggle('open', menuOpen);
-  const el = document.getElementById('menuIcon'); if (el) { el.setAttribute('data-lucide', menuOpen?'x':'menu'); lucide.createIcons(); }
-}
+function set(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+// ─── Init ────────────────────────────────────────────────────────────
 document.getElementById('year').textContent = new Date().getFullYear();
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-loadDefault();
+loadPreset('lean');
+lucide.createIcons();
 </script>
 </body>
 </html>
