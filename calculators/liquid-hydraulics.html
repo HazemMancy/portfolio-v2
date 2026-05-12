@@ -10,136 +10,234 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
     :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
-    [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--bg-card-hover:hsl(222,41%,13%);--border:hsl(222,30%,18%);--foreground:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);--secondary-bg:hsl(222,41%,16%);--input-bg:hsl(222,47%,9%)}
-    [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--bg-card-hover:hsl(0,0%,95%);--border:hsl(214,32%,88%);--foreground:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);--secondary-bg:hsl(210,40%,94%);--input-bg:hsl(0,0%,100%)}
+    [data-theme="dark"]{
+      --bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--border:hsl(222,30%,18%);
+      --fg:hsl(210,40%,98%);--muted:hsl(215,20%,55%);
+      --primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);
+      --sec-bg:hsl(222,41%,16%);--inp-bg:hsl(222,47%,9%);
+      --green:hsl(142,71%,45%);--green-bg:hsl(142,71%,45%,.06);--green-border:hsl(142,71%,45%,.25);
+      --amber:hsl(38,92%,50%); --amber-bg:hsl(38,92%,50%,.05);--amber-border:hsl(38,92%,50%,.25);
+      --red:hsl(0,72%,55%);    --red-bg:hsl(0,72%,55%,.07);   --red-border:hsl(0,72%,55%,.3);
+    }
+    [data-theme="light"]{
+      --bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--border:hsl(214,32%,88%);
+      --fg:hsl(222,47%,11%);--muted:hsl(215,16%,45%);
+      --primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);
+      --sec-bg:hsl(210,40%,94%);--inp-bg:hsl(0,0%,100%);
+      --green:hsl(142,71%,38%);--green-bg:hsl(142,71%,38%,.06);--green-border:hsl(142,71%,38%,.3);
+      --amber:hsl(38,92%,40%); --amber-bg:hsl(38,92%,40%,.06);--amber-border:hsl(38,92%,40%,.3);
+      --red:hsl(0,72%,48%);    --red-bg:hsl(0,72%,48%,.07);   --red-border:hsl(0,72%,48%,.3);
+    }
+    /* ── RESET ───────────────────────────────────────────── */
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
-    body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
-    a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
+    body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none}
     ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
+
+    /* ── NAVBAR ──────────────────────────────────────────── */
+    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s}
     #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .nav-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
     .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
-    nav.desktop{display:none;align-items:center;gap:.25rem} @media(min-width:1024px){nav.desktop{display:flex}}
-    .nav-link{padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s;background:none}
-    .nav-link:hover{color:var(--foreground);background:var(--secondary-bg)}
-    .nav-link-calc{display:flex;align-items:center;gap:.4rem;padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
-    .theme-toggle{width:2.25rem;height:2.25rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;background:none;border:none;cursor:pointer}
-    .theme-toggle:hover{background:var(--secondary-bg);color:var(--foreground)}
+    nav.desktop{display:none;align-items:center;gap:.25rem}
+    @media(min-width:1024px){nav.desktop{display:flex}}
+    .nav-link{padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s}
+    .nav-link:hover{color:var(--fg);background:var(--sec-bg)}
+    .nav-link-calc{display:flex;align-items:center;gap:.35rem;padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
+    .theme-toggle{width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;border:none;cursor:pointer}
+    .theme-toggle:hover{background:var(--sec-bg);color:var(--fg)}
     .desktop-th{display:none} @media(min-width:1024px){.desktop-th{display:flex}}
-    .mobile-controls{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mobile-controls{display:none}}
-    .mobile-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
-    .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
-    .mobile-menu a{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
-    .mobile-menu a:hover{background:var(--secondary-bg);color:var(--foreground)}
-    /* PAGE HEADER */
-    .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
-    .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
-    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
+    .mob-ctrl{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mob-ctrl{display:none}}
+    .mob-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
+    .mob-menu.open{display:block} @media(min-width:1024px){.mob-menu{display:none!important}}
+    .mob-menu a{display:block;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mob-menu a:hover{background:var(--sec-bg);color:var(--fg)}
+
+    /* ── PAGE HEADER ─────────────────────────────────────── */
+    .ph{padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--border)}
+    .ph-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
     .breadcrumb a:hover{color:var(--primary)}
-    .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.5rem}
-    .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
-    .page-desc{color:var(--muted);font-size:.8rem;max-width:42rem;line-height:1.6}
-    .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
-    /* LAYOUT */
-    .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
-    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 400px;align-items:start}}
-    /* CARD */
+    .sec-label{font-size:.65rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.35rem}
+    .page-title{font-size:clamp(1.3rem,2.8vw,1.85rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.35rem}
+    .page-desc{color:var(--muted);font-size:.78rem;max-width:42rem;line-height:1.6}
+    .badge-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
+    .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:9999px;font-size:.58rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--sec-bg)}
+
+    /* ── MAIN LAYOUT ─────────────────────────────────────── */
+    /* Mobile: single column. Tablet+: 2-col. Desktop: fixed right 390px. */
+    .calc-wrap{max-width:72rem;margin:0 auto;padding:1.25rem 1rem 2rem}
+    .calc-grid{
+      display:grid;
+      gap:1.25rem;
+      grid-template-columns:1fr;     /* mobile default */
+      grid-template-areas:
+        "inputs"
+        "results"
+        "meta";
+    }
+    @media(min-width:768px){
+      .calc-grid{
+        grid-template-columns:1fr 1fr;
+        grid-template-areas:
+          "inputs results"
+          "meta   meta";
+      }
+    }
+    @media(min-width:1024px){
+      .calc-grid{
+        grid-template-columns:1fr 390px;
+        grid-template-areas:
+          "inputs results"
+          "meta   meta";
+      }
+    }
+    .col-inputs {grid-area:inputs}
+    .col-results{grid-area:results}
+    .col-meta   {grid-area:meta}
+
+    /* Sticky inputs on desktop */
+    @media(min-width:768px){
+      .col-inputs{position:sticky;top:calc(var(--navbar-h) + .75rem);align-self:start}
+    }
+
+    /* ── CARD ─────────────────────────────────────────────── */
     .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
-    .card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
-    .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
-    .card-title{font-size:.8rem;font-weight:600}
-    .card-body{padding:1.25rem}
-    /* INPUTS */
-    .field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem;font-weight:500}
-    .field-note{font-size:.62rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
-    input[type=number],input[type=text],select{font-family:var(--font);padding:.45rem .65rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);outline:none;transition:border-color .15s;width:100%}
+    .card-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.55rem}
+    .hd-icon{width:1.6rem;height:1.6rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+    .card-title{font-size:.78rem;font-weight:600}
+    .card-body{padding:1rem 1.1rem}
+
+    /* ── FORM ELEMENTS ───────────────────────────────────── */
+    .flabel{font-size:.68rem;color:var(--muted);display:block;margin-bottom:.3rem;font-weight:500}
+    .fnote{font-size:.6rem;color:var(--muted);margin-top:.2rem;line-height:1.4}
+    input[type=number],input[type=text],select{
+      font-family:var(--font);padding:.42rem .6rem;
+      background:var(--inp-bg);border:1px solid var(--border);
+      border-radius:var(--radius);font-size:.78rem;color:var(--fg);
+      outline:none;transition:border-color .15s;width:100%;
+    }
     input[type=number]{-moz-appearance:textfield}
-    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
-    input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--primary)}
-    input.err{border-color:hsl(0,72%,55%)!important}
-    .err-msg{font-size:.65rem;color:hsl(0,72%,65%);margin-top:.25rem}
-    /* GRIDS */
-    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem}
-    @media(max-width:600px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
-    .section-sep{height:1px;background:var(--border);margin:1rem 0}
-    /* UNIT SECTION */
-    .unit-section{padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--secondary-bg)}
-    .unit-section-title{font-size:.7rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.5rem 1.1rem;border-radius:var(--radius);font-size:.78rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
-    .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
-    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
-    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
-    .btn-sm{padding:.3rem .7rem;font-size:.7rem}
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input:focus,select:focus{border-color:var(--primary)}
+    .err-msg{font-size:.62rem;color:hsl(0,72%,65%);margin-top:.2rem;display:none}
+
+    /* ── GRID HELPERS ────────────────────────────────────── */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem}
+    @media(max-width:480px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+
+    /* ── INPUT SECTION BOX ───────────────────────────────── */
+    .isec{padding:.85rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--sec-bg);margin-bottom:.75rem}
+    .isec-title{font-size:.65rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+
+    /* ── BUTTONS ─────────────────────────────────────────── */
+    .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.88}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--fg)}.btn-outline:hover{background:var(--sec-bg)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}.btn-ghost:hover{background:var(--sec-bg);color:var(--fg)}
+    .btn-sm{padding:.28rem .65rem;font-size:.68rem}
     .btn-full{width:100%;justify-content:center}
-    .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
-    /* RESULT PANELS */
-    .big-result{text-align:center;padding:1.25rem 1rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25);border-radius:var(--radius);margin-bottom:.75rem}
-    .big-result-label{font-size:.68rem;color:var(--muted);margin-bottom:.3rem}
-    .big-val{font-size:2rem;font-weight:800;color:var(--primary);font-variant-numeric:tabular-nums;line-height:1.1}
-    .big-unit{font-size:.85rem;font-weight:400;color:var(--muted);margin-left:.4rem}
-    .big-sub{font-size:.7rem;color:var(--muted);margin-top:.3rem}
-    .result-grid{display:grid;gap:.5rem;margin-top:.75rem}
-    .result-row{display:flex;justify-content:space-between;align-items:center;padding:.45rem .65rem;border-radius:var(--radius);background:var(--secondary-bg);font-size:.75rem}
-    .result-row.hl{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.18)}
-    .result-label{color:var(--muted)}
-    .result-val{font-weight:600;color:var(--foreground);font-variant-numeric:tabular-nums}
-    .result-row.hl .result-val{color:var(--primary)}
-    .result-unit{font-size:.65rem;color:var(--muted);margin-left:.3rem}
-    /* WARN / INFO BOXES */
-    .warn-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.25);border-radius:var(--radius);padding:.75rem;margin-bottom:.75rem}
-    .warn-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
-    .err-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(0,72%,55%,.07);border:1px solid hsl(0,72%,55%,.3);border-radius:var(--radius);padding:.75rem;margin-bottom:.75rem}
-    .err-box p{font-size:.72rem;color:hsl(0,72%,65%);line-height:1.6}
-    .info-box{display:flex;align-items:flex-start;gap:.6rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
-    .info-box p{font-size:.67rem;color:var(--muted);line-height:1.8}
-    .ok-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(142,71%,45%,.06);border:1px solid hsl(142,71%,45%,.25);border-radius:var(--radius);padding:.75rem;margin-bottom:.75rem}
-    .ok-box p{font-size:.67rem;color:hsl(142,71%,55%);line-height:1.8}
-    /* LIMIT BADGE */
-    .limit-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid}
-    .limit-ok{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.08)}
-    .limit-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
-    .limit-hi{border-color:hsl(0,72%,55%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,55%,.07)}
-    /* TABLE */
-    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-    table{width:100%;border-collapse:collapse;font-size:.75rem}
-    thead th{padding:.5rem .6rem;text-align:left;font-size:.65rem;font-weight:600;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
-    tbody td{padding:.4rem .6rem;border-bottom:1px solid hsl(222,30%,14%);vertical-align:middle;font-variant-numeric:tabular-nums}
-    [data-theme="light"] tbody td{border-bottom:1px solid hsl(214,32%,93%)}
-    tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover td{background:var(--secondary-bg)}
-    /* TRACE */
-    .trace-box{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem 1rem;font-size:.68rem;color:var(--muted);font-family:'Courier New',monospace;line-height:2;max-height:320px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
-    /* PIPE PICKER */
-    .pipe-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;align-items:end}
-    @media(max-width:500px){.pipe-row{grid-template-columns:1fr 1fr}}
-    /* FLOW REGIME CHIP */
-    .regime-chip{display:inline-flex;align-items:center;gap:.3rem;padding:.18rem .55rem;border-radius:9999px;font-size:.62rem;font-weight:600;border:1px solid}
-    .regime-lam{border-color:hsl(217,91%,60%,.4);color:hsl(217,91%,70%);background:hsl(217,91%,60%,.08)}
-    .regime-trans{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
-    .regime-turb{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
-    /* ASSUMPTIONS / REF PANEL */
-    .ref-panel{font-size:.68rem;color:var(--muted);line-height:1.9}
-    .ref-panel li{margin-left:1rem;padding:.1rem 0}
-    .ref-panel h4{font-size:.7rem;font-weight:600;color:var(--foreground);margin-bottom:.4rem;margin-top:.85rem}
+
+    /* ── RESULT PANELS ───────────────────────────────────── */
+    /* Two big KPI boxes side by side */
+    .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
+    @media(max-width:400px){.kpi-row{grid-template-columns:1fr}}
+    .kpi{text-align:center;padding:1rem .75rem;border-radius:var(--radius)}
+    .kpi-blue{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25)}
+    .kpi-green{background:var(--green-bg);border:1px solid var(--green-border)}
+    .kpi-lbl{font-size:.62rem;color:var(--muted);margin-bottom:.25rem}
+    .kpi-val{font-size:1.65rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+    .kpi-blue .kpi-val{color:var(--primary)}
+    .kpi-green .kpi-val{color:var(--green)}
+    .kpi-unit{font-size:.75rem;font-weight:400;color:var(--muted);margin-left:.3rem}
+    .kpi-sub{font-size:.6rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+
+    .res-grid{display:grid;gap:.4rem}
+    .res-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.73rem}
+    .res-row.hl{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.18)}
+    .res-lbl{color:var(--muted)}
+    .res-val{font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+    .res-row.hl .res-val{color:var(--primary)}
+    .res-unit{font-size:.6rem;color:var(--muted);margin-left:.25rem}
+
+    /* ── STATUS BOXES ────────────────────────────────────── */
+    .box{display:flex;align-items:flex-start;gap:.55rem;border-radius:var(--radius);padding:.65rem .8rem;margin-bottom:.65rem}
+    .box p,.box span{font-size:.67rem;line-height:1.75}
+    .box-warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+    .box-warn p{color:var(--muted)}
+    .box-err{background:var(--red-bg);border:1px solid var(--red-border)}
+    .box-err p{color:hsl(0,72%,65%)}
+
+    /* ── LIMIT BADGE ─────────────────────────────────────── */
+    .lbadge{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:9999px;font-size:.58rem;font-weight:600;border:1px solid;white-space:nowrap}
+    .lbadge-ok  {border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.08)}
+    .lbadge-warn{border-color:hsl(38,92%,50%,.4); color:hsl(38,92%,60%); background:hsl(38,92%,50%,.07)}
+    .lbadge-hi  {border-color:hsl(0,72%,55%,.4);  color:hsl(0,72%,65%);  background:hsl(0,72%,55%,.07)}
+
+    /* ── REGIME CHIP ─────────────────────────────────────── */
+    .regime{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid}
+    .r-lam  {border-color:hsl(217,91%,60%,.4);color:hsl(217,91%,70%);background:hsl(217,91%,60%,.08)}
+    .r-trans{border-color:hsl(38,92%,50%,.4); color:hsl(38,92%,60%); background:hsl(38,92%,50%,.07)}
+    .r-turb {border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
+
+    /* ── ACCORDION (trace / methodology) ─────────────────── */
+    .accordion{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .acc-trigger{
+      width:100%;display:flex;align-items:center;gap:.55rem;
+      padding:.85rem 1.1rem;cursor:pointer;background:none;border:none;
+      font-family:var(--font);font-size:.78rem;font-weight:600;color:var(--fg);
+      transition:background .15s;
+    }
+    .acc-trigger:hover{background:var(--sec-bg)}
+    .acc-trigger .acc-icon{margin-left:auto;color:var(--muted);transition:transform .2s}
+    .acc-trigger[aria-expanded="true"] .acc-icon{transform:rotate(180deg)}
+    .acc-body{display:none;padding:.85rem 1.1rem;border-top:1px solid var(--border)}
+    .acc-body.open{display:block}
+
+    /* Trace box */
+    .trace-box{
+      background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);
+      padding:.65rem .85rem;font-size:.65rem;color:var(--muted);
+      font-family:'Courier New',monospace;line-height:1.9;
+      max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;
+    }
+
+    /* Methodology / references */
+    .ref-panel{font-size:.67rem;color:var(--muted);line-height:1.85}
+    .ref-panel h4{font-size:.68rem;font-weight:600;color:var(--fg);margin:1rem 0 .35rem}
     .ref-panel h4:first-child{margin-top:0}
-    /* FOOTER */
-    footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
-    .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
-    .footer-links{display:flex;align-items:center;gap:.75rem}
-    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
-    .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
-    .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
+    .ref-panel li{margin-left:1.1rem;padding:.08rem 0}
+
+    /* Meta row: 2-col on tablet+, 1-col mobile */
+    .meta-grid{display:grid;gap:1rem;grid-template-columns:1fr}
+    @media(min-width:640px){.meta-grid{grid-template-columns:1fr 1fr}}
+
+    /* ── PLACEHOLDER ─────────────────────────────────────── */
+    .placeholder{padding:2.5rem 1rem;text-align:center}
+    .placeholder p{font-size:.78rem;color:var(--muted);margin-top:.5rem}
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer{border-top:1px solid var(--border);padding:1.1rem 1rem;margin-top:1rem}
+    .ft-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem}
+    .ft-links{display:flex;align-items:center;gap:.65rem}
+    .ft-icon{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .ft-icon:hover{color:var(--fg);border-color:var(--fg)}
+
+    /* ── UTIL ────────────────────────────────────────────── */
+    .text-primary{color:var(--primary)}.fw7{font-weight:700}.fs-sm{font-size:.875rem}.fs-xs{font-size:.72rem}
   </style>
 </head>
 <body>
 
+<!-- NAVBAR -->
 <header id="navbar">
-  <div class="navbar-inner">
+  <div class="nav-inner">
     <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
     <nav class="desktop">
       <a href="../index.html" class="nav-link">HOME</a>
@@ -148,298 +246,307 @@
       <a href="../index.html#projects" class="nav-link">PROJECTS</a>
       <a href="../index.html#skills" class="nav-link">SKILLS</a>
       <a href="../index.html#contact" class="nav-link">CONTACT</a>
-      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
-      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:16px;height:16px"></i></button>
+      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS</a>
+      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:15px;height:15px"></i></button>
     </nav>
-    <div class="mobile-controls">
-      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:16px;height:16px"></i></button>
-      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:16px;height:16px"></i></button>
+    <div class="mob-ctrl">
+      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:15px;height:15px"></i></button>
+      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:15px;height:15px"></i></button>
     </div>
   </div>
-  <div class="mobile-menu" id="mobileMenu">
+  <div class="mob-menu" id="mobileMenu">
     <a href="../index.html">HOME</a>
     <a href="../index.html#about">ABOUT</a>
     <a href="../index.html#experience">EXPERIENCE</a>
     <a href="../index.html#projects">PROJECTS</a>
     <a href="../index.html#skills">SKILLS</a>
     <a href="../index.html#contact">CONTACT</a>
-    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.4rem;margin-top:.5rem"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.35rem;margin-top:.4rem">
+      <i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS
+    </a>
   </div>
 </header>
 
 <!-- PAGE HEADER -->
-<div class="page-header">
-  <div class="page-header-inner">
+<div class="ph">
+  <div class="ph-inner">
     <div>
       <div class="breadcrumb">
         <a href="../index.html">Home</a>
-        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <i data-lucide="chevron-right" style="width:11px;height:11px"></i>
         <a href="index.html">Calculators</a>
-        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
-        <span style="color:var(--foreground)">Liquid Hydraulics</span>
+        <i data-lucide="chevron-right" style="width:11px;height:11px"></i>
+        <span style="color:var(--fg)">Liquid Hydraulics</span>
       </div>
-      <p class="section-label">HYDRAULICS</p>
+      <p class="sec-label">HYDRAULICS</p>
       <h1 class="page-title">Single Phase Liquid Hydraulics</h1>
-      <p class="page-desc">Darcy-Weisbach friction losses, static head, total pressure drop and total head. Friction factor via Swamee-Jain (turbulent) or f&nbsp;=&nbsp;64/Re (laminar). Service velocity and &Delta;P/100m limit checks per API&nbsp;RP&nbsp;14E.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem">
-        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Crane TP-410</span>
-        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>API RP 14E &mdash; velocity &amp; &Delta;P limits</span>
-        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Swamee-Jain (1976) &mdash; explicit Colebrook</span>
-        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>GPSA Data Book &sect;17</span>
-        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>&Delta;P = f&middot;(L/D)&middot;(&rho;v&sup2;/2)</span>
+      <p class="page-desc">Darcy-Weisbach friction + static head &mdash; total &Delta;P and total head. Swamee-Jain (turbulent) / f&nbsp;=&nbsp;64/Re (laminar). API&nbsp;RP&nbsp;14E service velocity &amp; &Delta;P/100m limit checks.</p>
+      <div class="badge-row">
+        <span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>Crane TP-410</span>
+        <span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>API RP 14E</span>
+        <span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>Swamee-Jain (1976)</span>
+        <span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>GPSA &sect;17</span>
       </div>
     </div>
-    <a href="index.html" class="btn btn-outline" style="margin-top:auto"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>All Calculators</a>
+    <a href="index.html" class="btn btn-outline btn-sm" style="align-self:flex-start;margin-top:.25rem">
+      <i data-lucide="arrow-left" style="width:13px;height:13px"></i>All Calculators
+    </a>
   </div>
 </div>
 
-<!-- MAIN LAYOUT -->
-<div class="calc-layout">
+<!-- CALCULATOR AREA -->
+<div class="calc-wrap">
+  <div class="calc-grid">
 
-  <!-- LEFT: INPUTS -->
-  <div>
-    <div class="card">
-      <div class="card-header">
-        <div class="card-header-icon"><i data-lucide="droplets" style="width:15px;height:15px"></i></div>
-        <span class="card-title">Input Parameters</span>
-        <div style="margin-left:auto;display:flex;gap:.35rem">
-          <button class="btn btn-outline btn-sm" onclick="loadTestCase()"><i data-lucide="flask-conical" style="width:12px;height:12px"></i>Test Case</button>
-          <button class="btn btn-ghost btn-sm" onclick="resetForm()" title="Reset"><i data-lucide="rotate-ccw" style="width:12px;height:12px"></i></button>
-        </div>
-      </div>
-      <div class="card-body">
-
-        <!-- FLOW & FLUID -->
-        <div class="unit-section" style="margin-bottom:.85rem">
-          <div class="unit-section-title"><i data-lucide="beaker" style="width:13px;height:13px"></i>Fluid & Flow</div>
-          <div class="grid-2">
-            <div>
-              <label class="field-label">Flow Rate (m³/h)</label>
-              <input type="number" id="inpFlow" value="" min="0" step="any" oninput="calculate()" placeholder="e.g. 100" />
-              <div class="err-msg" id="errFlow" style="display:none">Must be &gt; 0</div>
-            </div>
-            <div>
-              <label class="field-label">Density &rho; (kg/m³)</label>
-              <input type="number" id="inpRho" value="" min="0" step="any" oninput="calculate()" placeholder="e.g. 850" />
-              <div class="err-msg" id="errRho" style="display:none">Must be &gt; 0</div>
-            </div>
-            <div>
-              <label class="field-label">Dynamic Viscosity &mu; (cP)</label>
-              <input type="number" id="inpMu" value="" min="0" step="any" oninput="calculate()" placeholder="e.g. 5" />
-              <div class="err-msg" id="errMu" style="display:none">Must be &gt; 0</div>
-            </div>
-            <div>
-              <label class="field-label">Pipe Length L (m)</label>
-              <input type="number" id="inpLen" value="" min="0" step="any" oninput="calculate()" placeholder="e.g. 200" />
-              <div class="err-msg" id="errLen" style="display:none">Must be &gt; 0</div>
-            </div>
+    <!-- ══════════════════════════════════════
+         LEFT — INPUTS (sticky on desktop)
+    ══════════════════════════════════════ -->
+    <div class="col-inputs">
+      <div class="card">
+        <div class="card-hd">
+          <div class="hd-icon"><i data-lucide="droplets" style="width:14px;height:14px"></i></div>
+          <span class="card-title">Input Parameters</span>
+          <div style="margin-left:auto;display:flex;gap:.3rem">
+            <button class="btn btn-outline btn-sm" onclick="loadTestCase()">
+              <i data-lucide="flask-conical" style="width:11px;height:11px"></i>Test
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="resetForm()" title="Reset">
+              <i data-lucide="rotate-ccw" style="width:11px;height:11px"></i>
+            </button>
           </div>
         </div>
+        <div class="card-body">
 
-        <!-- PIPE -->
-        <div class="unit-section" style="margin-bottom:.85rem">
-          <div class="unit-section-title"><i data-lucide="circle-dashed" style="width:13px;height:13px"></i>Pipe Selection</div>
-          <div class="pipe-row">
-            <div>
-              <label class="field-label">NPS</label>
-              <select id="selNPS" onchange="onNPSChange()">
-                <option value="custom">— Custom ID —</option>
-              </select>
-            </div>
-            <div>
-              <label class="field-label">Schedule</label>
-              <select id="selSch" onchange="onSchChange()">
-                <option value="custom">— Custom —</option>
-              </select>
-            </div>
-            <div>
-              <label class="field-label">Inner Dia. D (mm)</label>
-              <input type="number" id="inpDia" value="" min="0" step="any" oninput="onCustomDia()" placeholder="e.g. 154.1" />
-              <div class="err-msg" id="errDia" style="display:none">Must be &gt; 0</div>
+          <!-- Fluid & Flow -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="droplet" style="width:12px;height:12px"></i>Fluid &amp; Flow</div>
+            <div class="g2">
+              <div>
+                <label class="flabel">Flow Rate (m³/h)</label>
+                <input type="number" id="inpFlow" min="0" step="any" oninput="calculate()" placeholder="e.g. 100" />
+                <div class="err-msg" id="errFlow">Must be &gt; 0</div>
+              </div>
+              <div>
+                <label class="flabel">Density &rho; (kg/m³)</label>
+                <input type="number" id="inpRho" min="0" step="any" oninput="calculate()" placeholder="e.g. 850" />
+                <div class="err-msg" id="errRho">Must be &gt; 0</div>
+              </div>
+              <div>
+                <label class="flabel">Viscosity &mu; (cP)</label>
+                <input type="number" id="inpMu" min="0" step="any" oninput="calculate()" placeholder="e.g. 5" />
+                <div class="err-msg" id="errMu">Must be &gt; 0</div>
+              </div>
+              <div>
+                <label class="flabel">Pipe Length L (m)</label>
+                <input type="number" id="inpLen" min="0" step="any" oninput="calculate()" placeholder="e.g. 200" />
+                <div class="err-msg" id="errLen">Must be &gt; 0</div>
+              </div>
             </div>
           </div>
-          <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:end">
-            <div style="flex:1">
-              <label class="field-label">Roughness &epsilon; (mm)</label>
+
+          <!-- Pipe -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="circle-dashed" style="width:12px;height:12px"></i>Pipe Selection</div>
+            <div class="g3">
+              <div>
+                <label class="flabel">NPS</label>
+                <select id="selNPS" onchange="onNPSChange()">
+                  <option value="custom">— Custom —</option>
+                </select>
+              </div>
+              <div>
+                <label class="flabel">Schedule</label>
+                <select id="selSch" onchange="onSchChange()">
+                  <option value="custom">— Custom —</option>
+                </select>
+              </div>
+              <div>
+                <label class="flabel">ID (mm)</label>
+                <input type="number" id="inpDia" min="0" step="any" oninput="onCustomDia()" placeholder="e.g. 154" />
+                <div class="err-msg" id="errDia">Must be &gt; 0</div>
+              </div>
+            </div>
+            <div style="margin-top:.55rem">
+              <label class="flabel">Roughness &epsilon; (mm)</label>
               <input type="number" id="inpRough" value="0.0457" min="0" step="any" oninput="calculate()" />
-              <div class="field-note">Default 0.0457 mm — commercial CS (Moody / GPSA)</div>
+              <div class="fnote">Default 0.0457 mm — commercial CS (Moody / GPSA)</div>
+            </div>
+          </div>
+
+          <!-- Elevation & Service -->
+          <div class="isec" style="margin-bottom:0">
+            <div class="isec-title"><i data-lucide="arrow-up-down" style="width:12px;height:12px"></i>Elevation &amp; Service</div>
+            <div class="g2">
+              <div>
+                <label class="flabel">&Delta;z Elevation (m)</label>
+                <input type="number" id="inpDz" value="0" step="any" oninput="calculate()" />
+                <div class="fnote">+ uphill &nbsp;|&nbsp; &minus; downhill</div>
+              </div>
+              <div>
+                <label class="flabel">Service Type</label>
+                <select id="selService" onchange="calculate()">
+                  <option value="">— None —</option>
+                </select>
+                <div class="fnote">API RP 14E limit check</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error -->
+          <div id="globalErr" class="box box-err" style="display:none;margin-top:.65rem">
+            <i data-lucide="circle-x" style="width:13px;height:13px;color:hsl(0,72%,65%);flex-shrink:0;margin-top:2px"></i>
+            <p id="globalErrText"></p>
+          </div>
+
+          <button class="btn btn-primary btn-full" style="margin-top:.75rem" onclick="calculate()">
+            <i data-lucide="zap" style="width:13px;height:13px"></i>Calculate
+          </button>
+        </div>
+      </div>
+    </div><!-- end col-inputs -->
+
+    <!-- ══════════════════════════════════════
+         RIGHT — RESULTS
+    ══════════════════════════════════════ -->
+    <div class="col-results">
+
+      <!-- Placeholder -->
+      <div id="placeholderCard" class="card">
+        <div class="placeholder">
+          <i data-lucide="droplets" style="width:32px;height:32px;color:var(--muted);opacity:.25;display:block;margin:0 auto"></i>
+          <p>Enter parameters and click Calculate.</p>
+        </div>
+      </div>
+
+      <!-- Warnings -->
+      <div id="warningsCard" class="box box-warn" style="display:none">
+        <i data-lucide="triangle-alert" style="width:13px;height:13px;color:var(--amber);flex-shrink:0;margin-top:2px"></i>
+        <p id="warningsText"></p>
+      </div>
+
+      <!-- Service limits -->
+      <div id="limitsCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd">
+          <div class="hd-icon" style="background:hsl(38,92%,50%,.1)">
+            <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--amber)"></i>
+          </div>
+          <span class="card-title">Service Limit Check</span>
+          <span id="limitsServiceName" style="font-size:.63rem;color:var(--muted);margin-left:.35rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        </div>
+        <div class="card-body" style="padding:.75rem 1rem"><div id="limitsBody"></div></div>
+      </div>
+
+      <!-- Main results -->
+      <div id="resultsCard" class="card" style="display:none">
+        <div class="card-hd">
+          <div class="hd-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>
+          <span class="card-title">Results</span>
+          <span id="regimeChip" style="margin-left:.4rem"></span>
+        </div>
+        <div class="card-body">
+          <!-- KPI row: side-by-side on all viewports -->
+          <div class="kpi-row">
+            <div class="kpi kpi-blue">
+              <div class="kpi-lbl">Total &Delta;P</div>
+              <div><span class="kpi-val" id="bigTotalDP">—</span><span class="kpi-unit">bar</span></div>
+              <div class="kpi-sub" id="bigDPBreakdown"></div>
+            </div>
+            <div class="kpi kpi-green">
+              <div class="kpi-lbl" style="color:var(--green)">Total Head</div>
+              <div><span class="kpi-val" id="bigTotalHead">—</span><span class="kpi-unit">m liq.</span></div>
+              <div class="kpi-sub" id="bigHeadBreakdown"></div>
+            </div>
+          </div>
+          <!-- Detail grid -->
+          <div class="res-grid" id="detailGrid"></div>
+        </div>
+      </div>
+
+    </div><!-- end col-results -->
+
+    <!-- ══════════════════════════════════════
+         FULL-WIDTH BOTTOM: Trace + Methodology
+    ══════════════════════════════════════ -->
+    <div class="col-meta">
+      <div class="meta-grid">
+
+        <!-- Calculation Trace accordion -->
+        <div id="traceAccordion" class="accordion" style="display:none">
+          <button class="acc-trigger" onclick="toggleAcc('traceBody',this)" aria-expanded="false">
+            <div class="hd-icon"><i data-lucide="file-code" style="width:14px;height:14px"></i></div>
+            Calculation Trace
+            <i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i>
+          </button>
+          <div class="acc-body" id="traceBody">
+            <div class="trace-box" id="traceBox"></div>
+          </div>
+        </div>
+
+        <!-- Methodology accordion -->
+        <div class="accordion">
+          <button class="acc-trigger" onclick="toggleAcc('methBody',this)" aria-expanded="false">
+            <div class="hd-icon"><i data-lucide="book-open" style="width:14px;height:14px"></i></div>
+            Methodology &amp; Assumptions
+            <i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i>
+          </button>
+          <div class="acc-body" id="methBody">
+            <div class="ref-panel">
+              <h4>Methodology</h4>
+              <ul>
+                <li>Darcy-Weisbach: &Delta;P<sub>f</sub> = f &middot; (L/D) &middot; (&rho;v&sup2;/2) &mdash; incompressible liquid</li>
+                <li>Turbulent (Re &ge; 4000): Swamee-Jain explicit Colebrook-White &mdash; f = 0.25/[log(&epsilon;/3.7D + 5.74/Re<sup>0.9</sup>)]&sup2;</li>
+                <li>Laminar (Re &lt; 2300): f = 64/Re (Hagen-Poiseuille)</li>
+                <li>Transition (2300 &ndash; 4000): linear interpolation</li>
+                <li>Static: &Delta;P<sub>s</sub> = &rho;&middot;g&middot;&Delta;z / 10<sup>5</sup> bar; +&Delta;z = uphill</li>
+                <li>Total: &Delta;P<sub>total</sub> = &Delta;P<sub>f</sub> + &Delta;P<sub>s</sub>; H<sub>total</sub> = H<sub>f</sub> + &Delta;z</li>
+              </ul>
+              <h4>Assumptions</h4>
+              <ul>
+                <li>Steady-state, single-phase incompressible flow</li>
+                <li>Isothermal &mdash; &rho; and &mu; constant along pipe</li>
+                <li>Newtonian fluid; major losses only (no fittings/bends)</li>
+                <li>Roughness uniform; default 0.0457 mm (commercial CS, GPSA Table 17-7)</li>
+              </ul>
+              <h4>Limits &mdash; API RP 14E</h4>
+              <ul>
+                <li>Screening-level guidance only &mdash; not hard code-compliance values</li>
+                <li>Vendor data and detailed engineering required before final design</li>
+              </ul>
+              <h4>References</h4>
+              <ul>
+                <li>Crane TP-410: Flow of Fluids Through Valves, Fittings, and Pipe</li>
+                <li>API RP 14E: Offshore Production Platform Piping Systems</li>
+                <li>Swamee &amp; Jain (1976), J. Hydraulics Div., ASCE</li>
+                <li>GPSA Engineering Data Book, 14th Ed. &mdash; Section 17</li>
+                <li>Perry's Chemical Engineers' Handbook, 9th Ed.</li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <!-- CONDITIONS -->
-        <div class="unit-section" style="margin-bottom:.85rem">
-          <div class="unit-section-title"><i data-lucide="arrow-up-down" style="width:13px;height:13px"></i>Elevation &amp; Service</div>
-          <div class="grid-2">
-            <div>
-              <label class="field-label">&Delta;z Elevation Change (m)</label>
-              <input type="number" id="inpDz" value="0" step="any" oninput="calculate()" placeholder="+ve = uphill" />
-              <div class="field-note">+ uphill (opposes flow) &nbsp;|&nbsp; &minus; downhill (assists)</div>
-            </div>
-            <div>
-              <label class="field-label">Service Type (limit check)</label>
-              <select id="selService" onchange="calculate()">
-                <option value="">— None —</option>
-              </select>
-              <div class="field-note">API RP 14E screening criteria</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ERROR BOX -->
-        <div id="globalErr" class="err-box" style="display:none">
-          <i data-lucide="circle-x" style="width:14px;height:14px;color:hsl(0,72%,65%);flex-shrink:0;margin-top:2px"></i>
-          <p id="globalErrText"></p>
-        </div>
-
-        <button class="btn btn-primary btn-full" onclick="calculate()">
-          <i data-lucide="zap" style="width:14px;height:14px"></i>Calculate
-        </button>
       </div>
-    </div>
-  </div>
+    </div><!-- end col-meta -->
 
-  <!-- RIGHT: RESULTS -->
-  <div id="resultsCol">
-
-    <!-- placeholder -->
-    <div id="placeholderCard" class="card">
-      <div class="card-body" style="padding:3rem 1rem;text-align:center">
-        <i data-lucide="droplets" style="width:36px;height:36px;color:var(--muted);opacity:.3;margin:0 auto .75rem;display:block"></i>
-        <p style="font-size:.8rem;color:var(--muted)">Enter parameters to calculate.</p>
-      </div>
-    </div>
-
-    <!-- warnings -->
-    <div id="warningsCard" class="warn-box" style="display:none">
-      <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
-      <p id="warningsText"></p>
-    </div>
-
-    <!-- service limits -->
-    <div id="limitsCard" class="card" style="display:none;margin-bottom:1.25rem">
-      <div class="card-header">
-        <div class="card-header-icon" style="background:hsl(38,92%,50%,.12)"><i data-lucide="shield-check" style="width:15px;height:15px;color:hsl(38,92%,60%)"></i></div>
-        <span class="card-title">Service Limit Check</span>
-        <span id="limitsServiceName" style="font-size:.68rem;color:var(--muted);margin-left:.4rem"></span>
-      </div>
-      <div class="card-body" style="padding:.75rem">
-        <div id="limitsBody"></div>
-      </div>
-    </div>
-
-    <!-- main results -->
-    <div id="resultsCard" class="card" style="display:none">
-      <div class="card-header">
-        <div class="card-header-icon"><i data-lucide="zap" style="width:15px;height:15px"></i></div>
-        <span class="card-title">Results</span>
-        <span id="regimeChip" style="margin-left:.4rem"></span>
-      </div>
-      <div class="card-body">
-        <!-- Big primary result: Total ΔP -->
-        <div class="big-result">
-          <div class="big-result-label">Total Pressure Drop</div>
-          <div><span class="big-val" id="bigTotalDP">—</span><span class="big-unit">bar</span></div>
-          <div class="big-sub" id="bigDPBreakdown"></div>
-        </div>
-        <!-- Big secondary: Total Head -->
-        <div class="big-result" style="background:hsl(142,71%,45%,.06);border-color:hsl(142,71%,45%,.25)">
-          <div class="big-result-label" style="color:hsl(142,71%,55%)">Total Head</div>
-          <div><span class="big-val" id="bigTotalHead" style="color:hsl(142,71%,55%)">—</span><span class="big-unit">m liq.</span></div>
-          <div class="big-sub" id="bigHeadBreakdown"></div>
-        </div>
-        <!-- Detailed results grid -->
-        <div class="result-grid" id="detailGrid"></div>
-      </div>
-    </div>
-
-    <!-- trace -->
-    <div class="card" id="traceCard" style="display:none;margin-top:1.25rem">
-      <div class="card-header">
-        <div class="card-header-icon"><i data-lucide="file-code" style="width:15px;height:15px"></i></div>
-        <span class="card-title">Calculation Trace</span>
-        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleTrace()">Toggle</button>
-      </div>
-      <div id="tracePanel">
-        <div class="card-body" style="padding:.75rem">
-          <div class="trace-box" id="traceBox">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- assumptions -->
-    <div class="card" style="margin-top:1.25rem">
-      <div class="card-header">
-        <div class="card-header-icon"><i data-lucide="book-open" style="width:15px;height:15px"></i></div>
-        <span class="card-title">Methodology &amp; Assumptions</span>
-        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleAssumptions()">Toggle</button>
-      </div>
-      <div id="assumptionsPanel">
-        <div class="card-body" style="padding:.75rem">
-          <div class="ref-panel">
-            <h4>Methodology</h4>
-            <ul>
-              <li>Darcy-Weisbach: &Delta;P<sub>f</sub> = f &middot; (L/D) &middot; (&rho;&nu;&sup2;/2) &mdash; incompressible liquid friction</li>
-              <li>Turbulent (Re &ge; 4000): Swamee-Jain explicit approximation of Colebrook-White &mdash; f = 0.25 / [log(&epsilon;/3.7D + 5.74/Re<sup>0.9</sup>)]&sup2;</li>
-              <li>Laminar (Re &lt; 2300): Hagen-Poiseuille &mdash; f = 64/Re</li>
-              <li>Transition (2300 &le; Re &lt; 4000): linear interpolation between laminar and turbulent</li>
-              <li>Static head: &Delta;P<sub>s</sub> = &rho; &middot; g &middot; &Delta;z / 10<sup>5</sup> [bar] &mdash; sign convention: +&Delta;z = uphill</li>
-              <li>Total: &Delta;P<sub>total</sub> = &Delta;P<sub>f</sub> + &Delta;P<sub>s</sub> | H<sub>total</sub> = H<sub>f</sub> + &Delta;z</li>
-            </ul>
-            <h4>Assumptions</h4>
-            <ul>
-              <li>Steady-state, single-phase incompressible liquid flow</li>
-              <li>Isothermal &mdash; density and viscosity constant along pipe</li>
-              <li>Newtonian fluid &mdash; viscosity independent of shear rate</li>
-              <li>Major friction losses only &mdash; minor losses (fittings, valves, bends) NOT included</li>
-              <li>Pipe roughness uniform and constant along length</li>
-              <li>Default roughness 0.0457 mm = commercial carbon steel (Moody / GPSA Table 17-7)</li>
-            </ul>
-            <h4>Velocity &amp; &Delta;P Limits (API RP 14E screening)</h4>
-            <ul>
-              <li>Limits are FEED / preliminary design guidance &mdash; not universal hard code-compliance values</li>
-              <li>Vendor confirmation and detailed engineering required before detailed design</li>
-            </ul>
-            <h4>References</h4>
-            <ul>
-              <li>Crane TP-410: Flow of Fluids Through Valves, Fittings, and Pipe</li>
-              <li>API RP 14E: Recommended Practice for Offshore Production Platform Piping Systems</li>
-              <li>Swamee &amp; Jain (1976): Explicit equations for pipe-flow problems, J. Hydraulics Div., ASCE</li>
-              <li>GPSA Engineering Data Book, 14th Ed. &mdash; Section 17</li>
-              <li>Perry's Chemical Engineers' Handbook, 9th Ed.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end results col -->
-</div><!-- end calc-layout -->
+  </div><!-- end calc-grid -->
+</div><!-- end calc-wrap -->
 
 <footer>
-  <div class="footer-inner">
-    <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
-    <div class="footer-links">
-      <a href="tel:+201096597449" class="footer-icon"><i data-lucide="phone" style="width:14px;height:14px"></i></a>
-      <a href="mailto:hazemmancy@outlook.com" class="footer-icon"><i data-lucide="mail" style="width:14px;height:14px"></i></a>
-      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="footer-icon">
-        <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg>
+  <div class="ft-inner">
+    <div class="logo"><span class="text-primary fw7 fs-sm">Hazem</span><span class="fw7 fs-sm">ElMancy</span></div>
+    <div class="ft-links">
+      <a href="tel:+201096597449" class="ft-icon"><i data-lucide="phone" style="width:13px;height:13px"></i></a>
+      <a href="mailto:hazemmancy@outlook.com" class="ft-icon"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="ft-icon">
+        <svg style="width:13px;height:13px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg>
       </a>
     </div>
-    <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+    <p class="fs-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
   </div>
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  CONSTANTS
-// ═══════════════════════════════════════════════════════════
-const G = 9.80665; // m/s²
+const G = 9.80665;
 
-// ═══════════════════════════════════════════════════════════
-//  NPS PIPE DATABASE  (OD mm, schedule → wall mm)
-//  Source: ASME B36.10 / B36.19
-// ═══════════════════════════════════════════════════════════
 const PIPE_DB = {
   '0.5"' :{ OD:21.3,  SCH:{ '40':2.77,'80':3.73,'160':4.78,'XXS':7.47 }},
   '0.75"':{ OD:26.7,  SCH:{ '40':2.87,'80':3.91,'160':5.56,'XXS':7.82 }},
@@ -459,28 +566,22 @@ const PIPE_DB = {
   '24"'  :{ OD:609.6, SCH:{ '40':9.53,'80':12.70,'120':17.48,'160':23.83}},
 };
 
-// ═══════════════════════════════════════════════════════════
-//  SERVICE LIMIT DATABASE  (API RP 14E / EPC FEED practice)
-// ═══════════════════════════════════════════════════════════
 const SERVICE_LIMITS = [
-  { service:'Crude Oil — Pump Suction',   vMin:0.3, vMax:1.5,  dpMin:null, dpMax:0.3,  note:'Low velocity to avoid turbulence and NPSHa issues; ΔP/100m ≤ 0.3 bar/100m' },
-  { service:'Crude Oil — Pump Discharge', vMin:0.5, vMax:3.0,  dpMin:null, dpMax:1.5,  note:'API RP 14E: v ≤ 3 m/s typical; ΔP/100m ≤ 1.5 bar/100m EPC guidance' },
-  { service:'Crude Oil — Gravity Line',   vMin:0.3, vMax:1.2,  dpMin:null, dpMax:0.2,  note:'Gravity flow: low ΔP; self-venting slope usually governs' },
-  { service:'Condensate — Pump Suction',  vMin:0.3, vMax:1.5,  dpMin:null, dpMax:0.3,  note:'Similar to crude suction; flash risk — keep velocity low' },
-  { service:'Condensate — Pump Discharge',vMin:0.5, vMax:3.0,  dpMin:null, dpMax:1.5,  note:'API RP 14E guidance' },
-  { service:'MEG / DEG / TEG',            vMin:0.3, vMax:2.0,  dpMin:null, dpMax:1.0,  note:'Higher viscosity; keep velocity moderate to limit ΔP' },
-  { service:'Methanol / Chemical Inj.',   vMin:0.3, vMax:3.0,  dpMin:null, dpMax:2.0,  note:'Small-bore high-pressure injection lines; velocity range wide' },
-  { service:'Produced Water — Suction',   vMin:0.5, vMax:2.0,  dpMin:null, dpMax:0.5,  note:'Erosion risk above 2 m/s with solids; check sand content' },
-  { service:'Produced Water — Discharge', vMin:0.5, vMax:3.0,  dpMin:null, dpMax:1.5,  note:'Check erosion if sand present' },
-  { service:'Cooling Water',              vMin:0.9, vMax:3.0,  dpMin:null, dpMax:1.5,  note:'Minimum 0.9 m/s to prevent fouling / deposition' },
-  { service:'Firewater',                  vMin:1.0, vMax:3.0,  dpMin:null, dpMax:1.0,  note:'Min velocity to maintain pressure during demand' },
-  { service:'Diesel / Fuel Oil',          vMin:0.3, vMax:2.0,  dpMin:null, dpMax:0.8,  note:'Gravity drain or pump; viscosity may vary significantly' },
-  { service:'Lube Oil',                   vMin:0.3, vMax:1.5,  dpMin:null, dpMax:0.5,  note:'High viscosity; laminar flow typical — verify Re' },
+  { service:'Crude Oil — Pump Suction',    vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Low velocity; ΔP/100m ≤ 0.3 bar/100m. NPSHa sensitivity.' },
+  { service:'Crude Oil — Pump Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E: v ≤ 3 m/s; ΔP/100m ≤ 1.5 bar/100m.' },
+  { service:'Crude Oil — Gravity Line',    vMin:0.3, vMax:1.2, dpMax:0.2,  note:'Gravity flow — low ΔP; slope typically governs.' },
+  { service:'Condensate — Pump Suction',   vMin:0.3, vMax:1.5, dpMax:0.3,  note:'Flash risk — keep velocity low.' },
+  { service:'Condensate — Pump Discharge', vMin:0.5, vMax:3.0, dpMax:1.5,  note:'API RP 14E guidance.' },
+  { service:'MEG / DEG / TEG',             vMin:0.3, vMax:2.0, dpMax:1.0,  note:'Higher viscosity; moderate velocity.' },
+  { service:'Methanol / Chemical Inj.',    vMin:0.3, vMax:3.0, dpMax:2.0,  note:'Small-bore high-pressure injection lines.' },
+  { service:'Produced Water — Suction',    vMin:0.5, vMax:2.0, dpMax:0.5,  note:'Erosion risk above 2 m/s with solids.' },
+  { service:'Produced Water — Discharge',  vMin:0.5, vMax:3.0, dpMax:1.5,  note:'Check erosion if sand present.' },
+  { service:'Cooling Water',               vMin:0.9, vMax:3.0, dpMax:1.5,  note:'Min 0.9 m/s to prevent fouling.' },
+  { service:'Firewater',                   vMin:1.0, vMax:3.0, dpMax:1.0,  note:'Min velocity to maintain pressure during demand.' },
+  { service:'Diesel / Fuel Oil',           vMin:0.3, vMax:2.0, dpMax:0.8,  note:'Viscosity-dependent; verify flow regime.' },
+  { service:'Lube Oil',                    vMin:0.3, vMax:1.5, dpMax:0.5,  note:'Laminar flow typical — verify Re.' },
 ];
 
-// ═══════════════════════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════════════════════
 function fmtN(n, d){
   if(!isFinite(n)) return '—';
   d = d !== undefined ? d : 4;
@@ -493,23 +594,20 @@ function fmtN(n, d){
   return n.toPrecision(4);
 }
 
-// ═══════════════════════════════════════════════════════════
-//  PIPE PICKER INIT
-// ═══════════════════════════════════════════════════════════
+/* ── PIPE PICKER ─────────────────────────────────── */
 function initPipePicker(){
   const selNPS = document.getElementById('selNPS');
-  selNPS.innerHTML = '<option value="custom">— Custom ID —</option>';
+  selNPS.innerHTML = '<option value="custom">— Custom —</option>';
   Object.keys(PIPE_DB).forEach(nps=>{
-    const opt = document.createElement('option');
-    opt.value = nps; opt.textContent = 'NPS '+nps;
-    selNPS.appendChild(opt);
+    const o = document.createElement('option');
+    o.value = nps; o.textContent = 'NPS ' + nps;
+    selNPS.appendChild(o);
   });
-
   const selSvc = document.getElementById('selService');
   SERVICE_LIMITS.forEach(s=>{
-    const opt = document.createElement('option');
-    opt.value = s.service; opt.textContent = s.service;
-    selSvc.appendChild(opt);
+    const o = document.createElement('option');
+    o.value = s.service; o.textContent = s.service;
+    selSvc.appendChild(o);
   });
 }
 
@@ -519,67 +617,53 @@ function onNPSChange(){
   selSch.innerHTML = '<option value="custom">— Custom —</option>';
   if(nps !== 'custom' && PIPE_DB[nps]){
     Object.keys(PIPE_DB[nps].SCH).forEach(sch=>{
-      const opt = document.createElement('option');
-      opt.value = sch;
+      const o = document.createElement('option');
+      o.value = sch;
       const id = (PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch]).toFixed(1);
-      opt.textContent = 'SCH ' + sch + '  (ID ' + id + ' mm)';
-      selSch.appendChild(opt);
+      o.textContent = 'SCH ' + sch + ' (ID ' + id + ' mm)';
+      selSch.appendChild(o);
     });
-    // Auto-select SCH 40 if available
     if(PIPE_DB[nps].SCH['40']) selSch.value = '40';
     onSchChange();
-  } else {
-    calculate();
-  }
+  } else { calculate(); }
 }
 
 function onSchChange(){
   const nps = document.getElementById('selNPS').value;
   const sch = document.getElementById('selSch').value;
-  if(nps !== 'custom' && sch !== 'custom' && PIPE_DB[nps] && PIPE_DB[nps].SCH[sch]){
-    const id = PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch];
-    document.getElementById('inpDia').value = id.toFixed(1);
+  if(nps !== 'custom' && sch !== 'custom' && PIPE_DB[nps]?.SCH[sch]){
+    document.getElementById('inpDia').value = (PIPE_DB[nps].OD - 2*PIPE_DB[nps].SCH[sch]).toFixed(1);
   }
   calculate();
 }
 
 function onCustomDia(){
-  // User typed a custom ID — reset NPS dropdowns to 'custom'
   document.getElementById('selNPS').value = 'custom';
   document.getElementById('selSch').innerHTML = '<option value="custom">— Custom —</option>';
   calculate();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  FRICTION FACTOR
-// ═══════════════════════════════════════════════════════════
-function frictionFactor(Re, eps_m, D_m){
+/* ── FRICTION FACTOR ─────────────────────────────── */
+function frictionFactor(Re, eps, D){
   if(Re <= 0) return 0;
-  if(Re < 2300) return 64 / Re; // Hagen-Poiseuille
+  if(Re < 2300) return 64/Re;
   if(Re >= 4000){
-    // Swamee-Jain explicit Colebrook-White
-    const ratio = eps_m / D_m;
-    const denom = Math.log10(ratio/3.7 + 5.74/Math.pow(Re,0.9));
-    return 0.25 / (denom * denom);
+    const d = Math.log10(eps/D/3.7 + 5.74/Math.pow(Re,0.9));
+    return 0.25/(d*d);
   }
-  // Transition: linear interpolation
-  const fLam = 64/2300;
-  const ratioT = eps_m / D_m;
-  const denomT = Math.log10(ratioT/3.7 + 5.74/Math.pow(4000,0.9));
-  const fTurb = 0.25 / (denomT * denomT);
-  const t = (Re - 2300) / (4000 - 2300);
-  return fLam + t*(fTurb - fLam);
+  const fL = 64/2300;
+  const dT = Math.log10(eps/D/3.7 + 5.74/Math.pow(4000,0.9));
+  const fT = 0.25/(dT*dT);
+  return fL + (Re-2300)/1700*(fT-fL);
 }
 
 function flowRegime(Re){
-  if(Re < 2300)  return { label:'Laminar',    cls:'regime-lam',   method:'f = 64/Re' };
-  if(Re < 4000)  return { label:'Transition', cls:'regime-trans',  method:'Interpolated f' };
-  return             { label:'Turbulent',   cls:'regime-turb',  method:'Swamee-Jain' };
+  if(Re < 2300)  return { label:'Laminar',    cls:'r-lam',   method:'f = 64/Re' };
+  if(Re < 4000)  return { label:'Transition', cls:'r-trans', method:'Interpolated f' };
+  return             { label:'Turbulent',   cls:'r-turb',  method:'Swamee-Jain' };
 }
 
-// ═══════════════════════════════════════════════════════════
-//  MAIN CALCULATE
-// ═══════════════════════════════════════════════════════════
+/* ── MAIN CALCULATE ──────────────────────────────── */
 function calculate(){
   clearErrors();
   const flowM3h = parseFloat(document.getElementById('inpFlow').value);
@@ -590,118 +674,91 @@ function calculate(){
   const eps_mm  = parseFloat(document.getElementById('inpRough').value) || 0.0457;
   const dz      = parseFloat(document.getElementById('inpDz').value) || 0;
 
-  let valid = true;
-  if(!isFinite(flowM3h)||flowM3h<=0){ showErr('errFlow','Must be > 0'); valid=false; }
-  if(!isFinite(rho)||rho<=0){ showErr('errRho','Must be > 0'); valid=false; }
-  if(!isFinite(muCP)||muCP<=0){ showErr('errMu','Must be > 0'); valid=false; }
-  if(!isFinite(L)||L<=0){ showErr('errLen','Must be > 0'); valid=false; }
-  if(!isFinite(D_mm)||D_mm<=0){ showErr('errDia','Must be > 0'); valid=false; }
-  if(!valid){ hideResults(); return; }
+  let ok = true;
+  if(!isFinite(flowM3h)||flowM3h<=0){ showErr('errFlow'); ok=false; }
+  if(!isFinite(rho)||rho<=0){         showErr('errRho');  ok=false; }
+  if(!isFinite(muCP)||muCP<=0){       showErr('errMu');   ok=false; }
+  if(!isFinite(L)||L<=0){             showErr('errLen');  ok=false; }
+  if(!isFinite(D_mm)||D_mm<=0){       showErr('errDia');  ok=false; }
+  if(!ok){ hideResults(); return; }
 
-  // Unit conversions
-  const Q     = flowM3h / 3600;       // m³/s
-  const D     = D_mm / 1000;          // m
-  const eps   = eps_mm / 1000;        // m
-  const mu    = muCP / 1000;          // Pa·s (= kg/m·s)
-
-  const A     = Math.PI * D * D / 4;  // m²
-  const v     = Q / A;                // m/s
-  const Re    = rho * v * D / mu;
-  const f     = frictionFactor(Re, eps, D);
+  const Q   = flowM3h/3600;
+  const D   = D_mm/1000;
+  const eps = eps_mm/1000;
+  const mu  = muCP/1000;
+  const A   = Math.PI*D*D/4;
+  const v   = Q/A;
+  const Re  = rho*v*D/mu;
+  const f   = frictionFactor(Re, eps, D);
   const regime = flowRegime(Re);
 
-  // Darcy-Weisbach friction pressure drop (Pa)
-  const dPf_Pa  = f * (L/D) * (rho * v*v / 2);
-  const dPf_bar = dPf_Pa / 1e5;
-
-  // Static head (Pa)
-  const dPs_Pa  = rho * G * dz;
-  const dPs_bar = dPs_Pa / 1e5;
-
-  // Total
-  const dPtot_bar = dPf_bar + dPs_bar;
-
-  // Friction head and total head
-  const Hf = dPf_Pa / (rho * G);   // m liquid
-  const Hs = dz;                    // m liquid (= elevation change)
-  const Htot = Hf + Hs;             // m liquid
-
-  // Per 100 m (friction only)
-  const dPer100 = (dPf_bar / L) * 100;
+  const dPf_Pa   = f*(L/D)*(rho*v*v/2);
+  const dPf_bar  = dPf_Pa/1e5;
+  const dPs_Pa   = rho*G*dz;
+  const dPs_bar  = dPs_Pa/1e5;
+  const dPtot    = dPf_bar + dPs_bar;
+  const Hf       = dPf_Pa/(rho*G);
+  const Htot     = Hf + dz;
+  const dPer100  = (dPf_bar/L)*100;
 
   const warnings = [];
-  if(Re < 2300) warnings.push('Flow is laminar (Re = '+Math.round(Re)+') — verify non-Newtonian assumption is inapplicable. Friction factor f = 64/Re.');
-  if(Re >= 2300 && Re < 4000) warnings.push('Flow is in the critical transition zone (2300 ≤ Re < 4000) — friction factor is interpolated; actual behavior may vary.');
-  if(v > 5) warnings.push('Velocity '+fmtN(v,2)+' m/s exceeds 5 m/s — potential erosion risk. Verify service erosional velocity limits (API RP 14E §2.4).');
-  if(eps_mm / D_mm > 0.05) warnings.push('Relative roughness ε/D = '+fmtN(eps_mm/D_mm,4)+' is high — fully rough turbulent flow likely.');
-  if(dPer100 > 5) warnings.push('ΔP/100m = '+fmtN(dPer100,2)+' bar/100m is high — verify line sizing and potential for erosion.');
-  if(Math.abs(dz) > 0.5 * L) warnings.push('Elevation change (|Δz| = '+Math.abs(dz)+' m) is >50% of pipe length — verify geometry.');
+  if(Re < 2300) warnings.push('Laminar flow (Re = '+Math.round(Re)+') — verify Newtonian assumption. f = 64/Re.');
+  else if(Re < 4000) warnings.push('Transition zone (2300 ≤ Re < 4000) — friction factor interpolated; results indicative only.');
+  if(v > 5) warnings.push('Velocity '+fmtN(v,2)+' m/s > 5 m/s — potential erosion. Check API RP 14E §2.4 erosional velocity.');
+  if(eps_mm/D_mm > 0.05) warnings.push('Relative roughness ε/D = '+fmtN(eps_mm/D_mm,4)+' is high — fully rough turbulent assumed.');
+  if(dPer100 > 5) warnings.push('ΔP/100m = '+fmtN(dPer100,2)+' bar/100m is high — verify line sizing.');
+  if(Math.abs(dz) > 0.5*L) warnings.push('|Δz| = '+Math.abs(dz)+' m exceeds 50% of L — verify pipe geometry.');
 
-  // Service limit check
   const svcKey = document.getElementById('selService').value;
-  const svc = SERVICE_LIMITS.find(s=>s.service === svcKey);
-  let limitRows = [];
+  const svc = SERVICE_LIMITS.find(s=>s.service===svcKey);
+  const limitRows = [];
   if(svc){
-    const velStat = getLimitStatus(v, svc.vMin, svc.vMax);
-    limitRows.push({ param:'Velocity', val:fmtN(v,3)+' m/s', min:svc.vMin+' m/s', max:svc.vMax+' m/s', status:velStat });
-    if(svc.dpMax !== null){
-      const dpStat = dPer100 <= svc.dpMax ? 'ok' : (dPer100 <= svc.dpMax*1.25 ? 'warn' : 'hi');
-      limitRows.push({ param:'ΔP/100 m', val:fmtN(dPer100,3)+' bar/100m', min:'—', max:svc.dpMax+' bar/100m', status:dpStat });
-    }
+    limitRows.push({ param:'Velocity', val:fmtN(v,3)+' m/s', max:svc.vMax+' m/s', status:getLimitStatus(v,svc.vMin,svc.vMax) });
+    const dpStat = dPer100 <= svc.dpMax ? 'ok' : dPer100 <= svc.dpMax*1.25 ? 'warn' : 'hi';
+    limitRows.push({ param:'ΔP/100 m', val:fmtN(dPer100,3)+' bar/100m', max:svc.dpMax+' bar/100m', status:dpStat });
   }
 
-  // Trace
   const trace = [
-    'Darcy-Weisbach: ΔPf = f·(L/D)·(ρ·v²/2)',
-    '─────────────────────────────────────────────────────────',
-    'Inputs:',
-    '  Q        = '+fmtN(flowM3h)+' m³/h  →  '+fmtN(Q,6)+' m³/s',
-    '  ρ        = '+fmtN(rho)+' kg/m³',
-    '  μ        = '+fmtN(muCP)+' cP  →  '+fmtN(mu,6)+' Pa·s',
-    '  L        = '+fmtN(L)+' m',
-    '  D (ID)   = '+fmtN(D_mm)+' mm  →  '+fmtN(D,5)+' m',
-    '  ε        = '+fmtN(eps_mm)+' mm  →  '+fmtN(eps,7)+' m',
-    '  ε/D      = '+fmtN(eps/D,6),
-    '  Δz       = '+fmtN(dz)+' m',
-    '─────────────────────────────────────────────────────────',
-    'Hydraulics:',
-    '  A (flow) = π·D²/4 = '+fmtN(A,6)+' m²',
-    '  v        = Q/A = '+fmtN(v,4)+' m/s',
-    '  Re       = ρ·v·D/μ = '+Math.round(Re),
-    '  Regime   = '+regime.label+' → '+regime.method,
-    '  f        = '+fmtN(f,6),
-    '─────────────────────────────────────────────────────────',
-    'Pressure drops:',
-    '  ΔPf (Pa) = f·(L/D)·(ρ·v²/2) = '+fmtN(dPf_Pa,3)+' Pa',
-    '  ΔPf      = '+fmtN(dPf_bar,5)+' bar',
-    '  ΔPs (Pa) = ρ·g·Δz = '+fmtN(dPs_Pa,3)+' Pa',
-    '  ΔPs      = '+fmtN(dPs_bar,5)+' bar',
-    '  ΔP_total = '+fmtN(dPtot_bar,5)+' bar',
-    '  ΔPf/100m = '+fmtN(dPer100,4)+' bar/100m',
-    '─────────────────────────────────────────────────────────',
-    'Heads:',
-    '  Hf       = ΔPf/(ρ·g) = '+fmtN(Hf,3)+' m liq.',
-    '  Hs (Δz)  = '+fmtN(Hs,3)+' m liq.',
-    '  H_total  = '+fmtN(Htot,3)+' m liq.',
+    'Darcy-Weisbach: ΔPf = f·(L/D)·(ρv²/2)',
+    '──────────────────────────────────────────────',
+    'Q       = '+fmtN(flowM3h)+' m³/h  →  '+fmtN(Q,6)+' m³/s',
+    'ρ       = '+fmtN(rho)+' kg/m³',
+    'μ       = '+fmtN(muCP)+' cP  →  '+fmtN(mu,6)+' Pa·s',
+    'L       = '+fmtN(L)+' m',
+    'D (ID)  = '+fmtN(D_mm)+' mm  →  '+fmtN(D,5)+' m',
+    'ε       = '+fmtN(eps_mm)+' mm | ε/D = '+fmtN(eps/D,6),
+    'Δz      = '+fmtN(dz)+' m',
+    '──────────────────────────────────────────────',
+    'A       = πD²/4 = '+fmtN(A,6)+' m²',
+    'v       = Q/A = '+fmtN(v,4)+' m/s',
+    'Re      = ρvD/μ = '+Math.round(Re).toLocaleString(),
+    'Regime  = '+regime.label+' ('+regime.method+')',
+    'f       = '+fmtN(f,6),
+    '──────────────────────────────────────────────',
+    'ΔPf     = '+fmtN(dPf_bar,5)+' bar  ('+fmtN(dPf_Pa,1)+' Pa)',
+    'ΔPs     = '+fmtN(dPs_bar,5)+' bar  (ρgΔz = '+fmtN(dPs_Pa,1)+' Pa)',
+    'ΔP_tot  = '+fmtN(dPtot,5)+' bar',
+    'ΔPf/100m= '+fmtN(dPer100,4)+' bar/100m',
+    '──────────────────────────────────────────────',
+    'Hf      = ΔPf/(ρg) = '+fmtN(Hf,3)+' m liq.',
+    'Hs (Δz)= '+fmtN(dz,3)+' m liq.',
+    'H_total = '+fmtN(Htot,3)+' m liq.',
   ].join('\n');
 
-  renderResults({ v, Re, f, regime, dPf_bar, dPs_bar, dPtot_bar, dPer100, Hf, Hs, Htot, warnings, limitRows, svc, trace });
+  renderResults({ v, Re, f, regime, dPf_bar, dPs_bar, dPtot, dPer100, Hf, dz, Htot, warnings, limitRows, svc, trace });
 }
 
-// ═══════════════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════════════
+/* ── RENDER ──────────────────────────────────────── */
 function getLimitStatus(val, min, max){
-  if(min !== null && val < min) return 'warn';
-  if(max !== null && val > max * 1.15) return 'hi';
-  if(max !== null && val > max) return 'warn';
+  if(val < min) return 'warn';
+  if(val > max*1.15) return 'hi';
+  if(val > max) return 'warn';
   return 'ok';
 }
-
-function limitBadgeHTML(status){
-  const map = { ok:['limit-ok','✓ Within limits'], warn:['limit-warn','⚠ Exceeds limit'], hi:['limit-hi','✗ High — check'] };
-  const [cls, text] = map[status] || ['limit-warn', status];
-  return `<span class="limit-badge ${cls}">${text}</span>`;
+function lbadgeHTML(s){
+  const m = { ok:['lbadge-ok','✓ OK'], warn:['lbadge-warn','⚠ Exceeds'], hi:['lbadge-hi','✗ High'] };
+  const [c,t] = m[s]||['lbadge-warn',s];
+  return `<span class="lbadge ${c}">${t}</span>`;
 }
 
 function renderResults(r){
@@ -709,92 +766,83 @@ function renderResults(r){
   document.getElementById('globalErr').style.display = 'none';
 
   // Warnings
-  const wBox = document.getElementById('warningsCard');
-  if(r.warnings.length > 0){
-    wBox.style.display = 'flex';
-    document.getElementById('warningsText').innerHTML = r.warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
-  } else { wBox.style.display = 'none'; }
+  const wb = document.getElementById('warningsCard');
+  if(r.warnings.length){
+    wb.style.display = 'flex';
+    document.getElementById('warningsText').innerHTML =
+      r.warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
+  } else wb.style.display = 'none';
 
   // Service limits
-  const limCard = document.getElementById('limitsCard');
-  if(r.limitRows.length > 0){
-    limCard.style.display = 'block';
+  const lc = document.getElementById('limitsCard');
+  if(r.limitRows.length){
+    lc.style.display = 'block';
     document.getElementById('limitsServiceName').textContent = document.getElementById('selService').value;
-    let html = '';
+    let h = '';
     r.limitRows.forEach(row=>{
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:.45rem .65rem;border-radius:var(--radius);background:var(--secondary-bg);font-size:.75rem;margin-bottom:.4rem">`;
-      html += `<span style="color:var(--muted)">${row.param}</span>`;
-      html += `<div style="display:flex;align-items:center;gap:.5rem">`;
-      html += `<span style="font-weight:600;font-variant-numeric:tabular-nums">${row.val}</span>`;
-      html += `<span style="font-size:.62rem;color:var(--muted)">max ${row.max}</span>`;
-      html += limitBadgeHTML(row.status);
-      html += `</div></div>`;
+      h += `<div style="display:flex;justify-content:space-between;align-items:center;padding:.38rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.72rem;margin-bottom:.35rem">`
+        +`<span style="color:var(--muted)">${row.param}</span>`
+        +`<div style="display:flex;align-items:center;gap:.45rem">`
+        +`<span style="font-weight:600">${row.val}</span>`
+        +`<span style="font-size:.6rem;color:var(--muted)">max ${row.max}</span>`
+        +lbadgeHTML(row.status)
+        +`</div></div>`;
     });
-    if(r.svc && r.svc.note) html += `<div style="font-size:.62rem;color:var(--muted);padding:.3rem .65rem;line-height:1.6">${r.svc.note}</div>`;
-    document.getElementById('limitsBody').innerHTML = html;
-    lucide.createIcons();
-  } else { limCard.style.display = 'none'; }
-
-  // Main results card
-  const rc = document.getElementById('resultsCard');
-  rc.style.display = 'block';
+    if(r.svc?.note) h += `<div style="font-size:.6rem;color:var(--muted);padding:.25rem .6rem;line-height:1.5">${r.svc.note}</div>`;
+    document.getElementById('limitsBody').innerHTML = h;
+  } else lc.style.display = 'none';
 
   // Regime chip
   document.getElementById('regimeChip').innerHTML =
-    `<span class="regime-chip ${r.regime.cls}">${r.regime.label} (Re = ${Math.round(r.Re).toLocaleString()})</span>`;
+    `<span class="regime ${r.regime.cls}">${r.regime.label} &mdash; Re = ${Math.round(r.Re).toLocaleString()}</span>`;
 
-  // Big values
-  document.getElementById('bigTotalDP').textContent = fmtN(r.dPtot_bar, 4);
-  document.getElementById('bigDPBreakdown').textContent =
-    'Friction: '+fmtN(r.dPf_bar,4)+' bar  |  Static: '+fmtN(r.dPs_bar,4)+' bar';
-  document.getElementById('bigTotalHead').textContent = fmtN(r.Htot, 3);
-  document.getElementById('bigHeadBreakdown').textContent =
-    'Friction head: '+fmtN(r.Hf,3)+' m  |  Elevation: '+fmtN(r.Hs,3)+' m';
+  // KPI
+  document.getElementById('bigTotalDP').textContent  = fmtN(r.dPtot,4);
+  document.getElementById('bigDPBreakdown').innerHTML = 'Friction '+fmtN(r.dPf_bar,4)+' bar&nbsp;|&nbsp;Static '+fmtN(r.dPs_bar,4)+' bar';
+  document.getElementById('bigTotalHead').textContent = fmtN(r.Htot,3);
+  document.getElementById('bigHeadBreakdown').innerHTML = 'Hf '+fmtN(r.Hf,3)+' m&nbsp;|&nbsp;Δz '+fmtN(r.dz,3)+' m';
 
-  // Detail grid
+  // Detail rows
   const rows = [
-    { label:'Velocity',             val:fmtN(r.v,4),      unit:'m/s',       hl:true  },
-    { label:'ΔP Friction',          val:fmtN(r.dPf_bar,4),unit:'bar',       hl:false },
-    { label:'ΔP Static',            val:fmtN(r.dPs_bar,4),unit:'bar',       hl:false },
-    { label:'ΔP Total',             val:fmtN(r.dPtot_bar,4),unit:'bar',     hl:true  },
-    { label:'ΔP Friction / 100 m',  val:fmtN(r.dPer100,4),unit:'bar/100m', hl:false },
-    { label:'Friction Head',        val:fmtN(r.Hf,3),     unit:'m liq.',    hl:false },
-    { label:'Static Head (Δz)',     val:fmtN(r.Hs,3),     unit:'m liq.',    hl:false },
-    { label:'Total Head',           val:fmtN(r.Htot,3),   unit:'m liq.',    hl:true  },
-    { label:'Reynolds Number',      val:Math.round(r.Re).toLocaleString(), unit:'—', hl:false },
-    { label:'Friction Factor f',    val:fmtN(r.f,6),      unit:'—',         hl:false },
+    { l:'Velocity',           v:fmtN(r.v,4),        u:'m/s',       hl:true  },
+    { l:'ΔP Friction',        v:fmtN(r.dPf_bar,4),  u:'bar',       hl:false },
+    { l:'ΔP Static',          v:fmtN(r.dPs_bar,4),  u:'bar',       hl:false },
+    { l:'ΔP Total',           v:fmtN(r.dPtot,4),    u:'bar',       hl:true  },
+    { l:'ΔP Friction / 100 m',v:fmtN(r.dPer100,4),  u:'bar/100m',  hl:false },
+    { l:'Friction Head',      v:fmtN(r.Hf,3),       u:'m liq.',    hl:false },
+    { l:'Static Head (Δz)',   v:fmtN(r.dz,3),       u:'m liq.',    hl:false },
+    { l:'Total Head',         v:fmtN(r.Htot,3),     u:'m liq.',    hl:true  },
+    { l:'Reynolds Number',    v:Math.round(r.Re).toLocaleString(), u:'—', hl:false },
+    { l:'Friction Factor f',  v:fmtN(r.f,6),        u:'—',         hl:false },
   ];
   document.getElementById('detailGrid').innerHTML = rows.map(row=>
-    `<div class="result-row${row.hl?' hl':''}">`+
-    `<span class="result-label">${row.label}</span>`+
-    `<span><span class="result-val">${row.val}</span><span class="result-unit">${row.unit}</span></span>`+
-    `</div>`
+    `<div class="res-row${row.hl?' hl':''}">`
+    +`<span class="res-lbl">${row.l}</span>`
+    +`<span><span class="res-val">${row.v}</span><span class="res-unit">${row.u}</span></span>`
+    +`</div>`
   ).join('');
 
   // Trace
-  document.getElementById('traceCard').style.display = 'block';
+  document.getElementById('traceAccordion').style.display = 'block';
   document.getElementById('traceBox').textContent = r.trace;
+
+  document.getElementById('resultsCard').style.display = 'block';
   lucide.createIcons();
 }
 
 function hideResults(){
-  document.getElementById('placeholderCard').style.display = 'block';
-  document.getElementById('resultsCard').style.display = 'none';
-  document.getElementById('warningsCard').style.display = 'none';
-  document.getElementById('limitsCard').style.display = 'none';
-  document.getElementById('traceCard').style.display = 'none';
+  ['placeholderCard'].forEach(id=>document.getElementById(id).style.display='block');
+  ['resultsCard','warningsCard','limitsCard','traceAccordion'].forEach(id=>document.getElementById(id).style.display='none');
   lucide.createIcons();
 }
 
-function showErr(id, msg){ const el=document.getElementById(id); if(el){ el.textContent=msg; el.style.display='block'; } }
+function showErr(id){ const e=document.getElementById(id); if(e)e.style.display='block'; }
 function clearErrors(){
   ['errFlow','errRho','errMu','errLen','errDia'].forEach(id=>{ const e=document.getElementById(id); if(e)e.style.display='none'; });
   document.getElementById('globalErr').style.display='none';
 }
 
-// ═══════════════════════════════════════════════════════════
-//  TEST CASE  (crude oil @ 100 m³/h, 850 kg/m³, 5 cP, 6" SCH40)
-// ═══════════════════════════════════════════════════════════
+/* ── TEST CASE ───────────────────────────────────── */
 function loadTestCase(){
   document.getElementById('inpFlow').value  = '100';
   document.getElementById('inpRho').value   = '850';
@@ -802,33 +850,36 @@ function loadTestCase(){
   document.getElementById('inpLen').value   = '200';
   document.getElementById('inpRough').value = '0.0457';
   document.getElementById('inpDz').value    = '10';
-  // Set pipe: 6" SCH 40 → ID = 168.3 - 2×7.11 = 154.08 mm
-  document.getElementById('selNPS').value = '6"';
+  document.getElementById('selNPS').value   = '6"';
   onNPSChange();
-  document.getElementById('selSch').value = '40';
+  document.getElementById('selSch').value   = '40';
   onSchChange();
   document.getElementById('selService').value = 'Crude Oil — Pump Discharge';
   calculate();
 }
 
 function resetForm(){
-  ['inpFlow','inpRho','inpMu','inpLen','inpDia'].forEach(id=>{ document.getElementById(id).value=''; });
+  ['inpFlow','inpRho','inpMu','inpLen','inpDia'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('inpRough').value = '0.0457';
   document.getElementById('inpDz').value    = '0';
   document.getElementById('selNPS').value   = 'custom';
   document.getElementById('selSch').innerHTML = '<option value="custom">— Custom —</option>';
   document.getElementById('selService').value = '';
-  clearErrors();
-  hideResults();
+  clearErrors(); hideResults();
 }
 
-// ═══════════════════════════════════════════════════════════
-//  UI TOGGLES
-// ═══════════════════════════════════════════════════════════
+/* ── ACCORDION ───────────────────────────────────── */
+function toggleAcc(bodyId, trigger){
+  const body = document.getElementById(bodyId);
+  const open = body.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', open);
+}
+
+/* ── THEME / MENU ────────────────────────────────── */
 function toggleTheme(){
   const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', t);
-  ['themeIconD','themeIconM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.setAttribute('data-lucide',t==='dark'?'moon':'sun'); });
+  ['themeIconD','themeIconM'].forEach(id=>{ const el=document.getElementById(id); if(el) el.setAttribute('data-lucide', t==='dark'?'moon':'sun'); });
   lucide.createIcons();
 }
 function toggleMenu(){
@@ -837,22 +888,11 @@ function toggleMenu(){
   document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open')?'x':'menu');
   lucide.createIcons();
 }
-function toggleTrace(){
-  const p = document.getElementById('tracePanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-}
-function toggleAssumptions(){
-  const p = document.getElementById('assumptionsPanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-}
 
 window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
 });
 
-// ═══════════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════════
 document.getElementById('year').textContent = new Date().getFullYear();
 initPipePicker();
 lucide.createIcons();
