@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hazem ElMancy — Oil & Gas Process Engineer</title>
+  <meta name="description" content="Process Engineer specializing in Oil & Gas FEED and detailed design, with expertise in process simulation, equipment sizing, and hydraulic calculations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ─── DESIGN TOKENS ─── */
+    :root {
+      --radius: 0.5rem;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg:            hsl(222, 47%, 7%);
+      --bg-card:       hsl(222, 41%, 11%);
+      --bg-card-hover: hsl(222, 41%, 13%);
+      --border:        hsl(222, 30%, 18%);
+      --foreground:    hsl(210, 40%, 98%);
+      --muted:         hsl(215, 20%, 55%);
+      --primary:       hsl(217, 91%, 60%);
+      --primary-bg:    hsl(217, 91%, 60%, 0.1);
+      --secondary-bg:  hsl(222, 41%, 16%);
+      --hero-glow:     radial-gradient(ellipse 80% 60% at 50% -10%, hsl(217 91% 60% / 0.18), transparent);
+    }
+    [data-theme="light"] {
+      --bg:            hsl(0, 0%, 100%);
+      --bg-card:       hsl(0, 0%, 98%);
+      --bg-card-hover: hsl(0, 0%, 95%);
+      --border:        hsl(214, 32%, 88%);
+      --foreground:    hsl(222, 47%, 11%);
+      --muted:         hsl(215, 16%, 45%);
+      --primary:       hsl(217, 91%, 50%);
+      --primary-bg:    hsl(217, 91%, 50%, 0.08);
+      --secondary-bg:  hsl(210, 40%, 94%);
+      --hero-glow:     radial-gradient(ellipse 80% 60% at 50% -10%, hsl(217 91% 50% / 0.10), transparent);
+    }
+
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--foreground);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ul { list-style: none; }
+    main { flex: 1; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── UTILITIES ─── */
+    .container      { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
+    .container-md   { max-width: 56rem; margin: 0 auto; padding: 0 1rem; }
+    .text-primary   { color: var(--primary); }
+    .text-muted     { color: var(--muted); }
+    .border-color   { border-color: var(--border); }
+    .section-label  {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      background: var(--bg-card-hover);
+    }
+    .card-body  { padding: 1.25rem; }
+    .card-body-lg { padding: 1.5rem 2rem; }
+
+    /* ─── BADGE ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      font-size: 0.65rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+    }
+    .badge-secondary {
+      background: var(--secondary-bg);
+      border-color: transparent;
+      color: var(--muted);
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: opacity 0.15s, background 0.15s, transform 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary   { background: var(--primary); color: #fff; }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-outline   { background: transparent; border: 1px solid var(--border); color: var(--foreground); }
+    .btn-outline:hover { background: var(--secondary-bg); }
+    .btn-ghost     { background: transparent; color: var(--foreground); }
+    .btn-ghost:hover { background: var(--secondary-bg); }
+    .btn-icon      { padding: 0.4rem; border-radius: var(--radius); }
+
+    /* ─── NAVBAR ─── */
+    #navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      transition: background 0.25s, border-color 0.25s, backdrop-filter 0.25s;
+    }
+    #navbar.scrolled {
+      background: color-mix(in srgb, var(--bg) 95%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar-inner {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 0 1rem;
+      height: 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .logo { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
+    .logo span { font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em; }
+    nav.desktop { display: none; align-items: center; gap: 0.25rem; }
+    @media (min-width: 1024px) { nav.desktop { display: flex; } }
+    .nav-link {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      border-radius: var(--radius);
+      transition: color 0.15s, background 0.15s;
+      background: none;
+    }
+    .nav-link:hover { color: var(--foreground); background: var(--secondary-bg); }
+    .nav-link-calc {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.375rem 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      border-radius: var(--radius);
+      transition: background 0.15s;
+    }
+    .nav-link-calc:hover { background: var(--primary-bg); }
+    .mobile-controls { display: flex; align-items: center; gap: 0.25rem; }
+    @media (min-width: 1024px) { .mobile-controls { display: none; } }
+    .theme-toggle {
+      width: 2.25rem; height: 2.25rem;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius);
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .theme-toggle:hover { background: var(--secondary-bg); color: var(--foreground); }
+    /* Desktop theme toggle (inside nav) */
+    .desktop-theme-toggle {
+      display: none;
+    }
+    @media (min-width: 1024px) { .desktop-theme-toggle { display: flex; } }
+    .mobile-menu {
+      display: none;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      padding: 0.75rem 1rem;
+    }
+    .mobile-menu.open { display: block; }
+    @media (min-width: 1024px) { .mobile-menu { display: none !important; } }
+    .mobile-menu button, .mobile-menu a {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      border-radius: var(--radius);
+      transition: background 0.15s;
+    }
+    .mobile-menu button:hover, .mobile-menu a:hover { background: var(--secondary-bg); color: var(--foreground); }
+    .mobile-menu .calc-link {
+      display: flex; align-items: center; gap: 0.4rem;
+      color: var(--primary); font-weight: 500; margin-top: 0.5rem;
+    }
+
+    /* ─── HERO ─── */
+    #home {
+      position: relative;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 1rem;
+      overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; inset: 0;
+      background: var(--hero-glow);
+      pointer-events: none;
+    }
+    .hero-radial {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle 500px at 50% 50%, hsl(222 41% 14% / 0.8), transparent);
+      pointer-events: none;
+    }
+    [data-theme="light"] .hero-radial { background: transparent; }
+    .hero-content { position: relative; z-index: 10; max-width: 48rem; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 0.375rem 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted);
+      max-width: 40rem;
+      margin: 0 auto 1rem;
+      line-height: 1.7;
+    }
+    .hero-location {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+    .hero-location .sep { color: var(--border); }
+    .hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+      color: var(--muted); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+      cursor: pointer; background: none; border: none;
+    }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+    .bounce { animation: bounce 1.5s ease-in-out infinite; }
+
+    /* ─── SECTIONS ─── */
+    .section { padding: 5rem 1rem; }
+    .section-sm { padding: 3rem 1rem; }
+    .section-header { text-align: center; margin-bottom: 2.5rem; }
+    .section-title { font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 700; }
+    .section-desc { color: var(--muted); font-size: 0.875rem; margin-top: 0.5rem; }
+
+    /* ─── ABOUT GRID ─── */
+    .about-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px) { .about-grid { grid-template-columns: repeat(3, 1fr); } }
+    .about-icon {
+      width: 2.5rem; height: 2.5rem;
+      border-radius: var(--radius);
+      background: var(--primary-bg);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    /* ─── EXPERIENCE ─── */
+    .exp-header {
+      display: flex; flex-wrap: wrap;
+      align-items: flex-start; justify-content: space-between;
+      gap: 0.75rem; margin-bottom: 1.5rem;
+    }
+    .exp-divider {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .exp-divider-line { width: 1.5rem; height: 2px; background: var(--primary); flex-shrink: 0; }
+    .resp-grid { display: grid; gap: 0.75rem; }
+    @media (min-width: 768px) { .resp-grid { grid-template-columns: 1fr 1fr; } }
+    .resp-item { display: flex; align-items: flex-start; gap: 0.5rem; }
+
+    /* ─── PROJECTS GRID ─── */
+    .projects-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px)  { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .projects-grid { grid-template-columns: repeat(3, 1fr); } }
+    .project-meta {
+      display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between;
+      gap: 0.5rem; margin-bottom: 0.75rem;
+    }
+    .project-location { display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; color: var(--muted); }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.375rem; }
+    .tag-label { display: flex; align-items: center; gap: 0.375rem; margin-top: 1rem; }
+
+    /* ─── SKILLS ─── */
+    .competencies { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; }
+    .skills-grid { display: grid; gap: 1rem; }
+    @media (min-width: 768px) { .skills-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* ─── CALCULATORS ─── */
+    .calc-cat { margin-bottom: 1.5rem; }
+    .calc-cat-label {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .calc-cat-line { width: 1.5rem; height: 2px; background: var(--primary); }
+    .calc-grid { display: grid; gap: 0.75rem; }
+    @media (min-width: 640px)  { .calc-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .calc-grid { grid-template-columns: repeat(3, 1fr); } }
+    .calc-card-icon {
+      width: 2.25rem; height: 2.25rem;
+      border-radius: var(--radius);
+      background: var(--primary-bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+    .calc-card-inner { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+    .disclaimer {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      background: hsl(38 92% 50% / 0.05);
+      border: 1px solid hsl(38 92% 50% / 0.2);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+    .disclaimer-icon { color: hsl(38, 92%, 50%); flex-shrink: 0; margin-top: 2px; }
+    .calc-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 2rem; }
+
+    /* ─── CONTACT ─── */
+    .contact-grid { display: grid; gap: 1rem; margin-bottom: 1rem; }
+    @media (min-width: 768px) { .contact-grid { grid-template-columns: repeat(3, 1fr); } }
+    .contact-card { text-align: center; }
+    .contact-icon {
+      width: 3rem; height: 3rem;
+      border-radius: 50%;
+      background: var(--primary-bg);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+      color: var(--primary);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+    }
+    .footer-inner {
+      max-width: 72rem; margin: 0 auto;
+      display: flex; flex-wrap: wrap;
+      align-items: center; justify-content: space-between;
+      gap: 1rem;
+    }
+    .footer-links { display: flex; align-items: center; gap: 0.75rem; }
+    .footer-icon {
+      width: 2.25rem; height: 2.25rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .footer-icon:hover { color: var(--foreground); border-color: var(--foreground); }
+
+    /* ─── HELPERS ─── */
+    .flex-center { display: flex; align-items: center; justify-content: center; }
+    .gap-2 { gap: 0.5rem; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+    .dot-green { background: hsl(142, 71%, 45%); }
+    .font-bold { font-weight: 700; }
+    .font-semi { font-weight: 600; }
+    .font-medium { font-weight: 500; }
+    .text-sm  { font-size: 0.875rem; }
+    .text-xs  { font-size: 0.75rem; }
+    .text-xxs { font-size: 0.65rem; }
+    .mt-1 { margin-top: 0.25rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-3 { margin-top: 0.75rem; }
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .space-y > * + * { margin-top: 1.5rem; }
+    .leading-relaxed { line-height: 1.7; }
+    .leading-snug { line-height: 1.4; }
+    .shrink-0 { flex-shrink: 0; }
+    .w-full { width: 100%; }
+    .col-red    { color: hsl(0, 72%, 65%); }
+    .col-orange { color: hsl(25, 95%, 58%); }
+    .col-green  { color: hsl(142, 71%, 50%); }
+    .col-blue   { color: hsl(217, 91%, 60%); }
+    .col-yellow { color: hsl(48, 96%, 53%); }
+    .col-purple { color: hsl(271, 81%, 70%); }
+    .col-primary-text { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+════════════════════════════════════ -->
+<header id="navbar">
+  <div class="navbar-inner">
+    <a href="/" class="logo">
+      <span class="text-primary">H</span><span>E</span>
+    </a>
+
+    <nav class="desktop">
+      <button class="nav-link" onclick="scrollTo('home')">HOME</button>
+      <button class="nav-link" onclick="scrollTo('about')">ABOUT</button>
+      <button class="nav-link" onclick="scrollTo('experience')">EXPERIENCE</button>
+      <button class="nav-link" onclick="scrollTo('projects')">PROJECTS</button>
+      <button class="nav-link" onclick="scrollTo('skills')">SKILLS</button>
+      <button class="nav-link" onclick="scrollTo('contact')">CONTACT</button>
+      <a href="calculators/index.html" class="nav-link-calc">
+        <i data-lucide="calculator" style="width:14px;height:14px"></i>
+        CALCULATORS
+      </a>
+      <button class="theme-toggle desktop-theme-toggle" id="themeToggleDesktop" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i data-lucide="moon" id="themeIconDesktop" style="width:16px;height:16px"></i>
+      </button>
+    </nav>
+
+    <div class="mobile-controls">
+      <button class="theme-toggle" id="themeToggleMobile" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i data-lucide="moon" id="themeIconMobile" style="width:16px;height:16px"></i>
+      </button>
+      <button class="theme-toggle" id="menuBtn" onclick="toggleMenu()" aria-label="Toggle menu">
+        <i data-lucide="menu" id="menuIcon" style="width:16px;height:16px"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <button onclick="scrollTo('home');   toggleMenu()">HOME</button>
+    <button onclick="scrollTo('about');  toggleMenu()">ABOUT</button>
+    <button onclick="scrollTo('experience'); toggleMenu()">EXPERIENCE</button>
+    <button onclick="scrollTo('projects'); toggleMenu()">PROJECTS</button>
+    <button onclick="scrollTo('skills'); toggleMenu()">SKILLS</button>
+    <button onclick="scrollTo('contact'); toggleMenu()">CONTACT</button>
+    <a href="calculators/index.html" class="calc-link" onclick="toggleMenu()">
+      <i data-lucide="calculator" style="width:14px;height:14px"></i>
+      CALCULATORS
+    </a>
+  </div>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════
+     HERO
+════════════════════════════════════ -->
+<section id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-radial"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Oil &amp; Gas Process Engineer
+    </div>
+    <h1 class="hero-title">
+      Hazem <span class="text-primary">ElMancy</span>
+    </h1>
+    <p class="hero-sub">
+      Transforming complex petroleum processes into
+      <strong style="color:var(--foreground)">efficient engineering solutions</strong>
+    </p>
+    <div class="hero-location">
+      <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--primary)"></i>
+      <span>Cairo, Egypt</span>
+      <span class="sep">|</span>
+      <span>Process Engineer</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="scrollTo('projects')">View My Projects</button>
+      <button class="btn btn-outline" onclick="scrollTo('contact')">Contact Me</button>
+    </div>
+  </div>
+  <button class="scroll-hint" onclick="scrollTo('about')">
+    <span>Scroll</span>
+    <i data-lucide="chevron-down" class="bounce" style="width:16px;height:16px"></i>
+  </button>
+</section>
+
+<!-- ═══════════════════════════════════
+     ABOUT
+════════════════════════════════════ -->
+<section id="about" class="section">
+  <div class="container-md">
+    <div class="section-header">
+      <p class="section-label mb-3">ABOUT ME</p>
+      <h2 class="section-title">Professional Summary</h2>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body-lg">
+        <p class="text-sm leading-relaxed" style="color:var(--muted)">
+          Process Engineer specializing in
+          <strong style="color:var(--foreground)">Oil &amp; Gas FEED and detailed design</strong>,
+          with expertise in process simulation (Aspen HYSYS, EDR, HTRI), equipment sizing, and hydraulic calculations.
+          Proven track record in developing
+          <span class="text-primary font-medium">PFDs, P&amp;IDs, UFDs, H&amp;MBs, BODs, C&amp;E Diagrams, Equipment Datasheets, Equipment Lists, and Studies Reports</span>
+          for EPC projects in compliance with API &amp; ASME standards. Skilled in process philosophies and
+          cross-disciplinary coordination, leveraging strong analytical skills to translate complex technical
+          concepts for stakeholders.
+        </p>
+      </div>
+    </div>
+
+    <div class="about-grid">
+      <div class="card"><div class="card-body">
+        <div class="about-icon"><i data-lucide="graduation-cap" style="width:20px;height:20px"></i></div>
+        <h3 class="font-semi text-sm mb-2">Education</h3>
+        <p class="text-sm" style="color:var(--muted);margin-bottom:0.25rem">B.Sc. in Petroleum Refining &amp; Petrochemical Engineering</p>
+        <p class="text-sm text-primary">Suez University (2016–2021)</p>
+      </div></div>
+
+      <div class="card"><div class="card-body">
+        <div class="about-icon"><i data-lucide="award" style="width:20px;height:20px"></i></div>
+        <h3 class="font-semi text-sm mb-2">Certifications</h3>
+        <ul style="display:flex;flex-direction:column;gap:0.4rem">
+          <li class="text-sm" style="color:var(--muted);display:flex;align-items:flex-start;gap:0.4rem">
+            <span class="dot" style="margin-top:6px"></span>Aspen Certified Expert User in Aspen HYSYS
+          </li>
+          <li class="text-sm" style="color:var(--muted);display:flex;align-items:flex-start;gap:0.4rem">
+            <span class="dot" style="margin-top:6px"></span>Google Data Analytics Certificate
+          </li>
+        </ul>
+      </div></div>
+
+      <div class="card"><div class="card-body">
+        <div class="about-icon"><i data-lucide="briefcase" style="width:20px;height:20px"></i></div>
+        <h3 class="font-semi text-sm mb-2">Current Role</h3>
+        <p class="text-sm" style="color:var(--muted);margin-bottom:0.25rem">Process Engineer</p>
+        <p class="text-sm text-primary">March 2023 – Present</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     EXPERIENCE
+════════════════════════════════════ -->
+<section id="experience" class="section">
+  <div class="container-md">
+    <div class="section-header">
+      <p class="section-label mb-3">CAREER</p>
+      <h2 class="section-title">Professional Experience</h2>
+    </div>
+
+    <div class="space-y">
+      <!-- DG Impianti -->
+      <div class="card"><div class="card-body-lg">
+        <div class="exp-header">
+          <div>
+            <h3 class="font-bold" style="font-size:1.1rem">DG Impianti Industriali S.P.A.</h3>
+            <p class="text-sm text-primary font-medium mt-1">Process Engineer</p>
+          </div>
+          <span class="badge" style="align-self:flex-start">
+            <span class="dot dot-green"></span>
+            March 2026 – Present
+          </span>
+        </div>
+        <div class="mb-6">
+          <div class="exp-divider"><div class="exp-divider-line"></div><h4 class="font-semi text-sm">Job Purpose</h4></div>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">As a Process Engineer, my primary responsibility is to contribute to the design, analysis, and optimization of processes within the petroleum industry. By leveraging my expertise in process engineering, hydraulic calculations, and equipment sizing, I ensure the efficient and safe operation of various systems. I actively participate in developing process models, creating detailed process drawings, and preparing technical documents and specifications.</p>
+        </div>
+        <div>
+          <div class="exp-divider"><div class="exp-divider-line"></div><h4 class="font-semi text-sm">Roles &amp; Responsibilities</h4></div>
+          <div class="resp-grid" id="resp-dg"></div>
+        </div>
+      </div></div>
+
+      <!-- UNEPP -->
+      <div class="card"><div class="card-body-lg">
+        <div class="exp-header">
+          <div>
+            <h3 class="font-bold" style="font-size:1.1rem">United Engineers for Petroleum Projects</h3>
+            <p class="text-sm text-primary font-medium mt-1">Process Engineer</p>
+            <p class="text-xs mt-1" style="color:var(--muted)">Cairo, Egypt</p>
+          </div>
+          <span class="badge" style="align-self:flex-start">March 2023 – March 2026</span>
+        </div>
+        <div class="mb-6">
+          <div class="exp-divider"><div class="exp-divider-line"></div><h4 class="font-semi text-sm">Job Purpose</h4></div>
+          <p class="text-sm leading-relaxed" style="color:var(--muted)">As a Process Engineer, my primary responsibility is to contribute to the design, analysis, and optimization of processes within the petroleum industry. By leveraging my expertise in process engineering, hydraulic calculations, and equipment sizing, I ensure the efficient and safe operation of various systems. I actively participate in developing process models, creating detailed process drawings, and preparing technical documents and specifications.</p>
+        </div>
+        <div>
+          <div class="exp-divider"><div class="exp-divider-line"></div><h4 class="font-semi text-sm">Roles &amp; Responsibilities</h4></div>
+          <div class="resp-grid" id="resp-un"></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     PROJECTS
+════════════════════════════════════ -->
+<section id="projects" class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label mb-3">PORTFOLIO</p>
+      <h2 class="section-title mb-2">Projects &amp; Achievements</h2>
+      <p class="section-desc">A showcase of petroleum engineering projects across Egypt, UAE, Iraq, and Yemen</p>
+    </div>
+    <div class="projects-grid" id="projectsGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     SKILLS
+════════════════════════════════════ -->
+<section id="skills" class="section">
+  <div class="container-md">
+    <div class="section-header">
+      <p class="section-label mb-3">EXPERTISE</p>
+      <h2 class="section-title">Skills &amp; Competencies</h2>
+    </div>
+    <div style="text-align:center;margin-bottom:2rem">
+      <h3 class="font-semi mb-3">Core Competencies</h3>
+      <div class="competencies" id="coreComps"></div>
+    </div>
+    <div class="skills-grid" id="skillsGrid"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     CALCULATORS
+════════════════════════════════════ -->
+<section class="section">
+  <div class="container-md">
+    <div class="section-header">
+      <p class="section-label mb-3">TOOLS</p>
+      <h2 class="section-title">Engineering Calculators</h2>
+      <p class="section-desc">Validated process engineering tools built on industry-standard equations</p>
+    </div>
+    <div id="calcCategories"></div>
+    <div class="calc-actions">
+      <a href="calculators/index.html" class="btn btn-outline">
+        <i data-lucide="calculator" style="width:16px;height:16px"></i>
+        View All Calculators
+      </a>
+      <a href="engineering-basis.html" class="btn btn-ghost">
+        <i data-lucide="book-open" style="width:16px;height:16px"></i>
+        Engineering Basis &amp; Standards
+      </a>
+    </div>
+    <div class="disclaimer">
+      <i data-lucide="triangle-alert" class="disclaimer-icon" style="width:16px;height:16px"></i>
+      <p class="text-xs leading-relaxed" style="color:var(--muted)">
+        These calculators are engineering screening tools developed for preliminary design, FEED studies, and educational engineering workflows.
+        Final design shall be validated against project specifications, licensed software, and applicable international codes and standards.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     CONTACT
+════════════════════════════════════ -->
+<section id="contact" class="section">
+  <div class="container-md">
+    <div class="section-header">
+      <p class="section-label mb-3">GET IN TOUCH</p>
+      <h2 class="section-title mb-2">Contact Me</h2>
+      <p class="section-desc">Feel free to reach out for collaborations, opportunities, or just to say hello!</p>
+    </div>
+    <div class="contact-grid">
+      <div class="card card-hover"><div class="card-body contact-card">
+        <div class="contact-icon"><i data-lucide="phone" style="width:20px;height:20px"></i></div>
+        <h3 class="font-semi text-sm mb-1">Phone</h3>
+        <a href="tel:+201096597449" class="text-sm" style="color:var(--muted)">+20 109 659 7449</a>
+      </div></div>
+      <div class="card card-hover"><div class="card-body contact-card">
+        <div class="contact-icon"><i data-lucide="mail" style="width:20px;height:20px"></i></div>
+        <h3 class="font-semi text-sm mb-1">Email</h3>
+        <a href="mailto:hazemmancy@outlook.com" class="text-sm" style="color:var(--muted)">hazemmancy@outlook.com</a>
+      </div></div>
+      <div class="card card-hover"><div class="card-body contact-card">
+        <div class="contact-icon">
+          <svg style="width:20px;height:20px;fill:var(--primary)" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg>
+        </div>
+        <h3 class="font-semi text-sm mb-1">LinkedIn</h3>
+        <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="text-sm" style="color:var(--muted)">linkedin.com/in/hazemmancy</a>
+      </div></div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="text-align:center">
+        <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:0.25rem">
+          <i data-lucide="map-pin" style="width:16px;height:16px;color:var(--primary)"></i>
+          <span class="font-medium text-sm">Cairo, Egypt</span>
+        </div>
+        <p class="text-sm" style="color:var(--muted)">Process Engineer — Oil &amp; Gas FEED/EPC Projects</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="logo">
+      <span class="text-primary font-bold text-sm">Hazem</span>
+      <span class="font-bold text-sm">ElMancy</span>
+    </div>
+    <div class="footer-links">
+      <a href="tel:+201096597449" class="footer-icon">
+        <i data-lucide="phone" style="width:14px;height:14px"></i>
+      </a>
+      <a href="mailto:hazemmancy@outlook.com" class="footer-icon">
+        <i data-lucide="mail" style="width:14px;height:14px"></i>
+      </a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="footer-icon">
+        <svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg>
+      </a>
+    </div>
+    <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const responsibilities = [
+  'Process design and optimization for petroleum facilities',
+  'Performing hydraulic calculation & line sizing',
+  'Equipment sizing and specifications',
+  'Developing PFDs, P&IDs, UFDs, and process philosophies',
+  'Developing BOD, C&E Diagrams, and Equipment Datasheets',
+  'Preparing Equipment Lists and Studies Reports',
+  'Process simulation using Aspen HYSYS, EDR, and HTRI',
+  'Relief valve sizing and safety analysis',
+  'Cross-disciplinary coordination with engineering teams',
+  'Technical documentation and specifications preparation',
+];
+
+const coreCompetencies = [
+  'FEED','EPC','Process Simulation','PFD','P&ID','UFD',
+  'Heat and Material Balance','BOD','C&E',
+  'Hydraulic Calculation','Relief Valve Sizing','Pipeline Design',
+  'Equipment Sizing','Process Philosophy',
+  'API Standards','ASME Codes','HAZOP',
+];
+
+const skillCategories = [
+  { icon:'settings', title:'Process Simulation', tags:['Aspen HYSYS','Aspen EDR','HTRI'], tagColor:'col-primary-text' },
+  { icon:'monitor',  title:'Data Analytics & Programming', tags:['Python','SQL','Power BI','R','Tableau'], tagColor:'col-blue' },
+  { icon:'wrench',   title:'General Engineering', tags:['AutoCAD','MS Office'], tagColor:'col-green' },
+  { icon:'globe',    title:'Languages', tags:['Arabic (Native)','English (Full Professional)'], tagColor:'col-orange' },
+];
+
+const projects = [
+  { category:'FEED', catClass:'col-red', client:'PhPC', location:'Port Said, Egypt',
+    title:'Atoll Crossover for Pressurizing Ha\u2019py Subsea Pipeline',
+    desc:'Pressurization study of the 30\" Ha\u2019py subsea pipeline using Atoll gas via 10\" crossover. Developed Pressurization Philosophy and Design Basis, including MDMT assessment, AIV/FIV screening, P&IDs, and transient hydraulic simulation using Aspen HYSYS Pressurization Tool.',
+    tags:['BOD','Hydraulic Calculations','AIV/FIV Analysis','P&ID'], extra:1 },
+  { category:'FEED', catClass:'col-red', client:'WASCO', location:'Damietta, Egypt',
+    title:'North El-Basant-1 Well Tie-in to Azhar-1 Manifold',
+    desc:'Prepared Basis of Design for tie-in of North El-Basant-1 well to Azhar-1 manifold within the WASCO production system. Covered wellhead hook-up line, spill back unit, pneumatic control panel gas supply, underground pipeline, and tie-in philosophy using approved PVT and well test data.',
+    tags:['BOD','Process Design','Hydraulic Design','P&ID'], extra:0 },
+  { category:'Pre-FEED', catClass:'col-orange', client:'GEMSA', location:'Gulf of Suez, Egypt',
+    title:'Offshore Oil Processing Platform & FSO Development',
+    desc:'Pre-FEED development for a new offshore production platform with oil processing topsides and new FSO for storage and export, replacing existing aging FPSO. Scope includes preliminary sizing of separators, pumps, desalter, heater treater, tanks, chemical injection skids, and produced water treatment.',
+    tags:['Equipment Sizing','Oil Treating','Produced Water Treatment'], extra:2 },
+  { category:'Rehabilitation', catClass:'col-green', client:'NORPETCO', location:'Egypt',
+    title:'Abrar Station Rehabilitation',
+    desc:'Engineering verification and process rehabilitation studies for Abrar Production Station. Developed Process Simulation Report, PFD, P&IDs, UFD, and Gap Analysis.',
+    tags:['Aspen HYSYS','P&ID Development','PFD Design'], extra:1 },
+  { category:'Study', catClass:'col-blue', client:'PhPC', location:'Egypt',
+    title:'KOD Level Transmitters Bottleneck Study',
+    desc:'Engineering bottleneck assessment for Wet Flare Knock-Out Drum at West Harbor Plant. Evaluated solutions including radar transmitters and electric heating.',
+    tags:['Troubleshooting','Engineering Assessment'], extra:2 },
+  { category:'FEED', catClass:'col-red', client:'UGDC', location:'Damietta, Egypt',
+    title:'Propane/LPG Export/Import Facility',
+    desc:'Developed process concept for new 14\" Propane export and 12\" LPG import lines. Managed Process Philosophy, Pipeline Hydraulic Calculations, P&ID, and Control Philosophy.',
+    tags:['Pipeline Design','Hydraulic Calculations'], extra:2 },
+  { category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt',
+    title:'West Harbor Heat Exchanger',
+    desc:'Concept Study for Shell and Tube Heat Exchanger to optimize plant energy consumption. Issued BOD, Steady State Simulation (Aspen HYSYS & HTRI), PFD, and...',
+    tags:['Aspen HYSYS','HTRI','Heat Exchanger Design'], extra:1 },
+  { category:'Detailed Engineering', catClass:'col-purple', client:'GEMSA', location:'Suez Gulf, Egypt',
+    title:'Fuel Gas Power Generators',
+    desc:'Detailed Engineering for 16 Km fuel gas pipeline feeding WARDA Platform. Issued Process Design Criteria, PSV sizing, P&IDs, UFDs, and Shutdown Philosophy.',
+    tags:['Pipeline Design','PSV Sizing','P&ID'], extra:1 },
+  { category:'FEED - International', catClass:'col-red', client:'ADNOC OFFSHORE', location:'Das Island, Abu Dhabi',
+    title:'Produced Water Injection Facility',
+    desc:'FEED Works for additional produced water injection facility. Responsible for BOD, PFD, P&IDs, C&E, Line List, and Equipment List.',
+    tags:['FEED','BOD','C&E Diagram'], extra:2 },
+  { category:'Concept Study', catClass:'col-yellow', client:'PhPC', location:'Egypt',
+    title:'Flashed Gas Compressor',
+    desc:'Concept Study for new flashed Gas Compressor to boost gas pressure up to 90 barg. Issued BOD, PFD, P&IDs, Utilities Description, and Equipment List.',
+    tags:['Compressor Design','High Pressure Systems'], extra:2 },
+  { category:'FEED', catClass:'col-red', client:'Indorama', location:'Ain Sokhna, Egypt',
+    title:'Ammonia Pipeline',
+    desc:'FEED Works for 13 KM Ammonia transportation pipeline. Issued comprehensive Process Philosophies, C&E, Line List, and Equipment List.',
+    tags:['FEED','Pipeline Design','C&E Diagram'], extra:1 },
+  { category:'Proposal - International', catClass:'col-orange', client:'PETROMASILA', location:'Yemen',
+    title:'Crude Topping Unit',
+    desc:'Proposal development for 10,000 BOPD crude distillation unit. Issued PFD, UFD, Process Description Report, and Equipment List.',
+    tags:['Distillation','PFD','UFD'], extra:1 },
+  { category:'Detailed Engineering - International', catClass:'col-purple', client:'Rumaila', location:'Iraq',
+    title:'Crude Oil Tank',
+    desc:'Detailed Engineering of 25,000 m\u00B3 crude oil tank at Degassing Stations. Managed P&ID, tank datasheet, storage calculations, and PVSV calculations.',
+    tags:['Storage Tank','P&ID','PVSV'], extra:1 },
+];
+
+const calculatorCategories = [
+  { label:'Hydraulics', items:[
+    { title:'Gas Line Sizing', desc:'Darcy-Weisbach with Swamee-Jain friction, Mach number check, and API RP 14E screening', icon:'wind', href:'calculators/gas-line-sizing.html' },
+    { title:'Liquid Line Sizing', desc:'Friction and static head losses with velocity screening per industry standards', icon:'droplets', href:'calculators/liquid-line-sizing.html' },
+    { title:'Multiphase Screening', desc:'Homogeneous model with API RP 14E erosional velocity and flow regime indicators', icon:'waves', href:'calculators/multiphase-line.html' },
+    { title:'Pump Sizing', desc:'Centrifugal and PD pump sizing with TDH, BHP, and NPSH/NPIP analysis', icon:'gauge', href:'calculators/pump-sizing.html' },
+  ]},
+  { label:'Fluids', items:[
+    { title:'Gas Mixing', desc:'Mole fraction weighted MW calculation with auto-normalization and validation', icon:'blend', href:'calculators/gas-mixing.html' },
+    { title:'Gas Volume Conversion', desc:'Standard to actual volume conversion with compressibility factor correction', icon:'arrow-left-right', href:'calculators/gas-volume.html' },
+  ]},
+  { label:'Equipment', items:[
+    { title:'Restriction Orifice', desc:'Liquid and gas orifice sizing with choked flow detection and beta ratio check', icon:'circle-dot', href:'calculators/restriction-orifice.html' },
+    { title:'Control Valve Cv', desc:'Required Cv per IEC 60534 with choked flow, piping geometry, and expansion factor', icon:'gauge', href:'calculators/control-valve.html' },
+    { title:'Separator Sizing', desc:'Unified separator sizing per API 12J / GPSA Sec 7', icon:'container', href:'calculators/separator-sizing.html' },
+    { title:'Heat Exchanger', desc:'LMTD-based area estimation with F-factor correction and fouling allowance', icon:'thermometer', href:'calculators/heat-exchanger.html' },
+    { title:'Compressor Sizing', desc:'Polytropic/isentropic compressor sizing with multi-stage and intercooling support', icon:'cog', href:'calculators/compressor.html' },
+    { title:'Flare KO Drum', desc:'Flare knockout drum sizing per API 521 with conservative K-factors', icon:'flame', href:'calculators/flare-ko-drum.html' },
+  ]},
+  { label:'Piping', items:[
+    { title:'Pipe Wall Thickness', desc:'Minimum wall thickness per ASME B31.1/B31.3/B31.4/B31.8 with Lamé thick-wall check', icon:'layers', href:'calculators/pipe-wall-thickness.html' },
+  ]},
+  { label:'Relief', items:[
+    { title:'PRD / Flare Relief', desc:'9-step wizard: scenario screening (API 521), sizing (API 520), orifice selection (API 526)', icon:'shield', href:'calculators/psv-sizing.html' },
+    { title:'Thermal Relief', desc:'Thermal expansion relief sizing for blocked-in liquid scenarios per API 521', icon:'flame', href:'calculators/thermal-relief.html' },
+    { title:'Tank Venting (API 2000)', desc:'Normal and emergency venting for atmospheric storage tanks per API 2000', icon:'cloud-rain', href:'calculators/tank-venting.html' },
+  ]},
+];
+
+// ─── RENDER FUNCTIONS ────────────────────────────────────────────────────────
+function renderResponsibilities(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = responsibilities.map(r => `
+    <div class="resp-item">
+      <i data-lucide="circle-check-big" style="width:16px;height:16px;color:var(--primary);margin-top:2px;flex-shrink:0"></i>
+      <p class="text-sm" style="color:var(--muted)">${r}</p>
+    </div>`).join('');
+}
+
+function renderProjects() {
+  const grid = document.getElementById('projectsGrid');
+  if (!grid) return;
+  grid.innerHTML = projects.map(p => `
+    <div class="card card-hover">
+      <div class="card-body">
+        <div class="project-meta">
+          <span class="badge ${p.catClass}" style="border-color:transparent">${p.category}</span>
+          <span class="project-location">
+            <i data-lucide="map-pin" style="width:12px;height:12px"></i>
+            ${p.location}
+          </span>
+        </div>
+        <h3 class="font-semi text-sm leading-snug mb-2">${p.client} ${p.title}</h3>
+        <p class="text-xxs leading-relaxed mb-3" style="color:var(--muted)">${p.desc}</p>
+        <div class="tag-label">
+          <i data-lucide="wrench" style="width:12px;height:12px;color:var(--muted)"></i>
+          <span class="text-xxs" style="color:var(--muted)">Skills &amp; Deliverables</span>
+        </div>
+        <div class="tag-row">
+          ${p.tags.map(t => `<span class="badge badge-secondary">${t}</span>`).join('')}
+          ${p.extra > 0 ? `<span class="badge badge-secondary text-primary">+${p.extra}</span>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCoreComps() {
+  const el = document.getElementById('coreComps');
+  if (!el) return;
+  el.innerHTML = coreCompetencies.map(c => `<span class="badge">${c}</span>`).join('');
+}
+
+function renderSkills() {
+  const grid = document.getElementById('skillsGrid');
+  if (!grid) return;
+  grid.innerHTML = skillCategories.map(cat => `
+    <div class="card"><div class="card-body">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <div class="about-icon" style="margin-bottom:0">
+          <i data-lucide="${cat.icon}" style="width:18px;height:18px"></i>
+        </div>
+        <h3 class="font-semi text-sm">${cat.title}</h3>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.375rem">
+        ${cat.tags.map(t => `<span class="badge badge-secondary ${cat.tagColor}">${t}</span>`).join('')}
+      </div>
+    </div></div>`).join('');
+}
+
+function renderCalcs() {
+  const el = document.getElementById('calcCategories');
+  if (!el) return;
+  el.innerHTML = calculatorCategories.map(cat => `
+    <div class="calc-cat">
+      <div class="calc-cat-label">
+        <div class="calc-cat-line"></div>
+        <h3 class="font-semi text-xs" style="letter-spacing:0.05em">${cat.label}</h3>
+      </div>
+      <div class="calc-grid">
+        ${cat.items.map(c => `
+          <a href="${c.href}" class="card card-hover" style="display:block">
+            <div class="card-body">
+              <div class="calc-card-inner">
+                <div class="calc-card-icon">
+                  <i data-lucide="${c.icon}" style="width:16px;height:16px"></i>
+                </div>
+                <h3 class="font-semi text-xs">${c.title}</h3>
+              </div>
+              <p class="text-xxs leading-relaxed" style="color:var(--muted)">${c.desc}</p>
+            </div>
+          </a>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// ─── THEME ───────────────────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const icon = theme === 'dark' ? 'sun' : 'moon';
+  ['themeIconDesktop','themeIconMobile'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.setAttribute('data-lucide', icon); }
+  });
+  if (window.lucide) lucide.createIcons();
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+const savedTheme = localStorage.getItem('theme') || 'dark';
+applyTheme(savedTheme);
+
+// ─── NAVBAR SCROLL ───────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// ─── MOBILE MENU ─────────────────────────────────────────────────────────────
+let menuOpen = false;
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('mobileMenu').classList.toggle('open', menuOpen);
+  const icon = menuOpen ? 'x' : 'menu';
+  const el = document.getElementById('menuIcon');
+  if (el) { el.setAttribute('data-lucide', icon); lucide.createIcons(); }
+}
+
+// ─── SMOOTH SCROLL ───────────────────────────────────────────────────────────
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ─── FOOTER YEAR ─────────────────────────────────────────────────────────────
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderResponsibilities('resp-dg');
+renderResponsibilities('resp-un');
+renderProjects();
+renderCoreComps();
+renderSkills();
+renderCalcs();
+lucide.createIcons();
+</script>
+</body>
+</html>
