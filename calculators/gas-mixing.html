@@ -124,7 +124,7 @@
     footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
     .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
     .footer-links{display:flex;align-items:center;gap:.75rem}
-    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:color:var(--muted);transition:color .15s,border-color .15s}
     .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
     .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
     select{font-family:var(--font)}
@@ -499,8 +499,33 @@ function addRow(name, mol) {
   renderTable(); calculate();
 }
 function removeRow(id) { rows = rows.filter(r=>r.id!==id); renderTable(); calculate(); }
-function onNameChange(id,val) { const r=rows.find(r=>r.id===id); if(r){r.name=val;calculate();} }
-function onMolChange(id,val) { const r=rows.find(r=>r.id===id); if(r){r.mol=parseFloat(val)||0;renderTable();calculate();} }
+
+// NAME change: update data row + re-render the single row's prop cells, then recalculate
+function onNameChange(id, val) {
+  const r = rows.find(r=>r.id===id);
+  if (!r) return;
+  r.name = val;
+  // update only the static prop cells in this row — no full innerHTML rebuild
+  const d = DB[val] || {};
+  const tr = document.querySelector(`tr[data-row-id="${id}"]`);
+  if (tr) {
+    tr.querySelector('.cell-formula').textContent = d.f || '';
+    tr.querySelector('.cell-mw').textContent   = d.MW  ? d.MW.toFixed(3)  : '';
+    tr.querySelector('.cell-tc').textContent   = d.Tc  ? d.Tc.toFixed(1)  : '';
+    tr.querySelector('.cell-pc').textContent   = d.Pc  ? d.Pc.toFixed(2)  : '';
+    tr.querySelector('.cell-w').textContent    = d.w != null ? d.w.toFixed(4) : '';
+    tr.querySelector('.cell-lhv').textContent  = d.LHV != null ? d.LHV.toFixed(2) : '';
+  }
+  calculate();
+}
+
+// MOL change: update data row only — NO renderTable() call, preserves focus
+function onMolChange(id, val) {
+  const r = rows.find(r=>r.id===id);
+  if (r) { r.mol = val === '' ? '' : parseFloat(val) || 0; }
+  calculate();
+}
+
 function addComponent() { addRow('Methane',''); }
 function clearAll() { rows=[]; renderTable(); calculate(); }
 function normalise() {
@@ -524,15 +549,15 @@ function renderTable() {
   tbody.innerHTML = rows.map(r => {
     const d = DB[r.name]||{};
     const opts = names.map(n=>`<option value="${n}"${n===r.name?' selected':''}>${n}</option>`).join('');
-    return `<tr>
+    return `<tr data-row-id="${r.id}">
       <td><select onchange="onNameChange(${r.id},this.value)" style="width:100%;padding:.28rem .35rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.72rem;color:var(--foreground);font-family:var(--font);outline:none">${opts}</select></td>
-      <td><span class="comp-formula">${d.f||''}</span></td>
+      <td><span class="comp-formula cell-formula">${d.f||''}</span></td>
       <td><input type="number" class="mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onMolChange(${r.id},this.value)" /></td>
-      <td class="prop-cell">${d.MW?d.MW.toFixed(3):''}</td>
-      <td class="prop-cell">${d.Tc?d.Tc.toFixed(1):''}</td>
-      <td class="prop-cell">${d.Pc?d.Pc.toFixed(2):''}</td>
-      <td class="prop-cell">${d.w!=null?d.w.toFixed(4):''}</td>
-      <td class="prop-cell">${d.LHV!=null?d.LHV.toFixed(2):''}</td>
+      <td class="prop-cell cell-mw">${d.MW?d.MW.toFixed(3):''}</td>
+      <td class="prop-cell cell-tc">${d.Tc?d.Tc.toFixed(1):''}</td>
+      <td class="prop-cell cell-pc">${d.Pc?d.Pc.toFixed(2):''}</td>
+      <td class="prop-cell cell-w">${d.w!=null?d.w.toFixed(4):''}</td>
+      <td class="prop-cell cell-lhv">${d.LHV!=null?d.LHV.toFixed(2):''}</td>
       <td><button onclick="removeRow(${r.id})" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:.3rem;color:var(--muted);background:none;border:none;cursor:pointer"><i data-lucide="x" style="width:13px;height:13px"></i></button></td>
     </tr>`;
   }).join('');
