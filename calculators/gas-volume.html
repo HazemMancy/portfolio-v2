@@ -732,8 +732,26 @@ function removeCompRow(side,id){
   compRows[side]=compRows[side].filter(r=>r.id!==id);
   renderCompTable(side); calculate();
 }
-function onCompName(side,id,val){ const r=compRows[side].find(r=>r.id===id); if(r){r.name=val;calculate();} }
-function onCompMol(side,id,val){ const r=compRows[side].find(r=>r.id===id); if(r){r.mol=parseFloat(val)||0;renderCompTable(side);calculate();} }
+function onCompName(side,id,val){
+  const r=compRows[side].find(r=>r.id===id);
+  if(r){ r.name=val; calculate(); }
+}
+// FIX: do NOT call renderCompTable() here — it destroys the tbody and causes focus loss.
+// Only update the running total display in-place, then recalculate.
+function onCompMol(side,id,val){
+  const r=compRows[side].find(r=>r.id===id);
+  if(r){
+    r.mol=parseFloat(val)||0;
+    // Update total display without touching any input DOM nodes
+    const total=compRows[side].reduce((s,row)=>s+(parseFloat(row.mol)||0),0);
+    const totalEl=document.getElementById(side+'CompTotal');
+    if(totalEl){
+      totalEl.textContent=total.toFixed(2);
+      totalEl.className=Math.abs(total-100)<0.01?'norm-ok-mini':'norm-warn-mini';
+    }
+    calculate();
+  }
+}
 function normaliseComp(side){
   const total=compRows[side].reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
   if(total<=0) return;
@@ -748,7 +766,6 @@ function renderCompTable(side){
   const total=compRows[side].reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
   totalEl.textContent=total.toFixed(2);
   totalEl.className=Math.abs(total-100)<0.01?'norm-ok-mini':'norm-warn-mini';
-  const opts=COMP_NAMES.map(n=>`<option value="${n}">${n}</option>`).join('');
   tbody.innerHTML=compRows[side].map(r=>`<tr>
     <td><select class="mini-sel" onchange="onCompName('${side}',${r.id},this.value)">${COMP_NAMES.map(n=>`<option value="${n}"${n===r.name?' selected':''}>${n}</option>`).join('')}</select></td>
     <td><input type="number" class="mini-mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onCompMol('${side}',${r.id},this.value)" /></td>
@@ -982,42 +999,6 @@ function calculate(){
     if(Pr>10)  warnings.push(`Target Pr=${Pr.toFixed(2)} > 10 — Pitzer range exceeded. Use PR or SRK.`);
   }
 
-  // Build trace
-  const fullTrace=[
-    `Gas Law: V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)  [Real gas: PV = ZnRT]`,
-    `─────────────────────────────────────────────────`,
-    `V1 = ${fmtNum(volume)} ${fromKey}`,
-    fromDef.factor!==1 ? `V1 (m³/h) = ${fmtNum(volume)} × ${fromDef.factor} = ${fmtNum(V1_m3h)}` : `V1 (m³/h) = ${fmtNum(V1_m3h)}`,
-    `─────────────────────────────────────────────────`,
-    `P1 = ${fmtNum(P1_kPa,3)} kPa abs  |  T1 = ${fmtNum(T1_K,3)} K  (${(T1_K-273.15).toFixed(2)} °C)`,
-    ...trace.filter((_,i)=>i===0 || trace[0].startsWith('Z1')?i===0:i<1), // Z1 line
-  ];
-  fullTrace.push(`P1 = ${fmtNum(P1_kPa,3)} kPa abs  (source)`);
-  fullTrace.push(`T1 = ${fmtNum(T1_K,3)} K`);
-  trace.forEach((l,i)=>{ if(i===0) fullTrace.push('Z1: '+l); });
-  fullTrace.push(`P2 = ${fmtNum(P2_kPa,3)} kPa abs  (target)`);
-  fullTrace.push(`T2 = ${fmtNum(T2_K,3)} K`);
-  trace.forEach((l,i)=>{ if(i===1) fullTrace.push('Z2: '+l); });
-  fullTrace.push(`─────────────────────────────────────────────────`);
-  fullTrace.push(`V2 = ${fmtNum(V1_m3h)} × (${fmtNum(P1_kPa,3)}/${fmtNum(P2_kPa,3)}) × (${fmtNum(T2_K,3)}/${fmtNum(T1_K,3)}) × (${fmtNum(Z2,5)}/${fmtNum(Z1,5)})`);
-  fullTrace.push(`V2 (m³/h) = ${fmtNum(V2_m3h)}`);
-  if(toDef.factor!==1) fullTrace.push(`V2 (${toKey}) = ${fmtNum(V2_m3h)} / ${toDef.factor} = ${fmtNum(outputVol)}`);
-  fullTrace.push(`Result: ${fmtNum(outputVol)} ${toKey}`);
-
-  // All units table
-  const allUnits=[];
-  for(const [key,def] of Object.entries(FLOW_UNITS)){
-    if(def.isActual){
-      if(key!==toKey) continue;
-      allUnits.push({key,def,value:V2_m3h/def.factor,isFixed:false,
-        note:`@ ${fmtNum(P2_kPa/100,3)} bara, ${(T2_K-273.15).toFixed(1)} °C, Z=${fmtNum(Z2,5)}`});
-    } else {
-      const tP=def.refP,tT=def.refT,tZ=def.refZ;
-      const v=V1_m3h*(P1_kPa/tP)*(tT/T1_K)*(tZ/Z1);
-      allUnits.push({key,def,value:v/def.factor,isFixed:true,note:''});
-    }
-  }
-
   document.getElementById('bigVal').textContent=fmtNum(outputVol,4);
   document.getElementById('bigUnit').textContent=toDef.label;
   document.getElementById('bigEq').textContent=`${fmtNum(volume)} ${fromKey}  →  ${fmtNum(outputVol)} ${toKey}  (Z1=${fmtNum(Z1,4)}, Z2=${fmtNum(Z2,4)})`;
@@ -1030,6 +1011,18 @@ function calculate(){
   } else { wBox.style.display='none'; }
 
   const tbody=document.getElementById('allUnitsTbody');
+  const allUnits=[];
+  for(const [key,def] of Object.entries(FLOW_UNITS)){
+    if(def.isActual){
+      if(key!==toKey) continue;
+      allUnits.push({key,def,value:V2_m3h/def.factor,isFixed:false,
+        note:`@ ${fmtNum(P2_kPa/100,3)} bara, ${(T2_K-273.15).toFixed(1)} °C, Z=${fmtNum(Z2,5)}`});
+    } else {
+      const tP=def.refP,tT=def.refT,tZ=def.refZ;
+      const v=V1_m3h*(P1_kPa/tP)*(tT/T1_K)*(tZ/Z1);
+      allUnits.push({key,def,value:v/def.factor,isFixed:true,note:''});
+    }
+  }
   tbody.innerHTML=allUnits.map(r=>{
     const isTarget=r.key===toKey;
     const dot=r.isFixed
