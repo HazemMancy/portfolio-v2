@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Centrifugal Pump Sizing | Process Calculators</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #22263a;
+  --border: #2e3347;
+  --accent: #4f8ef7;
+  --accent2: #38c9a0;
+  --warn: #f5a623;
+  --danger: #e8505b;
+  --text: #e2e6f0;
+  --muted: #7a8099;
+  --input-bg: #141720;
+  --card-bg: #1e2235;
+  --green: #38c9a0;
+  --red: #e8505b;
+  --yellow: #f5a623;
+}
+[data-theme="light"] {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface2: #edf0f7;
+  --border: #d0d5e8;
+  --text: #1a1d2e;
+  --muted: #6b7390;
+  --input-bg: #f9fafc;
+  --card-bg: #ffffff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+a{color:var(--accent);text-decoration:none}
+/* NAVBAR */
+.navbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;gap:16px}
+.nav-brand{font-weight:700;font-size:15px;color:var(--text);white-space:nowrap}
+.nav-brand span{color:var(--accent)}
+.nav-links{display:flex;gap:4px;align-items:center}
+.nav-links a{padding:6px 12px;border-radius:6px;font-size:13px;color:var(--muted);transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--text);background:var(--surface2)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.theme-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:5px 8px;font-size:13px;transition:all .15s}
+.theme-btn:hover{color:var(--text);border-color:var(--accent)}
+.hamburger{display:none;background:none;border:none;cursor:pointer;color:var(--text);font-size:20px}
+@media(max-width:768px){.nav-links{display:none}.hamburger{display:block}}
+/* BREADCRUMB */
+.breadcrumb{display:flex;align-items:center;gap:6px;padding:14px 24px 0;font-size:12px;color:var(--muted)}
+.breadcrumb a{color:var(--muted)}.breadcrumb a:hover{color:var(--accent)}
+.breadcrumb .sep{opacity:.4}
+/* PAGE HEADER */
+.page-header{padding:16px 24px 0}
+.page-header .label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.page-header h1{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
+.page-header .desc{font-size:13px;color:var(--muted);max-width:720px;line-height:1.6;margin-bottom:12px}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;letter-spacing:.03em}
+.badge-std{background:rgba(79,142,247,.12);color:var(--accent);border:1px solid rgba(79,142,247,.25)}
+.badge-warn{background:rgba(245,166,35,.1);color:var(--yellow);border:1px solid rgba(245,166,35,.25)}
+/* DOC HEADER */
+.doc-header{margin:16px 24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 20px}
+.doc-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:3px}
+.doc-field input{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:5px;padding:5px 8px;color:var(--text);font-size:12px}
+.doc-field input:focus{outline:none;border-color:var(--accent)}
+.doc-actions{display:flex;gap:8px;align-items:center;margin-top:12px}
+.btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s;letter-spacing:.02em}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.88}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(232,80,91,.15);color:var(--red);border:1px solid rgba(232,80,91,.3)}.btn-danger:hover{background:rgba(232,80,91,.25)}
+/* MAIN LAYOUT */
+.main{padding:16px 24px 40px}
+.calc-grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+@media(max-width:1100px){.calc-grid{grid-template-columns:1fr}}
+/* INPUTS PANEL */
+.inputs-panel{position:sticky;top:68px;display:flex;flex-direction:column;gap:14px}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.section-title .snum{background:var(--accent);color:#fff;border-radius:3px;padding:1px 5px;font-size:10px}
+.section-body{padding:14px}
+.input-group{margin-bottom:11px}
+.input-group:last-child{margin-bottom:0}
+.input-group label{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);margin-bottom:4px}
+.input-group label span{font-size:10px;color:var(--accent);font-weight:600}
+.input-row{display:flex;gap:6px;align-items:center}
+.input-row input,.input-row select{flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px;transition:border-color .15s}
+.input-row input:focus,.input-row select:focus{outline:none;border-color:var(--accent)}
+.unit-label{font-size:11px;color:var(--muted);white-space:nowrap;min-width:40px;text-align:right}
+/* RESULTS PANEL */
+.results-panel{display:flex;flex-direction:column;gap:14px}
+.result-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.result-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--border)}
+.result-item{background:var(--card-bg);padding:12px 14px}
+.result-item .r-label{font-size:11px;color:var(--muted);margin-bottom:4px;line-height:1.4}
+.result-item .r-value{font-size:18px;font-weight:700;color:var(--text)}
+.result-item .r-unit{font-size:11px;color:var(--muted);margin-left:3px}
+.result-item.highlight .r-value{color:var(--accent)}
+.result-item.warn-item .r-value{color:var(--yellow)}
+.result-item.danger-item .r-value{color:var(--red)}
+.result-item.ok-item .r-value{color:var(--green)}
+/* STATUS BLOCK */
+.status-block{padding:14px;display:flex;flex-wrap:wrap;gap:8px}
+.status-chip{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600}
+.status-chip.ok{background:rgba(56,201,160,.1);color:var(--green);border:1px solid rgba(56,201,160,.25)}
+.status-chip.warn{background:rgba(245,166,35,.1);color:var(--yellow);border:1px solid rgba(245,166,35,.25)}
+.status-chip.fail{background:rgba(232,80,91,.1);color:var(--red);border:1px solid rgba(232,80,91,.25)}
+.status-chip.neutral{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+/* NOTES */
+.note-box{margin:0 14px 14px;padding:10px 12px;background:rgba(79,142,247,.06);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;font-size:12px;color:var(--muted);line-height:1.6}
+/* SUMMARY TABLE */
+.sum-table{width:100%;border-collapse:collapse;font-size:12px}
+.sum-table th{background:var(--surface2);padding:8px 12px;text-align:left;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.sum-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.sum-table tr:last-child td{border-bottom:none}
+.sum-table .num{text-align:right;font-weight:600;font-family:monospace;font-size:13px}
+.sum-table .ok{color:var(--green)}.sum-table .warn{color:var(--yellow)}.sum-table .fail{color:var(--red)}
+/* EMPTY STATE */
+.empty-state{padding:40px;text-align:center;color:var(--muted)}
+.empty-state .icon{font-size:36px;margin-bottom:10px;opacity:.5}
+.empty-state p{font-size:13px}
+/* TABS */
+.tab-bar{display:flex;gap:2px;padding:4px;background:var(--surface2);border-radius:8px;margin:14px 14px 0}
+.tab-btn{flex:1;padding:7px 10px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;transition:all .15s}
+.tab-btn.active{background:var(--surface);color:var(--text)}
+.tab-pane{display:none;padding:14px}
+.tab-pane.active{display:block}
+/* SCROLLABLE TABLE WRAPPER */
+.table-wrap{overflow-x:auto;padding:0 14px 14px}
+</style>
+</head>
+<body>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand"><span>H</span>azemMancy</div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/calculators/" class="active">Calculators</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" id="themeToggle" title="Toggle theme">☀</button>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </div>
+</nav>
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="/">Home</a><span class="sep">/</span>
+  <a href="/calculators/">Calculators</a><span class="sep">/</span>
+  <span>Centrifugal Pump Sizing</span>
+</div>
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="label">Rotating Equipment</div>
+  <h1>Centrifugal Pump Sizing</h1>
+  <div class="desc">TDH, NPSHA, BHP and motor sizing for centrifugal pumps. Suction and discharge hydraulics, control valve ΔP, API 610 motor selection, and shutoff pressure check. Both SI and Imperial unit sets.</div>
+  <div class="badges">
+    <span class="badge badge-std">API 610</span>
+    <span class="badge badge-std">API RP 14E</span>
+    <span class="badge badge-std">GPSA</span>
+    <span class="badge badge-warn">Screening-level — not code-compliant design</span>
+  </div>
+</div>
+<!-- DOC HEADER -->
+<div class="doc-header">
+  <div class="doc-grid">
+    <div class="doc-field"><label>Company</label><input id="d_company" placeholder="DG Impianti"></div>
+    <div class="doc-field"><label>Project</label><input id="d_project" placeholder="Project Name"></div>
+    <div class="doc-field"><label>Doc No.</label><input id="d_docno" placeholder="WS-PR-001"></div>
+    <div class="doc-field"><label>Revision</label><input id="d_rev" value="A"></div>
+    <div class="doc-field"><label>Pump Tag</label><input id="d_tag" placeholder="P-101"></div>
+    <div class="doc-field"><label>Prepared by</label><input id="d_by" placeholder="H. El Mancy"></div>
+  </div>
+  <div class="doc-actions">
+    <button class="btn btn-primary" onclick="calculate()">&#9654; Calculate</button>
+    <button class="btn btn-secondary" onclick="resetForm()">Reset</button>
+    <button class="btn btn-secondary" onclick="window.print()">&#128438; Export PDF</button>
+  </div>
+</div>
+<!-- MAIN -->
+<div class="main">
+  <div class="calc-grid">
+    <!-- INPUTS -->
+    <div class="inputs-panel">
+      <!-- UNIT SYSTEM -->
+      <div class="section-card">
+        <div class="section-title">Unit System</div>
+        <div class="section-body">
+          <div class="input-group">
+            <div class="input-row">
+              <select id="unitSys" onchange="toggleUnits()">
+                <option value="SI">SI (m³/hr, kPa, m, kg/m³, kW)</option>
+                <option value="IMP">Imperial (USGPM, psi, ft, lb/ft³, HP)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- S1: FLUID PROPERTIES -->
+      <div class="section-card">
+        <div class="section-title"><span class="snum">1</span> Fluid Properties</div>
+        <div class="section-body">
+          <div class="input-group">
+            <label>Fluid Description</label>
+            <div class="input-row"><input id="fluidName" placeholder="e.g. Produced Water"></div>
+          </div>
+          <div class="input-group">
+            <label>Density @ Op. P&T <span id="lbl_rho">kg/m³</span></label>
+            <div class="input-row"><input id="rho" type="number" step="any" placeholder="1000"></div>
+          </div>
+          <div class="input-group">
+            <label>Viscosity @ Op. P&T <span>cP</span></label>
+            <div class="input-row"><input id="visc" type="number" step="any" placeholder="1.0"></div>
+          </div>
+          <div class="input-group">
+            <label>Vapour Pressure <span id="lbl_vp">kPaa</span></label>
+            <div class="input-row"><input id="vp" type="number" step="any" placeholder="2.34"></div>
+          </div>
+          <div class="input-group">
+            <label>Pumping Temperature <span id="lbl_temp">°C</span></label>
+            <div class="input-row"><input id="temp" type="number" step="any" placeholder="25"></div>
+          </div>
+          <div class="input-group">
+            <label>Atmospheric Pressure <span id="lbl_patm">kPaa</span></label>
+            <div class="input-row"><input id="patm" type="number" step="any" placeholder="101.325"></div>
+          </div>
+        </div>
+      </div>
+      <!-- S3: FLOW REQUIREMENTS -->
+      <div class="section-card">
+        <div class="section-title"><span class="snum">2</span> Flow Requirements</div>
+        <div class="section-body">
+          <div class="input-group">
+            <label>Min Flow <span id="lbl_q">m³/hr</span></label>
+            <div class="input-row"><input id="qMin" type="number" step="any" placeholder="0"></div>
+          </div>
+          <div class="input-group">
+            <label>Normal Flow <span id="lbl_q2">m³/hr</span></label>
+            <div class="input-row"><input id="qNorm" type="number" step="any" placeholder="50"></div>
+          </div>
+          <div class="input-group">
+            <label>Rated Flow <span id="lbl_q3">m³/hr</span></label>
+            <div class="input-row"><input id="qRated" type="number" step="any" placeholder="60"></div>
+          </div>
+          <div class="input-group">
+            <label>No. of Pumps (Rated) <span>—</span></label>
+            <div class="input-row">
+              <select id="nPumps">
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- S4: SUCTION -->
+      <div class="section-card">
+        <div class="section-title"><span class="snum">3</span> Suction Side</div>
+        <div class="section-body">
+          <div class="input-group">
+            <label>Suction Vessel Pressure <span id="lbl_ps">kPag</span></label>
+            <div class="input-row"><input id="pSuction" type="number" step="any" placeholder="0"></div>
+          </div>
+          <div class="input-group">
+            <label>Liquid Level (NLL) above grade <span id="lbl_elev">m</span></label>
+            <div class="input-row"><input id="lvlNLL" type="number" step="any" placeholder="3.0"></div>
+          </div>
+          <div class="input-group">
+            <label>Pump Inlet Elevation above grade <span id="lbl_elev2">m</span></label>
+            <div class="input-row"><input id="elevPumpIn" type="number" step="any" placeholder="0.3"></div>
+          </div>
+          <div class="input-group">
+            <label>Suction Frictional Losses <span id="lbl_dps">kPa</span></label>
+            <div class="input-row"><input id="dPSuction" type="number" step="any" placeholder="15"></div>
+          </div>
+          <div class="input-group">
+            <label>NPSH Design Margin <span id="lbl_npm">m</span></label>
+            <div class="input-row"><input id="npshMargin" type="number" step="any" placeholder="0.61"></div>
+          </div>
+          <div class="input-group">
+            <label>NPSHR (vendor / assumed) <span id="lbl_npshr">m</span></label>
+            <div class="input-row"><input id="npshr" type="number" step="any" placeholder="3.0"></div>
+          </div>
+        </div>
+      </div>
+      <!-- S10: DISCHARGE -->
+      <div class="section-card">
+        <div class="section-title"><span class="snum">4</span> Discharge Side</div>
+        <div class="section-body">
+          <div class="input-group">
+            <label>Target Destination Pressure <span id="lbl_pd">kPag</span></label>
+            <div class="input-row"><input id="pDest" type="number" step="any" placeholder="700"></div>
+          </div>
+          <div class="input-group">
+            <label>Destination Elevation above grade <span id="lbl_elevd">m</span></label>
+            <div class="input-row"><input id="elevDest" type="number" step="any" placeholder="5"></div>
+          </div>
+          <div class="input-group">
+            <label>Pump Outlet Elevation above grade <span id="lbl_elevout">m</span></label>
+            <div class="input-row"><input id="elevPumpOut" type="number" step="any" placeholder="0.3"></div>
+          </div>
+          <div class="input-group">
+            <label>Discharge Line Frictional Losses (excl. CV) <span id="lbl_dpd">kPa</span></label>
+            <div class="input-row"><input id="dPDischarge" type="number" step="any" placeholder="80"></div>
+          </div>
+          <div class="input-group">
+            <label>Control Valve Min. ΔP (rated flow) <span id="lbl_dpcv">kPa</span></label>
+            <div class="input-row"><input id="dPCV" type="number" step="any" placeholder="70"></div>
+          </div>
+        </div>
+      </div>
+      <!-- S11: PUMP PARAMETERS -->
+      <div class="section-card">
+        <div class="section-title"><span class="snum">5</span> Pump Parameters</div>
+        <div class="section-body">
+          <div class="input-group">
+            <label>Hydraulic Efficiency <span>%</span></label>
+            <div class="input-row"><input id="eta" type="number" step="any" placeholder="70"></div>
+          </div>
+          <div class="input-group">
+            <label>Head Design Margin <span>%</span></label>
+            <div class="input-row"><input id="headMargin" type="number" step="any" placeholder="10"></div>
+          </div>
+          <div class="input-group">
+            <label>Motor Efficiency <span>%</span></label>
+            <div class="input-row"><input id="etaMotor" type="number" step="any" placeholder="95"></div>
+          </div>
+          <div class="input-group">
+            <label>API 610 Applicable</label>
+            <div class="input-row">
+              <select id="api610">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Shutoff Head Rise vs Rated <span>%</span></label>
+            <div class="input-row"><input id="shutoffRatio" type="number" step="any" placeholder="125"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end inputs-panel -->
+
+    <!-- RESULTS -->
+    <div class="results-panel" id="resultsPanel">
+      <div class="result-section">
+        <div class="result-section-title">— Enter parameters and click Calculate —</div>
+        <div class="empty-state">
+          <div class="icon">⚙</div>
+          <p>Results will appear here after calculation.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- UNIT LABELS ----
+function toggleUnits(){
+  const SI = document.getElementById('unitSys').value === 'SI';
+  const labels = {
+    lbl_rho: SI?'kg/m³':'lb/ft³',
+    lbl_vp: SI?'kPaa':'psia',
+    lbl_temp: SI?'°C':'°F',
+    lbl_patm: SI?'kPaa':'psia',
+    lbl_q: SI?'m³/hr':'USGPM',
+    lbl_q2: SI?'m³/hr':'USGPM',
+    lbl_q3: SI?'m³/hr':'USGPM',
+    lbl_ps: SI?'kPag':'psig',
+    lbl_elev: SI?'m':'ft',
+    lbl_elev2: SI?'m':'ft',
+    lbl_dps: SI?'kPa':'psi',
+    lbl_npm: SI?'m':'ft',
+    lbl_npshr: SI?'m':'ft',
+    lbl_pd: SI?'kPag':'psig',
+    lbl_elevd: SI?'m':'ft',
+    lbl_elevout: SI?'m':'ft',
+    lbl_dpd: SI?'kPa':'psi',
+    lbl_dpcv: SI?'kPa':'psi',
+  };
+  for(const [id,val] of Object.entries(labels)){
+    const el = document.getElementById(id);
+    if(el) el.textContent = val;
+  }
+}
+
+// ---- HELPERS ----
+const g = (id) => { const el=document.getElementById(id); return el ? parseFloat(el.value)||0 : 0; };
+const gs = (id) => { const el=document.getElementById(id); return el ? el.value : ''; };
+const fmt = (v,d=2) => isFinite(v) ? v.toFixed(d) : '—';
+
+function resetForm(){
+  document.querySelectorAll('.inputs-panel input[type=number]').forEach(i=>i.value='');
+  document.getElementById('resultsPanel').innerHTML = `
+    <div class="result-section">
+      <div class="result-section-title">— Enter parameters and click Calculate —</div>
+      <div class="empty-state"><div class="icon">⚙</div><p>Results will appear here after calculation.</p></div>
+    </div>`;
+}
+
+// ---- MAIN CALCULATION ----
+function calculate(){
+  const SI = gs('unitSys') === 'SI';
+
+  // Inputs
+  const rho    = g('rho');       // kg/m³ or lb/ft³
+  const visc   = g('visc');      // cP
+  const vp     = g('vp');        // kPaa or psia
+  const patm   = g('patm') || (SI ? 101.325 : 14.696);
+  const qMin   = g('qMin');
+  const qNorm  = g('qNorm');
+  const qRated = g('qRated');
+  const nPumps = parseInt(gs('nPumps')) || 1;
+
+  // Suction
+  const pSuct_g   = g('pSuction');   // kPag or psig
+  const lvlNLL    = g('lvlNLL');      // m or ft above grade
+  const elevPIn   = g('elevPumpIn'); // m or ft
+  const dPSuct    = g('dPSuction');  // kPa or psi
+  const npshMarg  = g('npshMargin');  // m or ft
+  const npshr     = g('npshr');       // m or ft
+
+  // Discharge
+  const pDest_g   = g('pDest');      // kPag or psig
+  const elevDest  = g('elevDest');   // m or ft
+  const elevPOut  = g('elevPumpOut');// m or ft
+  const dPDisch   = g('dPDischarge');// kPa or psi
+  const dPCV_rated= g('dPCV');       // kPa or psi
+
+  // Pump
+  const eta       = g('eta') / 100 || 0.70;
+  const headMarg  = g('headMargin') / 100 || 0.10;
+  const etaMotor  = g('etaMotor') / 100 || 0.95;
+  const shutoffR  = g('shutoffRatio') / 100 || 1.25;
+
+  // ---- UNIT CONVERSION to SI internally ----
+  const toKPa  = SI ? 1 : 6.89476;
+  const toM    = SI ? 1 : 0.3048;
+  const toKgM3 = SI ? 1 : 16.0185;
+  const toM3hr = SI ? 1 : 0.227124;
+  const toKW   = SI ? 0.7457 : 1;  // HP to kW (only used for imperial->kW)
+
+  const rho_si   = rho * toKgM3;
+  const vp_kpa   = vp  * toKPa;  // absolute
+  const patm_kpa = patm* toKPa;
+  const pSuct_kpa= pSuct_g * toKPa;
+  const dPSuct_kpa= dPSuct * toKPa;
+  const pDest_kpa = pDest_g * toKPa;
+  const dPDisch_kpa= dPDisch * toKPa;
+  const dPCV_kpa   = dPCV_rated * toKPa;
+  const npshMarg_m = npshMarg * toM;
+  const npshr_m    = npshr    * toM;
+  const lvlNLL_m   = lvlNLL   * toM;
+  const elevPIn_m  = elevPIn  * toM;
+  const elevPOut_m = elevPOut * toM;
+  const elevDest_m = elevDest * toM;
+
+  const qRated_si = qRated * toM3hr;  // m³/hr
+  const qNorm_si  = qNorm  * toM3hr;
+  const qMin_si   = qMin   * toM3hr;
+
+  // --- SUCTION PRESSURE at pump inlet ---
+  // P_suct_abs = P_vessel_abs + rho*g*(lvlNLL - elevPIn)/1000 - dP_friction
+  const rhoGrav_kpa_m = rho_si * 9.81 / 1000; // kPa per metre of head
+  const P_vessel_abs = pSuct_kpa + patm_kpa;
+  const static_head_suct_kpa = rhoGrav_kpa_m * (lvlNLL_m - elevPIn_m);
+  const P_pumpIn_abs = P_vessel_abs + static_head_suct_kpa - dPSuct_kpa;
+  const P_pumpIn_g   = P_pumpIn_abs - patm_kpa;
+
+  // --- NPSHA ---
+  // NPSHA = (P_pump_in_abs - Pvap) / (rho*g/1000)  [in metres]
+  const NPSHA_raw = (P_pumpIn_abs - vp_kpa) / rhoGrav_kpa_m;
+  const NPSHA     = NPSHA_raw - npshMarg_m;
+  const npshStatus = NPSHA >= npshr_m ? 'OK' : (npshr_m > 0 ? 'FAIL' : 'CHECK');
+
+  // --- DISCHARGE PRESSURE required at pump outlet ---
+  // P_disch_req = P_dest + static_head_to_dest + friction_discharge + CV_drop
+  const static_head_disch_kpa = rhoGrav_kpa_m * (elevDest_m - elevPOut_m);
+  const P_pumpOut_req_kpa = pDest_kpa + patm_kpa + static_head_disch_kpa + dPDisch_kpa + dPCV_kpa;
+
+  // --- TDH (Total Dynamic Head) ---
+  const dP_pump_kpa = P_pumpOut_req_kpa - P_pumpIn_abs;
+  const TDH_m = dP_pump_kpa / rhoGrav_kpa_m;         // metres
+  const TDH_design_m = TDH_m * (1 + headMarg);
+
+  // --- BHP / kW ---
+  // HHP (kW) = Q(m³/s) * dP(Pa) / 1000
+  const Q_m3s = qRated_si / 3600;
+  const HHP_kW = Q_m3s * dP_pump_kpa * 1000 / 1000;   // = Q_m3s * dP_Pa
+  const BHP_kW = HHP_kW / eta;
+  const Motor_kW = BHP_kW / etaMotor;
+
+  // --- API 610 Motor nameplate selection ---
+  // API 610 Table: next standard kW above 1.25 * BHP
+  const Motor_req_kW = BHP_kW * 1.25;
+  const stdMotors_kW = [0.37,0.56,0.75,1.12,1.5,2.2,3,3.7,5.6,7.5,11.2,15,18.7,22.4,30,37.3,44.8,56,75,93.3,112,149.7,187,224,261,299.9,336.3,373,448,522.5,597,671,750,932.8,1119.3,1305,1491,1678,1864];
+  let nameplate_kW = Motor_req_kW;
+  for(const m of stdMotors_kW){ if(m >= Motor_req_kW){ nameplate_kW=m; break; } }
+
+  // --- SHUTOFF PRESSURE ---
+  const P_shutoff_kPag = P_pumpIn_g * toKPa + (dP_pump_kpa * (1+headMarg) * shutoffR);
+  // Hydrostatic test pressure
+  const P_hydro_kPag = 1.5 * (P_shutoff_kPag + patm_kpa);
+
+  // --- UNIT CONVERSION for DISPLAY ---
+  const dispP  = SI ? 1 : (1/6.89476);  // kPa → psi if IMP
+  const dispH  = SI ? 1 : (1/0.3048);    // m → ft if IMP
+  const dispQ  = SI ? 1 : (1/0.227124);  // m³/hr → USGPM if IMP
+  const dispPW = SI ? 1 : (1/0.7457);    // kW → HP if IMP
+  const Pu = SI?'kPa':'psi';
+  const Hu = SI?'m':'ft';
+  const Qu = SI?'m³/hr':'USGPM';
+  const PWu= SI?'kW':'HP';
+  const Pg = SI?'kPag':'psig';
+
+  // ---- BUILD RESULTS HTML ----
+  const npshClass = npshStatus==='OK' ? 'ok' : npshStatus==='FAIL' ? 'fail' : 'warn';
+  const npshIcon  = npshStatus==='OK' ? '✓' : npshStatus==='FAIL' ? '✗' : '?';
+
+  const html = `
+  <div class="result-section">
+    <div class="result-section-title">Flow Summary</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Min Flow / Pump</div><div class="r-value">${fmt(qMin_si/nPumps*dispQ,1)}<span class="r-unit">${Qu}</span></div></div>
+      <div class="result-item"><div class="r-label">Normal Flow / Pump</div><div class="r-value">${fmt(qNorm_si/nPumps*dispQ,1)}<span class="r-unit">${Qu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">Rated Flow / Pump</div><div class="r-value">${fmt(qRated_si/nPumps*dispQ,1)}<span class="r-unit">${Qu}</span></div></div>
+    </div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">Suction Pressure Analysis</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Vessel Abs. Pressure</div><div class="r-value">${fmt(P_vessel_abs*dispP)}<span class="r-unit">${Pu}a</span></div></div>
+      <div class="result-item"><div class="r-label">Static Suction Head</div><div class="r-value">${fmt(static_head_suct_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item"><div class="r-label">Suction Friction Loss</div><div class="r-value">${fmt(dPSuct_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">Pump Suction Pressure</div><div class="r-value">${fmt(P_pumpIn_g*dispP)}<span class="r-unit">${Pg}</span></div></div>
+    </div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">NPSH Analysis</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">NPSHA (excl. margin)</div><div class="r-value">${fmt(NPSHA_raw*dispH)}<span class="r-unit">${Hu}</span></div></div>
+      <div class="result-item"><div class="r-label">NPSH Design Margin</div><div class="r-value">${fmt(npshMarg_m*dispH)}<span class="r-unit">${Hu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">NPSHA (incl. margin)</div><div class="r-value">${fmt(NPSHA*dispH)}<span class="r-unit">${Hu}</span></div></div>
+      <div class="result-item"><div class="r-label">NPSHR (vendor)</div><div class="r-value">${fmt(npshr_m*dispH)}<span class="r-unit">${Hu}</span></div></div>
+    </div>
+    <div class="status-block">
+      <div class="status-chip ${npshClass}">${npshIcon} NPSH ${npshStatus} — Margin = ${fmt((NPSHA-npshr_m)*dispH,2)} ${Hu}</div>
+    </div>
+    <div class="note-box">NPSHA ≥ NPSHR + margin required per API 610 §6.1. Margin subject to project specification; typical minimum 0.6 m (2 ft).</div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">Discharge &amp; TDH</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Static Discharge Head</div><div class="r-value">${fmt(static_head_disch_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item"><div class="r-label">Discharge Friction Loss</div><div class="r-value">${fmt(dPDisch_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item"><div class="r-label">Control Valve ΔP (rated)</div><div class="r-value">${fmt(dPCV_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">Pump Discharge Pressure</div><div class="r-value">${fmt((P_pumpOut_req_kpa-patm_kpa)*dispP)}<span class="r-unit">${Pg}</span></div></div>
+      <div class="result-item"><div class="r-label">Differential Pressure</div><div class="r-value">${fmt(dP_pump_kpa*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">TDH (rated)</div><div class="r-value">${fmt(TDH_m*dispH)}<span class="r-unit">${Hu}</span></div></div>
+      <div class="result-item warn-item"><div class="r-label">TDH + Design Margin (${(headMarg*100).toFixed(0)}%)</div><div class="r-value">${fmt(TDH_design_m*dispH)}<span class="r-unit">${Hu}</span></div></div>
+    </div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">Power &amp; Motor Sizing</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Hydraulic Power (HHP)</div><div class="r-value">${fmt(HHP_kW*dispPW)}<span class="r-unit">${PWu}</span></div></div>
+      <div class="result-item"><div class="r-label">Brake / Shaft Power (BHP)</div><div class="r-value">${fmt(BHP_kW*dispPW)}<span class="r-unit">${PWu}</span></div></div>
+      <div class="result-item highlight"><div class="r-label">Required Motor Power</div><div class="r-value">${fmt(Motor_kW*dispPW)}<span class="r-unit">${PWu}</span></div></div>
+      <div class="result-item warn-item"><div class="r-label">Motor Req. (BHP × 1.25)</div><div class="r-value">${fmt(Motor_req_kW*dispPW)}<span class="r-unit">${PWu}</span></div></div>
+      <div class="result-item ok-item"><div class="r-label">Nameplate Std Motor (API 610)</div><div class="r-value">${fmt(nameplate_kW*dispPW)}<span class="r-unit">${PWu}</span></div></div>
+    </div>
+    <div class="note-box">API 610 §9.3.2: Motor nameplate rating ≥ 1.25 × maximum BHP on pump curve. Motor efficiency assumed ${(etaMotor*100).toFixed(0)}%. Subject to vendor datasheet confirmation.</div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">Shutoff &amp; Hydrostatic Pressure</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="r-label">Pump Differential @ Rated</div><div class="r-value">${fmt(dP_pump_kpa*(1+headMarg)*dispP)}<span class="r-unit">${Pu}</span></div></div>
+      <div class="result-item warn-item"><div class="r-label">Max Discharge (Shutoff) Pressure</div><div class="r-value">${fmt((dP_pump_kpa*(1+headMarg)*shutoffR+P_pumpIn_g)*dispP)}<span class="r-unit">${Pg}</span></div></div>
+      <div class="result-item danger-item"><div class="r-label">Min Hydrostatic Test (1.5×)</div><div class="r-value">${fmt(1.5*(dP_pump_kpa*(1+headMarg)*shutoffR+P_pumpIn_g+patm_kpa)*dispP)}<span class="r-unit">${Pu}a</span></div></div>
+    </div>
+    <div class="note-box">Shutoff pressure basis: rated differential × head margin × ${(shutoffR*100).toFixed(0)}% head rise. Hydrostatic test = 1.5 × shutoff (absolute). Confirm with ASME B31.3 and vessel rating.</div>
+  </div>
+
+  <div class="result-section">
+    <div class="result-section-title">Summary Table — Rated Flow Case</div>
+    <div class="table-wrap">
+      <table class="sum-table">
+        <thead><tr><th>Parameter</th><th class="num">Value</th><th>Unit</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Rated Flow / Pump</td><td class="num">${fmt(qRated_si/nPumps*dispQ,1)}</td><td>${Qu}</td><td></td></tr>
+          <tr><td>Pump Suction Pressure</td><td class="num">${fmt(P_pumpIn_g*dispP)}</td><td>${Pg}</td><td></td></tr>
+          <tr><td>Pump Discharge Pressure</td><td class="num">${fmt((P_pumpOut_req_kpa-patm_kpa)*dispP)}</td><td>${Pg}</td><td></td></tr>
+          <tr><td>Differential Pressure (ΔP)</td><td class="num">${fmt(dP_pump_kpa*dispP)}</td><td>${Pu}</td><td></td></tr>
+          <tr><td>TDH (with margin)</td><td class="num">${fmt(TDH_design_m*dispH)}</td><td>${Hu}</td><td></td></tr>
+          <tr><td>NPSHA (incl. margin)</td><td class="num">${fmt(NPSHA*dispH)}</td><td>${Hu}</td><td class="${npshClass}">${npshStatus}</td></tr>
+          <tr><td>BHP</td><td class="num">${fmt(BHP_kW*dispPW)}</td><td>${PWu}</td><td></td></tr>
+          <tr><td>Motor Nameplate (API 610)</td><td class="num">${fmt(nameplate_kW*dispPW)}</td><td>${PWu}</td><td class="ok">OK</td></tr>
+          <tr><td>Max Discharge (Shutoff)</td><td class="num">${fmt((dP_pump_kpa*(1+headMarg)*shutoffR+P_pumpIn_g)*dispP)}</td><td>${Pg}</td><td class="warn">CHECK vs casing rating</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note-box">Screening-level result. All losses (suction/discharge) must be confirmed from detailed hydraulic calculations per Darcy-Weisbach. NPSH margin per project specification. Motor nameplate per API 610 Table — nearest standard size above 1.25 × BHP.</div>
+  </div>`;
+
+  document.getElementById('resultsPanel').innerHTML = html;
+}
+
+// ---- THEME TOGGLE ----
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeToggle').textContent = isDark ? '☾' : '☀';
+});
+</script>
+</body>
+</html>
