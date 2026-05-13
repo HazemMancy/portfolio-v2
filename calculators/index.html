@@ -164,11 +164,9 @@
 const calculators = [
   // HYDRAULICS
   { title:'Single Phase Liquid Hydraulic Tool',        cat:'Hydraulics', icon:'droplets',        standard:'Darcy-Weisbach · Swamee-Jain · API RP 14E · Crane TP-410',          status:'live', href:'liquid-hydraulics.html' },
-  { title:'Single Phase Vapor Hydraulic Tool',         cat:'Hydraulics', icon:'wind',            standard:'Isothermal / adiabatic compressible flow',        status:'wip' },
-  { title:'Vapour Line Hydraulic with Summary',        cat:'Hydraulics', icon:'wind',            standard:'Darcy-Weisbach · compressible flow summary',       status:'wip' },
-  { title:'PumpCalc with Hydraulics',                  cat:'Hydraulics', icon:'gauge',           standard:'System curve · operating point analysis',        status:'wip' },
+  { title:'Single Phase Vapor Hydraulic Tool',         cat:'Hydraulics', icon:'wind',            standard:'Darcy-Weisbach · Swamee-Jain · real-gas density · API RP 14E · Crane TP-410', status:'live', href:'vapor-hydraulics.html' },
+  { title:'Mixed-Phase Line Sizing Tool',              cat:'Hydraulics', icon:'blend',           standard:'Two-phase flow · Lockhart-Martinelli · API RP 14E · erosion check',  status:'wip' },
   { title:'Surge Pressure',                            cat:'Hydraulics', icon:'waves',           standard:'Joukowsky equation · water hammer',              status:'wip' },
-  { title:'Waste Water Treatment Plant Hydraulics',    cat:'Hydraulics', icon:'droplets',        standard:'Hydraulic modelling of WWTP networks',           status:'wip' },
   // FLUID PROPERTIES
   { title:'Gas Mixing',                                cat:'Fluids',     icon:'blend',           standard:'Mole fraction weighted MW · Z-factor · auto-normalisation',      status:'live', href:'gas-mixing.html' },
   { title:'Gas Volume Conversion',                     cat:'Fluids',     icon:'arrow-left-right',standard:'Real gas · Z-factor · AGA-8 / van der Waals · MMSCFD / Sm³',     status:'live', href:'gas-volume.html' },
@@ -199,7 +197,6 @@ const calculators = [
   { title:'PSV Relief Sizing Tool',                    cat:'Relief',     icon:'shield',          standard:'API 520 · gas / liquid / steam / two-phase',     status:'wip' },
   { title:'PSV Gas Expansion Fire Case',               cat:'Relief',     icon:'flame',           standard:'API 521 fire case · gas-filled vessels',         status:'wip' },
   { title:'Pressure Safety Valve Sizing — Supercritical Fluids', cat:'Relief', icon:'shield', standard:'API 520 · supercritical region correction',      status:'wip' },
-  { title:'PSV Summary',                               cat:'Relief',     icon:'clipboard-list',  standard:'Multi-PSV register with scenario summary',       status:'wip' },
   { title:'Design of Liquid, Vapor & Two-Phase Relieving Valve', cat:'Relief', icon:'shield',    standard:'API 520 · all fluid phases',                     status:'wip' },
   { title:'Relief Valve Sizing',                       cat:'Relief',     icon:'shield',          standard:'API 520 · orifice area calculation',             status:'wip' },
   { title:'Atmospheric & Low Pressure Tank Venting (API 2000)', cat:'Relief', icon:'cloud-rain', standard:'API 2000 5th Ed. · normal & emergency venting',   status:'wip' },
