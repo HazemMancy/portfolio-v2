@@ -121,7 +121,7 @@
 <div class="page-header">
   <p class="section-label">TOOLS</p>
   <h1 class="page-title">Engineering Calculators</h1>
-  <p class="page-desc">Process engineering calculators built on industry-standard equations — covering hydraulics, equipment sizing, relief systems, and more.</p>
+  <p class="page-desc">Process engineering calculators built on industry-standard equations &mdash; covering hydraulics, equipment sizing, relief systems, and more.</p>
 </div>
 
 <div class="toolbar">
@@ -163,19 +163,19 @@
 <script>
 const calculators = [
   // HYDRAULICS
-  { title:'Single Phase Liquid Hydraulic Tool',        cat:'Hydraulics', icon:'droplets',        standard:'Crane TP-410 · Darcy-Weisbach',                  status:'wip' },
+  { title:'Single Phase Liquid Hydraulic Tool',        cat:'Hydraulics', icon:'droplets',        standard:'Darcy-Weisbach · Swamee-Jain · API RP 14E · Crane TP-410',          status:'live', href:'liquid-hydraulics.html' },
   { title:'Single Phase Vapor Hydraulic Tool',         cat:'Hydraulics', icon:'wind',            standard:'Isothermal / adiabatic compressible flow',        status:'wip' },
   { title:'Vapour Line Hydraulic with Summary',        cat:'Hydraulics', icon:'wind',            standard:'Darcy-Weisbach · compressible flow summary',       status:'wip' },
   { title:'PumpCalc with Hydraulics',                  cat:'Hydraulics', icon:'gauge',           standard:'System curve · operating point analysis',        status:'wip' },
   { title:'Surge Pressure',                            cat:'Hydraulics', icon:'waves',           standard:'Joukowsky equation · water hammer',              status:'wip' },
   { title:'Waste Water Treatment Plant Hydraulics',    cat:'Hydraulics', icon:'droplets',        standard:'Hydraulic modelling of WWTP networks',           status:'wip' },
   // FLUID PROPERTIES
-  { title:'Gas Mixing',                                cat:'Fluids',     icon:'blend',           standard:'Mole fraction weighted MW · auto-normalisation',  status:'live', href:'gas-mixing.html' },
-  { title:'Gas Volume Conversion',                     cat:'Fluids',     icon:'arrow-left-right',standard:'Real gas · Z-factor correction (AGA-8 / van der Waals)',status:'live', href:'gas-volume.html' },
+  { title:'Gas Mixing',                                cat:'Fluids',     icon:'blend',           standard:'Mole fraction weighted MW · Z-factor · auto-normalisation',      status:'live', href:'gas-mixing.html' },
+  { title:'Gas Volume Conversion',                     cat:'Fluids',     icon:'arrow-left-right',standard:'Real gas · Z-factor · AGA-8 / van der Waals · MMSCFD / Sm³',     status:'live', href:'gas-volume.html' },
   { title:'Settle-Out Pressure & Temperature',         cat:'Fluids',     icon:'thermometer',     standard:'Closed system equalisation',                     status:'wip' },
   { title:'Hydrate Inhibitor Requirements',            cat:'Fluids',     icon:'snowflake',       standard:'Hammerschmidt equation · MEG / MeOH dosing',      status:'wip' },
   { title:'Units of Measure Conversions',              cat:'Fluids',     icon:'arrow-left-right',standard:'Engineering unit conversion reference',           status:'wip' },
-  { title:'CO₂ Corrosion Rate Calculation (NORSOK M506)',cat:'Fluids', icon:'zap',             standard:'NORSOK Std. M506 (2005)',                        status:'wip' },
+  { title:'CO₂ Corrosion Rate Calculation (NORSOK M506)',cat:'Fluids', icon:'zap',            standard:'NORSOK Std. M506 (2005)',                        status:'wip' },
   // EQUIPMENT
   { title:'Horizontal 2-Phase Separator Tool',         cat:'Equipment',  icon:'container',       standard:'API 12J · settling theory',                      status:'wip' },
   { title:'Horizontal 3-Phase Separator Tool',         cat:'Equipment',  icon:'container',       standard:'API 12J · retention time / settling theory',     status:'wip' },
@@ -183,7 +183,7 @@ const calculators = [
   { title:'Separator Sizing Calculation Sheets',       cat:'Equipment',  icon:'clipboard-list',  standard:'API 12J · gas and liquid capacity checks',       status:'wip' },
   { title:'Minimum Inlet Separator Pressure',          cat:'Equipment',  icon:'gauge',           standard:'Two-phase inlet flashing determination',         status:'wip' },
   { title:'Shell & Tube H.EX. Preliminary Sizing',     cat:'Equipment',  icon:'thermometer',     standard:'LMTD · F-factor correction · TEMA fouling',       status:'wip' },
-  { title:'Preliminary Sizing of Air Cooled Heat Exchanger',cat:'Equipment',icon:'wind',        standard:'LMTD · air-side duty estimation',                status:'wip' },
+  { title:'Preliminary Sizing of Air Cooled Heat Exchanger',cat:'Equipment',icon:'wind',         standard:'LMTD · air-side duty estimation',                status:'wip' },
   { title:'Kettle Type Reboiler Hydraulic Calculation',cat:'Equipment',  icon:'thermometer',     standard:'Two-phase thermosiphon / kettle circuit',        status:'wip' },
   { title:'Hot Oil System Expansion Vessel Sizing',    cat:'Equipment',  icon:'thermometer',     standard:'Thermal expansion volume calculation',           status:'wip' },
   { title:'Process Tank Sizing',                       cat:'Equipment',  icon:'container',       standard:'Retention time · holdup volume',                 status:'wip' },
@@ -200,9 +200,9 @@ const calculators = [
   { title:'PSV Gas Expansion Fire Case',               cat:'Relief',     icon:'flame',           standard:'API 521 fire case · gas-filled vessels',         status:'wip' },
   { title:'Pressure Safety Valve Sizing — Supercritical Fluids', cat:'Relief', icon:'shield', standard:'API 520 · supercritical region correction',      status:'wip' },
   { title:'PSV Summary',                               cat:'Relief',     icon:'clipboard-list',  standard:'Multi-PSV register with scenario summary',       status:'wip' },
-  { title:'Design of Liquid, Vapor & Two-Phase Relieving Valve', cat:'Relief', icon:'shield',   standard:'API 520 · all fluid phases',                     status:'wip' },
+  { title:'Design of Liquid, Vapor & Two-Phase Relieving Valve', cat:'Relief', icon:'shield',    standard:'API 520 · all fluid phases',                     status:'wip' },
   { title:'Relief Valve Sizing',                       cat:'Relief',     icon:'shield',          standard:'API 520 · orifice area calculation',             status:'wip' },
-  { title:'Atmospheric & Low Pressure Tank Venting (API 2000)', cat:'Relief', icon:'cloud-rain',standard:'API 2000 5th Ed. · normal & emergency venting',   status:'wip' },
+  { title:'Atmospheric & Low Pressure Tank Venting (API 2000)', cat:'Relief', icon:'cloud-rain', standard:'API 2000 5th Ed. · normal & emergency venting',   status:'wip' },
   { title:'Flare Stack Sizing',                        cat:'Relief',     icon:'flame',           standard:'API 521 · radiation / dispersion',               status:'wip' },
   { title:'Flare System Purge Gas Estimate (API 521)', cat:'Relief',     icon:'flame',           standard:'API 521 · purge rate calculation',               status:'wip' },
   { title:'Flare Noise Prediction',                    cat:'Relief',     icon:'volume-2',        standard:'Combustion noise estimation',                    status:'wip' },
