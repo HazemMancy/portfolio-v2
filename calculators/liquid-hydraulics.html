@@ -226,6 +226,68 @@
     .ft-icon{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
     .ft-icon:hover{color:var(--fg);border-color:var(--fg)}
     .text-primary{color:var(--primary)}.fw7{font-weight:700}.fs-sm{font-size:.875rem}.fs-xs{font-size:.72rem}
+    /* ── DOCUMENT HEADER / PRINT PANEL ───────────────────────── */
+.doc-hd-wrap{max-width:72rem;margin:0 auto;padding:.75rem 1rem 0}
+.doc-hd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem}
+.doc-hd-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+.doc-grid{display:grid;gap:.55rem;grid-template-columns:1fr 1fr}
+@media(min-width:640px){.doc-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1024px){.doc-grid{grid-template-columns:repeat(6,1fr)}}
+
+/* ── PRINT STYLES (@media print) ─────────────────────────── */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  #navbar,footer,.ph .btn-outline,.card-hd .btn,.card-hd .unit-pill,
+  .card-hd .btn-outline,.card-hd .btn-ghost,#traceAccordion,
+  .meta-wrap,.mob-ctrl,.desktop-th,.breadcrumb,button.acc-trigger,
+  .btn-primary,.doc-hd-wrap .doc-hd-title i,
+  #placeholderCard,#warningsCard,
+  .col-inputs .isec,                /* hide raw input fields — print uses summary table */
+  .col-inputs .card-hd .unit-pill,
+  .col-inputs .card-hd div[style]  {display:none!important}
+
+  html,body{background:#fff!important;color:#000!important;font-size:9pt;margin:0;padding:0}
+  .ph{border:none;padding:.5cm 1cm .25cm}
+  .ph-inner{display:block}
+  .page-title{font-size:14pt;font-weight:700;color:#000}
+  .page-desc,.badge-row,.sec-label{display:none}
+
+  /* Print header block */
+  #printHeader{display:block!important}
+
+  /* show print-only input summary */
+  #printInputTable{display:table!important}
+
+  .calc-wrap,.meta-wrap,.doc-hd-wrap{max-width:100%;padding:.2cm 1cm}
+  .calc-grid{display:block}
+  .col-inputs{display:none!important}   /* suppress the interactive input card */
+  .col-results{display:block;width:100%}
+
+  .card{border:1px solid #ccc;border-radius:3px;margin-bottom:.35cm;break-inside:avoid}
+  .card-hd{background:#f0f4ff;padding:.3cm .4cm;border-bottom:1px solid #ccc}
+  .card-title{color:#000;font-size:9pt}
+  .card-body{padding:.3cm .4cm}
+  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.2cm}
+  .kpi{border:1px solid #ccc;border-radius:3px;padding:.25cm;text-align:center}
+  .kpi-blue{background:#e8f0fe!important;border-color:#4285f4!important}
+  .kpi-green{background:#e6f4ea!important;border-color:#34a853!important}
+  .kpi-val{font-size:16pt;font-weight:700;color:#1a1a2e}
+  .kpi-lbl,.kpi-sub,.kpi-unit{color:#444;font-size:7pt}
+  .res-row{background:#f8f9fa!important;border:1px solid #e0e0e0;margin-bottom:2pt;padding:3pt 6pt;font-size:8pt}
+  .res-row.hl{background:#e8f0fe!important;border-color:#4285f4!important}
+  .res-lbl{color:#555}
+  .res-val{color:#000;font-weight:600}
+  .lbadge-ok{background:#e6f4ea!important;color:#137333!important;border-color:#34a853!important}
+  .lbadge-warn{background:#fef7e0!important;color:#b45309!important;border-color:#f59e0b!important}
+  .lbadge-hi{background:#fce8e6!important;color:#c0392b!important;border-color:#ea4335!important}
+  .regime{font-size:7pt}
+
+  /* Print methodology — keep collapsed by default, show if open */
+  .accordion{display:none}
+
+  /* page setup */
+  @page{size:A4;margin:1.5cm 1cm}
+}
   </style>
 </head>
 <body>
@@ -261,7 +323,84 @@
     </a>
   </div>
 </header>
+<!-- ══ DOCUMENT HEADER (screen + print) ══════════════════════════════ -->
+<div class="doc-hd-wrap" id="docHdWrap">
+  <div class="doc-hd-card">
+    <div class="doc-hd-title">
+      <i data-lucide="file-text" style="width:12px;height:12px"></i>
+      Document / Project Reference
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="printCalc()" id="btnPrint">
+        <i data-lucide="printer" style="width:11px;height:11px"></i>Export PDF
+      </button>
+    </div>
+    <div class="doc-grid">
+      <div>
+        <label class="flabel">Company</label>
+        <input type="text" id="docCompany" placeholder="e.g. DG Impianti" />
+      </div>
+      <div>
+        <label class="flabel">Project Name</label>
+        <input type="text" id="docProject" placeholder="e.g. FEED — Offshore Platform" />
+      </div>
+      <div>
+        <label class="flabel">Document Number</label>
+        <input type="text" id="docNumber" placeholder="e.g. PRJ-PR-CAL-0001" />
+      </div>
+      <div>
+        <label class="flabel">Revision</label>
+        <input type="text" id="docRev" placeholder="e.g. A0" />
+      </div>
+      <div>
+        <label class="flabel">Line Number / Tag</label>
+        <input type="text" id="docLine" placeholder="e.g. 6&quot;-HC-1001-A1A" />
+      </div>
+      <div>
+        <label class="flabel">Prepared By</label>
+        <input type="text" id="docBy" placeholder="e.g. H. ElMancy" />
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- ══ PRINT-ONLY HEADER (hidden on screen) ══════════════════════════ -->
+<div id="printHeader" style="display:none;padding:.2cm 1cm .4cm;border-bottom:2px solid #1a56db;margin-bottom:.3cm">
+  <table style="width:100%;font-size:8pt;border-collapse:collapse">
+    <tr>
+      <td style="width:60%;vertical-align:top">
+        <div style="font-size:12pt;font-weight:700;color:#1a56db">Single Phase Liquid Hydraulics</div>
+        <div style="font-size:8pt;color:#555;margin-top:2pt">Darcy-Weisbach · Swamee-Jain · API RP 14E · Crane TP-410</div>
+        <div style="font-size:7pt;color:#888;margin-top:2pt">Screening-level calculation — not for final code-compliant design</div>
+      </td>
+      <td style="text-align:right;vertical-align:top">
+        <table style="font-size:8pt;border-collapse:collapse;margin-left:auto">
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Company:</td><td style="font-weight:600" id="ph_company"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Project:</td><td style="font-weight:600" id="ph_project"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Doc. No.:</td><td style="font-weight:600" id="ph_number"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Revision:</td><td style="font-weight:600" id="ph_rev"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Line / Tag:</td><td style="font-weight:600" id="ph_line"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Prepared by:</td><td style="font-weight:600" id="ph_by"></td></tr>
+          <tr><td style="color:#555;padding:1pt 6pt 1pt 0">Date:</td><td style="font-weight:600" id="ph_date"></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- ══ PRINT-ONLY INPUT SUMMARY TABLE ════════════════════════════════ -->
+<table id="printInputTable" style="display:none;width:100%;border-collapse:collapse;font-size:8pt;margin:.3cm 1cm .4cm;width:calc(100% - 2cm)">
+  <thead>
+    <tr style="background:#e8f0fe">
+      <th colspan="4" style="padding:4pt 6pt;text-align:left;font-size:9pt;color:#1a56db;border:1px solid #ccc">Input Parameters</th>
+    </tr>
+    <tr style="background:#f0f4ff">
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #ccc;width:30%">Parameter</th>
+      <th style="padding:3pt 6pt;text-align:right;border:1px solid #ccc;width:20%">Value</th>
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #ccc;width:15%">Unit</th>
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #ccc">Notes</th>
+    </tr>
+  </thead>
+  <tbody id="printInputBody"></tbody>
+</table>
 <!-- PAGE HEADER -->
 <div class="ph">
   <div class="ph-inner">
@@ -981,6 +1120,43 @@ window.addEventListener('scroll',()=>{
 document.getElementById('year').textContent=new Date().getFullYear();
 initPipePicker();
 lucide.createIcons();
+  /* ── PRINT / PDF EXPORT ──────────────────────────────────────────────── */
+function printCalc(){
+  // Populate print header from doc fields
+  const g=id=>document.getElementById(id)?.value||'—';
+  document.getElementById('ph_company').textContent=g('docCompany');
+  document.getElementById('ph_project').textContent=g('docProject');
+  document.getElementById('ph_number') .textContent=g('docNumber');
+  document.getElementById('ph_rev')    .textContent=g('docRev');
+  document.getElementById('ph_line')   .textContent=g('docLine');
+  document.getElementById('ph_by')     .textContent=g('docBy');
+  document.getElementById('ph_date')   .textContent=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+
+  // Build input summary table
+  const s=getSI();
+  const imp=unitSys==='IMP';
+  const rows=[
+    ['Flow Rate',        imp?fmtN(parseFloat(document.getElementById('inpFlow').value)):fmtN(s.flowM3h),          imp?'USGPM':'m³/h', ''],
+    ['Density (ρ)',      imp?fmtN(parseFloat(document.getElementById('inpRho').value)):fmtN(s.rho),              imp?'lb/ft³':'kg/m³',''],
+    ['Viscosity (μ)',    fmtN(s.muCP),   'cP',''],
+    ['Pipe Length',      imp?fmtN(parseFloat(document.getElementById('inpLen').value)):fmtN(s.L),                 imp?'ft':'m',''],
+    ['Pipe ID',          imp?fmtN(parseFloat(document.getElementById('inpDia').value)):fmtN(s.D_mm),              imp?'in':'mm','NPS '+document.getElementById('selNPS').value+' SCH '+document.getElementById('selSch').value],
+    ['Roughness (ε)',    fmtN(s.eps_mm), 'mm','Commercial CS default 0.0457 mm'],
+    ['Elevation Δz',     imp?fmtN(parseFloat(document.getElementById('inpDz').value)):fmtN(s.dz),                imp?'ft':'m',s.dz>=0?'Uphill':'Downhill'],
+    ['Service Type',     document.getElementById('selService').value||'None','','API RP 14E limit check'],
+    ['Unit System',      unitSys,'',''],
+  ];
+  document.getElementById('printInputBody').innerHTML=rows.map((r,i)=>
+    `<tr style="background:${i%2===0?'#fff':'#f8f9fa'}">
+      <td style="padding:3pt 6pt;border:1px solid #ddd;font-weight:500">${r[0]}</td>
+      <td style="padding:3pt 6pt;border:1px solid #ddd;text-align:right;font-variant-numeric:tabular-nums">${r[1]}</td>
+      <td style="padding:3pt 6pt;border:1px solid #ddd">${r[2]}</td>
+      <td style="padding:3pt 6pt;border:1px solid #ddd;color:#555">${r[3]}</td>
+    </tr>`
+  ).join('');
+
+  window.print();
+}
 </script>
 </body>
 </html>
