@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Engineering Calculators — Hazem ElMancy</title>
-  <meta name="description" content="Process engineering calculators — built on industry-standard equations." />
+  
   <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="../favicon.png" />
   <link rel="apple-touch-icon" href="../favicon.png" />
+<title>Engineering Calculators — Hazem ElMancy</title>
+  <meta name="description" content="Process engineering calculators — built on industry-standard equations." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -123,7 +125,7 @@
 <div class="page-header">
   <p class="section-label">TOOLS</p>
   <h1 class="page-title">Engineering Calculators</h1>
-  <p class="page-desc">Process engineering calculators built on industry-standard equations &mdash; covering hydraulics, equipment sizing, relief systems, and more.</p>
+  <p class="page-desc">Process engineering screening calculators currently active in the portfolio, with remaining tools shown as future development items.</p>
 </div>
 
 <div class="toolbar">
@@ -165,18 +167,19 @@
 <script>
 const calculators = [
   // HYDRAULICS
-  { title:'Single Phase Liquid Hydraulic Tool',        cat:'Hydraulics', icon:'droplets',        standard:'Darcy-Weisbach · Swamee-Jain · API RP 14E · Crane TP-410',          status:'live', href:'liquid-hydraulics.html' },
-  { title:'Single Phase Gas Hydraulic Tool',         cat:'Hydraulics', icon:'wind',            standard:'Darcy-Weisbach · Swamee-Jain · real-gas density · API RP 14E · Crane TP-410', status:'live', href:'gas-hydraulics.html' },
-  { title:'Mixed-Phase Line Sizing Tool',              cat:'Hydraulics', icon:'blend',           standard:'Two-phase flow · Lockhart-Martinelli · API RP 14E · erosion check',  status:'wip' },
-  { title:'Surge Pressure',                            cat:'Hydraulics', icon:'waves',           standard:'Joukowsky equation · water hammer',              status:'wip' },
+  { title:'Single Phase Liquid Hydraulics',            cat:'Hydraulics', icon:'droplets',        standard:'Darcy-Weisbach · Swamee-Jain · fittings K-losses · service checks', status:'live', href:'liquid-hydraulics.html' },
+  { title:'Single Phase Gas Hydraulics',               cat:'Hydraulics', icon:'wind',            standard:'Darcy-Weisbach · Swamee-Jain · real-gas density · fittings K-losses', status:'live', href:'gas-hydraulics.html' },
+  { title:'Mixed-Phase Line Sizing',                   cat:'Hydraulics', icon:'blend',           standard:'Friedel · Chisholm-Baroczy · Lockhart-Martinelli · Beggs & Brill',  status:'live', href:'mixed-phase-hydraulics.html' },
+  { title:'Surge Pressure',                            cat:'Hydraulics', icon:'waves',           standard:'Joukowsky equation · wave celerity · allowable surge screening',     status:'live', href:'surge-pressure.html' },
   // FLUID PROPERTIES
-  { title:'Gas Mixing',                                cat:'Fluids',     icon:'blend',           standard:'Mole fraction weighted MW · Z-factor · auto-normalisation',      status:'live', href:'gas-mixing.html' },
-  { title:'Gas Volume Conversion',                     cat:'Fluids',     icon:'arrow-left-right',standard:'Real gas · Z-factor · AGA-8 / van der Waals · MMSCFD / Sm³',     status:'live', href:'gas-volume.html' },
+  { title:'Gas Mixing',                                cat:'Fluids',     icon:'blend',           standard:'Mole fraction weighted MW · PR/SRK/Generalized Z · auto-normalisation', status:'live', href:'gas-mixing.html' },
+  { title:'Gas Volume Conversion',                     cat:'Fluids',     icon:'arrow-left-right',standard:'Real gas · Z-factor correction · standard/actual volume conversion', status:'live', href:'gas-volume.html' },
   { title:'Settle-Out Pressure & Temperature',         cat:'Fluids',     icon:'thermometer',     standard:'Closed system equalisation',                     status:'wip' },
   { title:'Hydrate Inhibitor Requirements',            cat:'Fluids',     icon:'snowflake',       standard:'Hammerschmidt equation · MEG / MeOH dosing',      status:'wip' },
   { title:'Units of Measure Conversions',              cat:'Fluids',     icon:'arrow-left-right',standard:'Engineering unit conversion reference',           status:'wip' },
   { title:'CO₂ Corrosion Rate Calculation (NORSOK M506)',cat:'Fluids', icon:'zap',            standard:'NORSOK Std. M506 (2005)',                        status:'wip' },
   // EQUIPMENT
+  { title:'Pump Sizing',                                cat:'Equipment',  icon:'gauge',           standard:'Head · NPSHa · hydraulic and shaft power · shut-off screening',      status:'live', href:'pump-sizing.html' },
   { title:'Horizontal 2-Phase Separator Tool',         cat:'Equipment',  icon:'container',       standard:'API 12J · settling theory',                      status:'wip' },
   { title:'Horizontal 3-Phase Separator Tool',         cat:'Equipment',  icon:'container',       standard:'API 12J · retention time / settling theory',     status:'wip' },
   { title:'Vertical 2-Phase Separator Tool',           cat:'Equipment',  icon:'container',       standard:'API 12J · droplet settling',                     status:'wip' },
@@ -190,7 +193,6 @@ const calculators = [
   { title:'Total, Partial Volume & Wetted Area — Vertical & Horizontal Vessels', cat:'Equipment', icon:'container', standard:'Vertical & horizontal vessels — partial fill', status:'wip' },
   { title:'Vessel Heat Loss',                          cat:'Equipment',  icon:'thermometer',     standard:'Conduction / convection / radiation losses',     status:'wip' },
   // PIPING
-  { title:'Pipe Wall Thickness',                       cat:'Piping',     icon:'layers',          standard:'ASME B31.3 / B31.4 / B31.8 · Lamé check',        status:'live', href:'pipe-wall-thickness.html' },
   { title:'Orifice Sizing',                            cat:'Piping',     icon:'circle-dot',      standard:'ISO 5167 · differential pressure metering',      status:'wip' },
   { title:'Pipe Heat Loss',                            cat:'Piping',     icon:'thermometer',     standard:'Conduction / convection losses per unit length',  status:'wip' },
   { title:'Insulation Thickness Verification',         cat:'Piping',     icon:'layers',          standard:'Heat loss limit · economic insulation thickness',  status:'wip' },
