@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pump Sizing — Hazem ElMancy</title>
+  <link rel="icon" type="image/png" href="../favicon.png" />
+  <link rel="apple-touch-icon" href="../favicon.png" />
+  <meta name="description" content="Centrifugal, reciprocating and screw pump sizing: suction head, NPSH, discharge head, differential pressure, hydraulic power, shaft power, shut-off pressure, specific speed and impeller diameter." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
+    [data-theme="dark"]{
+      --bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--border:hsl(222,30%,18%);
+      --fg:hsl(210,40%,98%);--muted:hsl(215,20%,55%);
+      --primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);
+      --sec-bg:hsl(222,41%,16%);--inp-bg:hsl(222,47%,9%);
+      --green:hsl(142,71%,45%);--green-bg:hsl(142,71%,45%,.06);--green-border:hsl(142,71%,45%,.25);
+      --amber:hsl(38,92%,50%);--amber-bg:hsl(38,92%,50%,.05);--amber-border:hsl(38,92%,50%,.25);
+      --red:hsl(0,72%,55%);--red-bg:hsl(0,72%,55%,.07);--red-border:hsl(0,72%,55%,.3);
+    }
+    [data-theme="light"]{
+      --bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--border:hsl(214,32%,88%);
+      --fg:hsl(222,47%,11%);--muted:hsl(215,16%,45%);
+      --primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);
+      --sec-bg:hsl(210,40%,94%);--inp-bg:hsl(0,0%,100%);
+      --green:hsl(142,71%,38%);--green-bg:hsl(142,71%,38%,.06);--green-border:hsl(142,71%,38%,.3);
+      --amber:hsl(38,92%,40%);--amber-bg:hsl(38,92%,40%,.06);--amber-border:hsl(38,92%,40%,.3);
+      --red:hsl(0,72%,48%);--red-bg:hsl(0,72%,48%,.07);--red-border:hsl(0,72%,48%,.3);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+    a{color:inherit;text-decoration:none}
+    button{font-family:inherit;cursor:pointer;border:none;background:none}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+    #navbar{position:sticky;top:0;z-index:100;width:100%;background:var(--bg);transition:background .25s}
+    #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+    nav.desktop{display:none;align-items:center;gap:.25rem}
+    @media(min-width:1024px){nav.desktop{display:flex}}
+    .nav-link{padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s}
+    .nav-link:hover{color:var(--fg);background:var(--sec-bg)}
+    .nav-link-calc{display:flex;align-items:center;gap:.35rem;padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
+    .theme-toggle{width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;border:none;cursor:pointer}
+    .theme-toggle:hover{background:var(--sec-bg);color:var(--fg)}
+    .desktop-th{display:none}@media(min-width:1024px){.desktop-th{display:flex}}
+    .mob-ctrl{display:flex;align-items:center;gap:.25rem}@media(min-width:1024px){.mob-ctrl{display:none}}
+    .mob-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
+    .mob-menu.open{display:block}@media(min-width:1024px){.mob-menu{display:none!important}}
+    .mob-menu a{display:block;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mob-menu a:hover{background:var(--sec-bg);color:var(--fg)}
+
+    .doc-hd-wrap{max-width:72rem;margin:0 auto;padding:.85rem 1rem 0}
+    .doc-hd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem}
+    .doc-hd-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+    .doc-grid{display:grid;gap:.55rem;grid-template-columns:1fr}
+    @media(min-width:640px){.doc-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1024px){.doc-grid{grid-template-columns:repeat(3,1fr)}}
+
+    .ph{padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--border)}
+    .ph-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
+    .breadcrumb a:hover{color:var(--primary)}
+    .sec-label{font-size:.65rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.35rem}
+    .page-title{font-size:clamp(1.3rem,2.8vw,1.85rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.35rem}
+    .page-desc{color:var(--muted);font-size:.78rem;max-width:42rem;line-height:1.6}
+    .bae-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
+    .bae{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:9999px;font-size:.58rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--sec-bg)}
+
+    .unit-pill{display:inline-flex;align-items:center;background:var(--sec-bg);border:1px solid var(--border);border-radius:9999px;padding:2px}
+    .unit-pill button{padding:.22rem .75rem;font-size:.65rem;font-weight:600;letter-spacing:.06em;border-radius:9999px;color:var(--muted);transition:background .15s,color .15s;border:none;background:none;cursor:pointer}
+    .unit-pill button.active{background:var(--primary);color:#fff;box-shadow:0 1px 4px hsl(217,91%,60%,.35)}
+
+    .calc-wrap{max-width:72rem;margin:0 auto;padding:1.25rem 1rem 1rem}
+    .calc-grid{display:grid;gap:1.25rem;grid-template-columns:1fr}
+    @media(min-width:768px){.calc-grid{grid-template-columns:1fr 1fr;align-items:start}}
+    @media(min-width:1024px){.calc-grid{grid-template-columns:1fr 390px;align-items:start}}
+    @media(min-width:768px) and (min-height:600px){
+      .col-inputs{position:sticky;top:calc(var(--navbar-h) + .75rem);max-height:calc(100vh - var(--navbar-h) - 1.5rem);overflow-y:auto;scrollbar-width:thin}
+    }
+    .meta-wrap{max-width:72rem;margin:0 auto;padding:0 1rem 2rem}
+    .meta-grid{display:grid;gap:1rem;grid-template-columns:1fr}
+    @media(min-width:640px){.meta-grid{grid-template-columns:1fr 1fr}}
+
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+    .card-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}
+    .hd-icon{width:1.6rem;height:1.6rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+    .card-title{font-size:.78rem;font-weight:600;flex:1;min-width:0}
+    .card-body{padding:1rem 1.1rem}
+
+    .flabel{font-size:.68rem;color:var(--muted);display:block;margin-bottom:.3rem;font-weight:500}
+    .fnote{font-size:.6rem;color:var(--muted);margin-top:.2rem;line-height:1.4}
+    input[type=number],input[type=text],select{font-family:var(--font);padding:.42rem .6rem;background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.78rem;color:var(--fg);outline:none;transition:border-color .15s;width:100%}
+    input[type=number]{-moz-appearance:textfield}
+    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input:focus,select:focus{border-color:var(--primary)}
+    .err-msg{font-size:.62rem;color:hsl(0,72%,65%);margin-top:.2rem;display:none}
+
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+    .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem}
+    @media(max-width:480px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}
+
+    .isec{padding:.85rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--sec-bg);margin-bottom:.75rem}
+    .isec-title{font-size:.65rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+
+    .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
+    .btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.88}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--fg)}.btn-outline:hover{background:var(--sec-bg)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}.btn-ghost:hover{background:var(--sec-bg);color:var(--fg)}
+    .btn-sm{padding:.28rem .65rem;font-size:.68rem}
+    .btn-full{width:100%;justify-content:center}
+
+    .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}
+    @media(max-width:400px){.kpi-row{grid-template-columns:1fr}}
+    .kpi{text-align:center;padding:1rem .75rem;border-radius:var(--radius)}
+    .kpi-blue{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25)}
+    .kpi-green{background:var(--green-bg);border:1px solid var(--green-border)}
+    .kpi-amber{background:var(--amber-bg);border:1px solid var(--amber-border)}
+    .kpi-lbl{font-size:.62rem;color:var(--muted);margin-bottom:.25rem}
+    .kpi-val{font-size:1.65rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+    .kpi-blue .kpi-val{color:var(--primary)}
+    .kpi-green .kpi-val{color:var(--green)}
+    .kpi-amber .kpi-val{color:var(--amber)}
+    .kpi-unit{font-size:.75rem;font-weight:400;color:var(--muted);margin-left:.3rem}
+    .kpi-sub{font-size:.6rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
+
+    .res-grid{display:grid;gap:.4rem}
+    .res-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.73rem}
+    .res-row.hl{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.18)}
+    .res-row.hl-green{background:var(--green-bg);border:1px solid var(--green-border)}
+    .res-row.hl-amber{background:var(--amber-bg);border:1px solid var(--amber-border)}
+    .res-row.hl-red{background:var(--red-bg);border:1px solid var(--red-border)}
+    .res-lbl{color:var(--muted)}
+    .res-val{font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}
+    .res-row.hl .res-val{color:var(--primary)}
+    .res-row.hl-green .res-val{color:var(--green)}
+    .res-row.hl-amber .res-val{color:var(--amber)}
+    .res-row.hl-red .res-val{color:hsl(0,72%,65%)}
+    .res-unit{font-size:.6rem;color:var(--muted);margin-left:.25rem}
+
+    .box{display:flex;align-items:flex-start;gap:.55rem;border-radius:var(--radius);padding:.65rem .8rem;margin-bottom:.65rem}
+    .box p,.box span{font-size:.67rem;line-height:1.75}
+    .box-warn{background:var(--amber-bg);border:1px solid var(--amber-border)}
+    .box-warn p{color:var(--muted)}
+    .box-err{background:var(--red-bg);border:1px solid var(--red-border)}
+    .box-err p{color:hsl(0,72%,65%)}
+
+    .lbae{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:9999px;font-size:.58rem;font-weight:600;border:1px solid;white-space:nowrap}
+    .lbae-ok{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.08)}
+    .lbae-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+    .lbae-hi{border-color:hsl(0,72%,55%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,55%,.07)}
+
+    .pump-badge{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid}
+    .pb-cent{border-color:hsl(217,91%,60%,.4);color:hsl(217,91%,70%);background:hsl(217,91%,60%,.08)}
+    .pb-recip{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
+    .pb-screw{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+
+    .accordion{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .acc-trigger{width:100%;display:flex;align-items:center;gap:.55rem;padding:.85rem 1.1rem;cursor:pointer;background:none;border:none;font-family:var(--font);font-size:.78rem;font-weight:600;color:var(--fg);transition:background .15s}
+    .acc-trigger:hover{background:var(--sec-bg)}
+    .acc-trigger .acc-icon{margin-left:auto;color:var(--muted);transition:transform .2s}
+    .acc-trigger[aria-expanded="true"] .acc-icon{transform:rotate(180deg)}
+    .acc-body{display:none;padding:.85rem 1.1rem;border-top:1px solid var(--border)}
+    .acc-body.open{display:block}
+    .trace-box{background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem;font-size:.65rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.9;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}
+    .ref-panel{font-size:.67rem;color:var(--muted);line-height:1.85}
+    .ref-panel h4{font-size:.68rem;font-weight:600;color:var(--fg);margin:1rem 0 .35rem}
+    .ref-panel h4:first-child{margin-top:0}
+    .ref-panel li{margin-left:1.1rem;padding:.08rem 0}
+
+    .placeholder{padding:2.5rem 1rem;text-align:center}
+    .placeholder p{font-size:.78rem;color:var(--muted);margin-top:.5rem}
+    footer{border-top:1px solid var(--border);padding:1.1rem 1rem;margin-top:1rem}
+    .ft-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem}
+    .ft-links{display:flex;align-items:center;gap:.65rem}
+    .ft-icon{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .ft-icon:hover{color:var(--fg);border-color:var(--fg)}
+    .text-primary{color:var(--primary)}.fw7{font-weight:700}.fs-sm{font-size:.875rem}.fs-xs{font-size:.72rem}
+
+    #printHeader{display:none}
+    #printInputTable{display:none}
+    #printFooter{display:none}
+
+    @media print{
+      @page{size:A4;margin:1.1cm 1.2cm 1.3cm 1.2cm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      html,body{background:#fff!important;color:#111!important;font-size:9pt;margin:0;padding:0}
+      body{padding-bottom:1.2cm!important}
+      [data-theme="dark"],[data-theme="light"]{
+        --bg:#fff;--bg-card:#fff;--border:#d0d7e3;--fg:#111;--muted:#555;
+        --primary:#1a56db;--primary-bg:#e8f0fe;--sec-bg:#f3f6fb;--inp-bg:#fff;
+        --green:#137333;--green-bg:#e6f4ea;--green-border:#34a853;
+        --amber:#b45309;--amber-bg:#fef7e0;--amber-border:#f59e0b;
+        --red:#c0392b;--red-bg:#fce8e6;--red-border:#ea4335;
+      }
+      #navbar,.mob-menu,.mob-ctrl,.desktop-th,
+      .breadcrumb,.page-desc,.bae-row,.sec-label,
+      footer,#placeholderCard,#traceAccordion,#globalErr,
+      .theme-toggle,.btn-ghost,.btn-primary,
+      .col-inputs,.ph .btn-outline,#docHdWrap,
+      .meta-wrap{display:none!important}
+      #printHeader{display:block!important;padding:0 0 .3cm;border-bottom:2px solid #1a56db;margin-bottom:.35cm}
+      #printFooter{display:block!important;position:fixed;bottom:0;left:1.2cm;right:1.2cm;padding:3pt 0;background:#fff}
+      #printInputTable{display:table!important;width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:.35cm}
+      #printInputTable thead{display:table-header-group}
+      #printInputTable tr{break-inside:avoid;page-break-inside:avoid}
+      /* Start the printable Pump Sizing title/results section on a new page after the input table. */
+      .ph{padding:.2cm 0 .2cm;border:none;display:block!important;break-before:page;page-break-before:always;break-after:avoid;page-break-after:avoid}
+      .ph-inner{display:block;max-width:100%;break-inside:avoid;page-break-inside:avoid}
+      .page-title{font-size:13pt;font-weight:700;color:#111;margin:0;display:block!important;break-after:avoid;page-break-after:avoid}
+      .calc-wrap{max-width:100%;padding:.15cm 0 0}
+      .calc-grid{display:block}
+      .col-results{display:block;width:100%}
+      .card{border:1px solid #d0d7e3!important;border-radius:3px!important;margin-bottom:.3cm;break-inside:avoid;page-break-inside:avoid;background:#fff!important}
+      .card-hd{background:#e8f0fe!important;padding:.22cm .35cm!important;border-bottom:1px solid #c5cfe8!important}
+      .card-title{color:#111!important;font-size:9pt!important}
+      .card-body{padding:.25cm .35cm!important}
+      .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.2cm;break-inside:avoid;page-break-inside:avoid}
+      .kpi{border-radius:3px!important;padding:.22cm!important;text-align:center;break-inside:avoid;page-break-inside:avoid}
+      .kpi-blue{background:#e8f0fe!important;border:1px solid #4285f4!important}
+      .kpi-green{background:#e6f4ea!important;border:1px solid #34a853!important}
+      .kpi-amber{background:#fef7e0!important;border:1px solid #f59e0b!important}
+      .kpi-val{font-size:15pt!important;font-weight:700!important;line-height:1.2!important}
+      .kpi-blue .kpi-val{color:#1a56db!important}
+      .kpi-green .kpi-val{color:#137333!important}
+      .kpi-amber .kpi-val{color:#b45309!important}
+      .kpi-lbl{color:#555!important;font-size:7pt!important}
+      .kpi-unit{color:#555!important;font-size:7pt!important}
+      .kpi-sub{color:#555!important;font-size:7pt!important}
+      .res-grid{display:grid;gap:2pt}
+      .res-row{background:#f3f6fb!important;border:1px solid #d0d7e3!important;border-radius:2px!important;padding:3pt 6pt!important;font-size:8pt!important;display:flex;justify-content:space-between;align-items:center;break-inside:avoid;page-break-inside:avoid}
+      .res-row.hl{background:#e8f0fe!important;border-color:#4285f4!important}
+      .res-row.hl-green{background:#e6f4ea!important;border-color:#34a853!important}
+      .res-row.hl-amber{background:#fef7e0!important;border-color:#f59e0b!important}
+      .res-row.hl-red{background:#fce8e6!important;border-color:#ea4335!important}
+      .res-lbl{color:#555!important}
+      .res-val{color:#111!important;font-weight:600!important}
+      .res-row.hl .res-val{color:#1a56db!important}
+      .res-row.hl-green .res-val{color:#137333!important}
+      .res-row.hl-amber .res-val{color:#b45309!important}
+      .res-row.hl-red .res-val{color:#c0392b!important}
+      .res-unit{color:#777!important;font-size:6.5pt!important;margin-left:3pt}
+      #warningsCard{background:#fef7e0!important;border:1px solid #e0b64b!important;margin-bottom:.25cm!important;break-inside:avoid;page-break-inside:avoid}
+      #warningsCard p,#warningsCard span{color:#6b4f00!important;font-size:7.5pt!important}
+      #unitBadge{background:#e8f0fe!important;color:#1a56db!important;border-color:#4285f4!important;font-size:7pt!important}
+      /* Start the Power section on a subsequent new page for clean report pagination. */
+      #powerCard{break-before:page;page-break-before:always;break-inside:avoid;page-break-inside:avoid}
+      #powerCard .card-hd{break-after:avoid;page-break-after:avoid}
+    }
+  </style>
+</head>
+<body>
+<header id="navbar">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
+    <nav class="desktop">
+      <a href="../index.html" class="nav-link">HOME</a>
+      <a href="../index.html#about" class="nav-link">ABOUT</a>
+      <a href="../index.html#experience" class="nav-link">EXPERIENCE</a>
+      <a href="../index.html#projects" class="nav-link">PROJECTS</a>
+      <a href="../index.html#skills" class="nav-link">SKILLS</a>
+      <a href="../index.html#contact" class="nav-link">CONTACT</a>
+      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS</a>
+      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:15px;height:15px"></i></button>
+    </nav>
+    <div class="mob-ctrl">
+      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:15px;height:15px"></i></button>
+      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:15px;height:15px"></i></button>
+    </div>
+  </div>
+  <div class="mob-menu" id="mobileMenu">
+    <a href="../index.html">HOME</a>
+    <a href="../index.html#about">ABOUT</a>
+    <a href="../index.html#experience">EXPERIENCE</a>
+    <a href="../index.html#projects">PROJECTS</a>
+    <a href="../index.html#skills">SKILLS</a>
+    <a href="../index.html#contact">CONTACT</a>
+    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.35rem;margin-top:.4rem"><i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS</a>
+  </div>
+</header>
+
+<!-- DOCUMENT HEADER -->
+<div class="doc-hd-wrap" id="docHdWrap">
+  <div class="doc-hd-card">
+    <div class="doc-hd-title">
+      <i data-lucide="file-text" style="width:12px;height:12px"></i>
+      Document / Project Reference
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="printCalc()">
+        <i data-lucide="printer" style="width:11px;height:11px"></i>Export PDF
+      </button>
+    </div>
+    <div class="doc-grid">
+      <div><label class="flabel">Company</label><input type="text" id="docCompany" placeholder="e.g. X" /></div>
+      <div><label class="flabel">Project Name</label><input type="text" id="docProject" placeholder="e.g. FEED — Offshore Platform" /></div>
+      <div><label class="flabel">Document Name</label><input type="text" id="docName" placeholder="e.g. Pump Sizing Calculation" /></div>
+      <div><label class="flabel">Document Number</label><input type="text" id="docNumber" placeholder="e.g. PRJ-PR-CAL-0015" /></div>
+      <div><label class="flabel">Revision</label><input type="text" id="docRev" placeholder="e.g. A0" /></div>
+      <div><label class="flabel">Equipment Number / Tag</label><input type="text" id="docLine" placeholder="e.g. P-1001 A/B" /></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT HEADER -->
+<div id="printHeader">
+  <table style="width:100%;border-collapse:collapse;font-size:8.5pt;color:#111">
+    <tr>
+      <td style="width:55%;vertical-align:top;padding-right:.5cm">
+        <div style="font-size:13pt;font-weight:700;color:#1a56db;line-height:1.2">Pump Sizing</div>
+        <div style="font-size:7.5pt;color:#444;margin-top:3pt">Centrifugal &middot; Reciprocating &middot; Screw &nbsp;&mdash;&nbsp; Hydraulic Institute &middot; API 610 &middot; ISO 13709</div>
+        <div style="font-size:7pt;color:#888;margin-top:2pt;font-style:italic">Screening-level calculation — not a code-compliant design document</div>
+        <div style="font-size:8pt;color:#333;margin-top:4pt;font-weight:600" id="ph_docname"></div>
+      </td>
+      <td style="vertical-align:top">
+        <table style="margin-left:auto;border-collapse:collapse;font-size:8pt;width:100%">
+          <tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Company</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8;min-width:3cm" id="ph_company"></td></tr>
+          <tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Project</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_project"></td></tr>
+          <tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Doc. No.</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8" id="ph_number"></td></tr>
+          <tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Revision</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_rev"></td></tr>
+          <tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Equip. / Tag</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8" id="ph_line"></td></tr>
+          <tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Date</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_date"></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- PRINT INPUT TABLE -->
+<table id="printInputTable">
+  <thead>
+    <tr style="background:#1a56db"><th colspan="4" style="padding:4pt 6pt;text-align:left;font-size:9pt;color:#fff;border:1px solid #1a56db;letter-spacing:.04em">INPUT PARAMETERS</th></tr>
+    <tr style="background:#e8f0fe">
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;width:32%;font-size:8pt;color:#111">Parameter</th>
+      <th style="padding:3pt 6pt;text-align:right;border:1px solid #c5cfe8;width:18%;font-size:8pt;color:#111">Value</th>
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;width:14%;font-size:8pt;color:#111">Unit</th>
+      <th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;font-size:8pt;color:#111">Notes</th>
+    </tr>
+  </thead>
+  <tbody id="printInputBody"></tbody>
+</table>
+
+<!-- PRINT FOOTER -->
+<div id="printFooter">
+  <table style="width:100%;border-collapse:collapse">
+    <tr>
+      <td style="font-size:7.5pt;color:#444;padding:3pt 0;border-top:1px solid #c5cfe8">
+        <span id="pf_docname" style="font-weight:600;color:#1a56db"></span>
+        <span id="pf_docnumber" style="color:#888;margin-left:8pt"></span>
+      </td>
+      <td style="text-align:right;font-size:7.5pt;color:#888;padding:3pt 0;border-top:1px solid #c5cfe8">
+        <span id="pf_date"></span>&nbsp;&nbsp;|&nbsp;&nbsp;Hazem ElMancy &mdash; Pump Sizing
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-inner">
+    <div>
+      <div class="breadcrumb"><a href="../index.html">Home</a><i data-lucide="chevron-right" style="width:11px;height:11px"></i><a href="index.html">Calculators</a><i data-lucide="chevron-right" style="width:11px;height:11px"></i><span style="color:var(--fg)">Pump Sizing</span></div>
+      <p class="sec-label">EQUIPMENT</p>
+      <h1 class="page-title">Pump Sizing</h1>
+      <p class="page-desc">Centrifugal, reciprocating &amp; screw pumps &mdash; suction head, NPSH, discharge head, differential pressure, hydraulic power, shaft power, shut-off pressure, specific speed and impeller diameter.</p>
+      <div class="bae-row">
+        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>Hydraulic Institute</span>
+        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>API 610 / ISO 13709</span>
+        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>GPSA &sect;12</span>
+        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>Perry's &sect;10</span>
+      </div>
+    </div>
+    <a href="index.html" class="btn btn-outline btn-sm" style="align-self:flex-start;margin-top:.25rem"><i data-lucide="arrow-left" style="width:13px;height:13px"></i>All Calculators</a>
+  </div>
+</div>
+
+<!-- CALCULATOR -->
+<div class="calc-wrap">
+  <div class="calc-grid">
+    <!-- INPUTS -->
+    <div class="col-inputs">
+      <div class="card">
+        <div class="card-hd">
+          <div class="hd-icon"><i data-lucide="gauge" style="width:14px;height:14px"></i></div>
+          <span class="card-title">Input Parameters</span>
+          <div class="unit-pill" id="unitPill">
+            <button id="btnSI" class="active" onclick="setUnits('SI')">SI</button>
+            <button id="btnIMP" onclick="setUnits('IMP')">Imperial</button>
+          </div>
+          <div style="display:flex;gap:.3rem;margin-left:.4rem">
+            <button class="btn btn-outline btn-sm" onclick="loadTestCase()"><i data-lucide="flask-conical" style="width:11px;height:11px"></i>Test</button>
+            <button class="btn btn-ghost btn-sm" onclick="resetForm()" title="Reset"><i data-lucide="rotate-ccw" style="width:11px;height:11px"></i></button>
+          </div>
+        </div>
+        <div class="card-body">
+
+          <!-- Fluid & Flow -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="droplet" style="width:12px;height:12px"></i>Fluid &amp; Flow</div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblTemp">Fluid Temp, T (&deg;C)</label><input type="number" id="inpTemp" step="any" oninput="calculate()" placeholder="e.g. 25" /><div class="err-msg" id="errTemp">Required</div><div class="fnote">Documentation basis only; enter density/viscosity at operating temperature.</div></div>
+              <div><label class="flabel" id="lblTempMax">Max Temp (&deg;C)</label><input type="number" id="inpTempMax" step="any" oninput="calculate()" placeholder="e.g. 40" /><div class="fnote">Use for vapor-pressure basis / NPSHa screening.</div></div>
+            </div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel">&mu; Viscosity (cP)</label><input type="number" id="inpMu" min="0" step="any" oninput="calculate()" placeholder="e.g. 0.89" /><div class="err-msg" id="errMu">Must be &gt; 0</div></div>
+              <div><label class="flabel" id="lblRho">&rho; Density (kg/m&sup3;)</label><input type="number" id="inpRho" min="0" step="any" oninput="calculate()" placeholder="e.g. 1007" /><div class="err-msg" id="errRho">Must be &gt; 0</div></div>
+            </div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblPvap">Vapour Pressure (kPaa)</label><input type="number" id="inpPvap" min="0" step="any" oninput="calculate()" placeholder="e.g. 7.3" /><div class="err-msg" id="errPvap">Required and must be &ge; 0</div><div class="fnote">Enter at maximum pumping temperature for NPSHa.</div></div>
+              <div><label class="flabel" id="lblFlow">Volumetric Flow (m&sup3;/h)</label><input type="number" id="inpFlow" min="0" step="any" oninput="calculate()" placeholder="e.g. 23" /><div class="err-msg" id="errFlow">Must be &gt; 0</div></div>
+            </div>
+            <div class="g2">
+              <div><label class="flabel">Recycle Margin (%)</label><input type="number" id="inpMarginRec" min="0" max="100" step="any" value="0" oninput="calculate()" /><div class="fnote">Continuous flow recycle</div></div>
+              <div><label class="flabel">Design Margin, Flow (%)</label><input type="number" id="inpMarginFlow" min="0" max="100" step="any" value="10" oninput="calculate()" /></div>
+            </div>
+            <div id="designQDisplay" style="margin-top:.55rem;padding:.35rem .6rem;background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius);font-size:.7rem;display:none">
+              Design Flowrate: <strong id="designQVal" style="color:var(--primary)">—</strong>
+            </div>
+          </div>
+
+          <!-- Pump Configuration -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="settings-2" style="width:12px;height:12px"></i>Pump Configuration</div>
+            <div style="margin-bottom:.65rem">
+              <label class="flabel">Pump Type</label>
+              <select id="selPumpType" onchange="onPumpTypeChange();calculate()">
+                <option value="centrifugal">Centrifugal</option>
+                <option value="reciprocating">Reciprocating</option>
+                <option value="screw">Screw</option>
+              </select>
+            </div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblCL">Pump CL Elevation (m)</label><input type="number" id="inpCL" step="any" value="0" oninput="calculate()" /><div class="fnote">Above grade</div></div>
+              <div><label class="flabel" id="lblSpeed">Pump Speed (rpm)</label><input type="number" id="inpSpeed" min="0" step="1" oninput="calculate()" placeholder="e.g. 1450" /></div>
+            </div>
+            <!-- Centrifugal only -->
+            <div id="rowStages" style="margin-bottom:.65rem">
+              <label class="flabel">Number of Stages</label>
+              <input type="number" id="inpStages" min="1" step="1" value="1" oninput="calculate()" />
+              <div class="fnote">Typical: 1 stage (single-stage) or multi-stage for high-head service</div>
+            </div>
+            <div class="g2">
+              <div><label class="flabel" id="lblNPSHMargin">NPSH Margin Allowance (m)</label><input type="number" id="inpNPSHMargin" min="0" step="any" value="1.0" oninput="calculate()" /><div class="fnote">Screening allowance only; final margin by project/vendor NPSHr.</div></div>
+              <div><label class="flabel">Pump Efficiency (%)</label><input type="number" id="inpEff" min="1" max="100" step="any" placeholder="auto" oninput="calculate()" /><div class="fnote">Blank = screening estimate; manual value preferred for EPC checks.</div></div>
+            </div>
+          </div>
+
+          <!-- Suction Conditions -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="arrow-down-to-line" style="width:12px;height:12px"></i>Suction Conditions</div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblPsucVessel">Vessel Pressure (kPaa)</label><input type="number" id="inpPsucVessel" min="0" step="any" oninput="calculate()" placeholder="e.g. 101.3" /><div class="err-msg" id="errPsucVessel">Must be &gt; 0</div></div>
+              <div><label class="flabel" id="lblLsuc">Liquid Level (m)</label><input type="number" id="inpLsuc" step="any" oninput="calculate()" placeholder="e.g. 8.0" /><div class="err-msg" id="errLsuc">Required</div><div class="fnote">Above grade</div></div>
+            </div>
+            <div style="margin-bottom:.65rem"><label class="flabel" id="lblDPsucLine">Line / Fittings &Delta;P (kPa)</label><input type="number" id="inpDPsucLine" min="0" step="any" value="0" oninput="calculate()" /><div class="fnote">Use Liquid Hydraulics calculator</div></div>
+            <!-- Reciprocating acceleration head -->
+            <div id="recipSucFields" style="display:none">
+              <div class="g2" style="margin-bottom:.65rem">
+                <div><label class="flabel" id="lblSucLength">Suction Line Length (m)</label><input type="number" id="inpSucLength" min="0" step="any" value="0" oninput="calculate()" /></div>
+                <div><label class="flabel" id="lblSucID">Suction Line ID (mm)</label><input type="number" id="inpSucID" min="0" step="any" oninput="calculate()" placeholder="e.g. 200" /></div>
+              </div>
+              <div class="g2">
+                <div>
+                  <label class="flabel">Pump Constant, C</label>
+                  <select id="selC" onchange="calculate()">
+                    <option value="0.200">0.200 — Simplex / Duplex SA</option>
+                    <option value="0.115">0.115 — Duplex DA</option>
+                    <option value="0.066" selected>0.066 — Triplex SA</option>
+                    <option value="0.040">0.040 — Quadruplex DA</option>
+                    <option value="0.022">0.022 — Quintuplex SA</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="flabel">Compressibility, k</label>
+                  <select id="selK" onchange="calculate()">
+                    <option value="2.0" selected>2.0 — Cold water</option>
+                    <option value="1.5">1.5 — Hot water (&gt;65&deg;C)</option>
+                    <option value="2.5">2.5 — Hydrocarbons</option>
+                    <option value="1.4">1.4 — High compressibility</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Discharge Conditions -->
+          <div class="isec">
+            <div class="isec-title"><i data-lucide="arrow-up-from-line" style="width:12px;height:12px"></i>Discharge Conditions</div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblPdisVessel">Vessel Pressure (kPaa)</label><input type="number" id="inpPdisVessel" min="0" step="any" oninput="calculate()" placeholder="e.g. 700" /><div class="err-msg" id="errPdisVessel">Must be &gt; 0</div></div>
+              <div><label class="flabel" id="lblLdis">Liquid Level (m)</label><input type="number" id="inpLdis" step="any" oninput="calculate()" placeholder="e.g. 12.0" /><div class="err-msg" id="errLdis">Required</div><div class="fnote">Above grade</div></div>
+            </div>
+            <div class="g2" style="margin-bottom:.65rem">
+              <div><label class="flabel" id="lblDPdisLine">Line / Fittings &Delta;P (kPa)</label><input type="number" id="inpDPdisLine" min="0" step="any" value="0" oninput="calculate()" /></div>
+              <div><label class="flabel" id="lblDPCV">Control Valve &Delta;P (kPa)</label><input type="number" id="inpDPCV" min="0" step="any" value="0" oninput="calculate()" /></div>
+            </div>
+            <div><label class="flabel" id="lblDPeq">Equipment &Delta;P (kPa)</label><input type="number" id="inpDPeq" min="0" step="any" value="0" oninput="calculate()" /><div class="fnote">HEX, filter, flow element, etc.</div></div>
+          </div>
+
+          <!-- Shut-off Pressure -->
+          <div class="isec" id="shutoffIsec" style="margin-bottom:0">
+            <div class="isec-title"><i data-lucide="shield-alert" style="width:12px;height:12px"></i>Shut-off Pressure</div>
+            <div class="g2">
+              <div><label class="flabel" id="lblPSV">Max Suction Source Pressure (kPaa abs)</label><input type="number" id="inpPSV" min="0" step="any" oninput="calculate()" placeholder="e.g. 300" /><div class="fnote">Absolute pressure basis; do not enter barg unless converted.</div></div>
+              <div><label class="flabel" id="lblLHH">Vessel HH Level (m)</label><input type="number" id="inpLHH" min="0" step="any" oninput="calculate()" placeholder="e.g. 10.0" /><div class="fnote">Above grade</div></div>
+            </div>
+            <div style="margin-top:.55rem"><label class="flabel">Shut-off / Rated Head Ratio</label><input type="number" id="inpSORatio" min="1" step="any" value="1.25" oninput="calculate()" /><div class="fnote">Centrifugal screening default only. Vendor curve required for final shut-off pressure.</div></div>
+          </div>
+
+          <div id="globalErr" class="box box-err" style="display:none;margin-top:.65rem"><i data-lucide="circle-x" style="width:13px;height:13px;color:hsl(0,72%,65%);flex-shrink:0;margin-top:2px"></i><p id="globalErrText"></p></div>
+          <button class="btn btn-primary btn-full" style="margin-top:.75rem" onclick="calculate()"><i data-lucide="zap" style="width:13px;height:13px"></i>Calculate</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="col-results">
+      <div id="placeholderCard" class="card"><div class="placeholder"><i data-lucide="gauge" style="width:32px;height:32px;color:var(--muted);opacity:.25;display:block;margin:0 auto"></i><p>Enter parameters and click Calculate.</p></div></div>
+      <div id="warningsCard" class="box box-warn" style="display:none"><i data-lucide="triangle-alert" style="width:13px;height:13px;color:var(--amber);flex-shrink:0;margin-top:2px"></i><p id="warningsText"></p></div>
+
+      <!-- Summary -->
+      <div id="summaryCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd">
+          <div class="hd-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>
+          <span class="card-title">Results Summary</span>
+          <span id="pumpTypeBadge" style="margin-left:.35rem"></span>
+          <span id="unitBadge" style="margin-left:auto;font-size:.6rem;font-weight:600;padding:.15rem .5rem;border-radius:9999px;background:var(--primary-bg);color:var(--primary);border:1px solid hsl(217,91%,60%,.3)">SI</span>
+        </div>
+        <div class="card-body">
+          <div class="kpi-row">
+            <div class="kpi kpi-blue"><div class="kpi-lbl">Differential Pressure</div><div><span class="kpi-val" id="bigDP">&mdash;</span><span class="kpi-unit" id="kpiDPUnit">bar</span></div><div class="kpi-sub" id="bigDPSub"></div></div>
+            <div class="kpi kpi-green"><div class="kpi-lbl" style="color:var(--green)">Differential Head</div><div><span class="kpi-val" id="bigHead">&mdash;</span><span class="kpi-unit" id="kpiHeadUnit">m</span></div><div class="kpi-sub" id="bigHeadSub"></div></div>
+          </div>
+          <div class="res-grid" id="summaryGrid"></div>
+        </div>
+      </div>
+
+      <!-- Suction & NPSH -->
+      <div id="suctionCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd"><div class="hd-icon" style="background:hsl(217,91%,60%,.1)"><i data-lucide="arrow-down-to-line" style="width:14px;height:14px;color:var(--primary)"></i></div><span class="card-title">Suction &amp; NPSH</span></div>
+        <div class="card-body"><div class="res-grid" id="suctionGrid"></div></div>
+      </div>
+
+      <!-- Discharge -->
+      <div id="dischargeCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd"><div class="hd-icon" style="background:hsl(142,71%,45%,.1)"><i data-lucide="arrow-up-from-line" style="width:14px;height:14px;color:var(--green)"></i></div><span class="card-title">Discharge Conditions</span></div>
+        <div class="card-body"><div class="res-grid" id="dischargeGrid"></div></div>
+      </div>
+
+      <!-- Power -->
+      <div id="powerCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd"><div class="hd-icon" style="background:hsl(38,92%,50%,.1)"><i data-lucide="activity" style="width:14px;height:14px;color:var(--amber)"></i></div><span class="card-title">Power</span></div>
+        <div class="card-body">
+          <div class="kpi-row">
+            <div class="kpi kpi-amber"><div class="kpi-lbl" style="color:var(--amber)">Estimated Shaft Power</div><div><span class="kpi-val" id="bigPower">&mdash;</span><span class="kpi-unit" id="kpiPowerUnit">kW</span></div><div class="kpi-sub" id="bigPowerSub"></div></div>
+            <div class="kpi kpi-blue"><div class="kpi-lbl">Hydraulic Power</div><div><span class="kpi-val" id="bigPowHyd">&mdash;</span><span class="kpi-unit" id="kpiPowHydUnit">kW</span></div><div class="kpi-sub" id="bigPowHydSub"></div></div>
+          </div>
+          <div class="res-grid" id="powerGrid"></div>
+        </div>
+      </div>
+
+      <!-- Shut-off -->
+      <div id="shutoffCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd"><div class="hd-icon" style="background:hsl(0,72%,55%,.1)"><i data-lucide="shield-alert" style="width:14px;height:14px;color:var(--red)"></i></div><span class="card-title">Maximum Shut-off Pressure</span></div>
+        <div class="card-body"><div class="res-grid" id="shutoffGrid"></div></div>
+      </div>
+
+      <!-- Centrifugal Details -->
+      <div id="centCard" class="card" style="display:none;margin-bottom:.75rem">
+        <div class="card-hd"><div class="hd-icon"><i data-lucide="circle-dashed" style="width:14px;height:14px"></i></div><span class="card-title">Preliminary Centrifugal Pump Details</span></div>
+        <div class="card-body"><div class="res-grid" id="centGrid"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- META -->
+<div class="meta-wrap">
+  <div class="meta-grid">
+    <div id="traceAccordion" class="accordion" style="display:none">
+      <button class="acc-trigger" onclick="toggleAcc('traceBody',this)" aria-expanded="false"><div class="hd-icon"><i data-lucide="file-code" style="width:14px;height:14px"></i></div>Calculation Trace<i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i></button>
+      <div class="acc-body" id="traceBody"><div class="trace-box" id="traceBox"></div></div>
+    </div>
+    <div class="accordion">
+      <button class="acc-trigger" onclick="toggleAcc('methBody',this)" aria-expanded="false"><div class="hd-icon"><i data-lucide="book-open" style="width:14px;height:14px"></i></div>Methodology &amp; Assumptions<i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i></button>
+      <div class="acc-body" id="methBody">
+        <div class="ref-panel">
+          <h4>Methodology</h4>
+          <ul>
+            <li>Suction head: P_suc = P_vessel + &rho;g(L_level &minus; CL)/1000 &minus; &Delta;P_line [kPaa]</li>
+            <li>NPSHa calculated: NPSHa = (P_suc,abs &minus; P_vap)/(ρg). Vendor NPSHr is not calculated.</li>
+            <li>Discharge head: P_dis = P_vessel + &rho;g(L_level &minus; CL)/1000 + &Delta;P_line + &Delta;P_CV + &Delta;P_eq [kPaa]</li>
+            <li>Differential: &Delta;P = P_dis &minus; P_suc; &Delta;H = &Delta;P &times; 1000 / (&rho;g)</li>
+            <li>Hydraulic power: P_hyd = &Delta;P [kPa] &times; Q [m&sup3;/s] [kW]</li>
+            <li>Pump efficiency: user-entered efficiency if provided; otherwise a screening estimate is used for power only.</li>
+            <li>Reciprocating efficiency: 90% (fixed); Screw: 85% (fixed)</li>
+            <li>Centrifugal shut-off pressure: P_so = P_suc,max + selected shut-off/rated head ratio × ΔP_design. Vendor curve required for final value.</li>
+            <li>Specific speed: N_s = N &times; &radic;Q [m&sup3;/s] / H_stage&sup3;&frasl;&sup4; [SI]</li>
+            <li>Impeller diameter: D = (60/&pi;N) &times; &radic;(2g &times; H_stage / &psi;) where &psi; = 0.75</li>
+            <li>Reciprocating acceleration head: Ha = L &times; v &times; N / (C &times; k &times; g)</li>
+          </ul>
+          <h4>Pump Type Classification (Specific Speed, SI)</h4>
+          <ul>
+            <li>N_s &lt; 15: Radial Flow (high head, low flow)</li>
+            <li>15 &le; N_s &lt; 70: Mixed Flow</li>
+            <li>N_s &ge; 70: Axial Flow (low head, high flow)</li>
+          </ul>
+          <h4>Assumptions</h4>
+          <ul>
+            <li>Single-phase liquid flow; isothermal; &rho; and &mu; constant</li>
+            <li>All pressures are absolute (kPaa / psia) except stated differentials</li>
+            <li>Centrifugal efficiency is estimated from flow only &mdash; validate against vendor curves</li>
+            <li>Default shut-off ratio 1.25 is a screening assumption for centrifugal pumps only; verify against vendor curve, especially for multi-stage pumps.</li>
+            <li>NPSH margin allowance is a screening input; final NPSH margin shall follow project/company criteria and vendor NPSHr curve.</li>
+            <li>Screening-level result &mdash; subject to project / company criteria</li>
+          </ul>
+          <h4>References</h4>
+          <ul>
+            <li>Hydraulic Institute Standards for Centrifugal, Rotary and Reciprocating Pumps</li>
+            <li>API 610 / ISO 13709: Centrifugal Pumps for Petroleum, Petrochemical and Natural Gas Industries</li>
+            <li>GPSA Engineering Data Book, Section 12 (Pumps)</li>
+            <li>Perry's Chemical Engineers' Handbook, Section 10</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-inner">
+    <div class="logo"><span class="text-primary fw7 fs-sm">Hazem</span><span class="fw7 fs-sm">ElMancy</span></div>
+    <div class="ft-links">
+      <a href="tel:+201096597449" class="ft-icon"><i data-lucide="phone" style="width:13px;height:13px"></i></a>
+      <a href="mailto:hazemmancy@outlook.com" class="ft-icon"><i data-lucide="mail" style="width:13px;height:13px"></i></a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="ft-icon"><svg style="width:13px;height:13px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+    </div>
+    <p class="fs-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const G = 9.80665;
+let unitSys = 'SI';
+
+const U = {
+  temp:   { SI: '\u00b0C',    IMP: '\u00b0F'   },
+  rho:    { SI: 'kg/m\u00b3', IMP: 'lb/ft\u00b3' },
+  pvap:   { SI: 'kPaa',       IMP: 'psia'      },
+  flow:   { SI: 'm\u00b3/h',  IMP: 'USgpm'     },
+  pAbs:   { SI: 'kPaa',       IMP: 'psia'      },
+  pDiff:  { SI: 'kPa',        IMP: 'psi'       },
+  pBar:   { SI: 'bar',        IMP: 'psi'       },
+  head:   { SI: 'm',          IMP: 'ft'        },
+  len:    { SI: 'm',          IMP: 'ft'        },
+  dia:    { SI: 'mm',         IMP: 'in'        },
+  power:  { SI: 'kW',         IMP: 'hp'        },
+};
+
+function fmtN(n, d=4) {
+  if (!isFinite(n)) return '\u2014';
+  const a = Math.abs(n);
+  if (a === 0) return '0';
+  if (a >= 10000) return n.toFixed(0);
+  if (a >= 1000) return n.toFixed(1);
+  if (a >= 100) return n.toFixed(2);
+  if (a >= 1) return n.toFixed(d < 3 ? 3 : d);
+  return n.toPrecision(4);
+}
+function fmtInput(v) {
+  if (!isFinite(v)) return '';
+  const a = Math.abs(v);
+  if (a >= 1000) return v.toFixed(1);
+  if (a >= 1) return v.toFixed(3);
+  return v.toPrecision(4);
+}
+function rv(id) { return parseFloat(document.getElementById(id).value); }
+function readFinite(id, fallback = NaN) {
+  const el = document.getElementById(id);
+  const v = parseFloat(el?.value);
+  return Number.isFinite(v) ? v : fallback;
+}
+function convertField(id, factor) {
+  const el = document.getElementById(id);
+  const v = parseFloat(el.value);
+  if (Number.isFinite(v)) el.value = fmtInput(v * factor);
+}
+function convertTemp(id, toIMP) {
+  const el = document.getElementById(id);
+  const v = parseFloat(el.value);
+  if (!isFinite(v)) return;
+  el.value = fmtInput(toIMP ? v * 9/5 + 32 : (v - 32) * 5/9);
+}
+
+function setUnits(sys) {
+  if (unitSys === sys) return;
+  const toIMP = unitSys === 'SI';
+  unitSys = sys;
+  document.getElementById('btnSI').classList.toggle('active', sys === 'SI');
+  document.getElementById('btnIMP').classList.toggle('active', sys === 'IMP');
+
+  convertTemp('inpTemp', toIMP);
+  convertTemp('inpTempMax', toIMP);
+  convertField('inpRho', toIMP ? 1/16.0185 : 16.0185);
+  convertField('inpPvap', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpFlow', toIMP ? 4.40287 : 1/4.40287);
+  convertField('inpCL', toIMP ? 3.28084 : 1/3.28084);
+  convertField('inpPsucVessel', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpLsuc', toIMP ? 3.28084 : 1/3.28084);
+  convertField('inpDPsucLine', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpSucLength', toIMP ? 3.28084 : 1/3.28084);
+  convertField('inpSucID', toIMP ? 1/25.4 : 25.4);
+  convertField('inpPdisVessel', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpLdis', toIMP ? 3.28084 : 1/3.28084);
+  convertField('inpDPdisLine', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpDPCV', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpDPeq', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpPSV', toIMP ? 1/6.89476 : 6.89476);
+  convertField('inpLHH', toIMP ? 3.28084 : 1/3.28084);
+  convertField('inpNPSHMargin', toIMP ? 3.28084 : 1/3.28084);
+  updateLabels();
+  calculate();
+}
+
+function updateLabels() {
+  const s = unitSys;
+  document.getElementById('lblTemp').textContent = 'Fluid Temp, T (' + U.temp[s] + ')';
+  document.getElementById('lblTempMax').textContent = 'Max Temp (' + U.temp[s] + ')';
+  document.getElementById('lblRho').textContent = '\u03c1 Density (' + U.rho[s] + ')';
+  document.getElementById('lblPvap').textContent = 'Vapour Pressure (' + U.pvap[s] + ')';
+  document.getElementById('lblFlow').textContent = 'Volumetric Flow (' + U.flow[s] + ')';
+  document.getElementById('lblCL').textContent = 'Pump CL Elevation (' + U.len[s] + ')';
+  document.getElementById('lblPsucVessel').textContent = 'Vessel Pressure (' + U.pAbs[s] + ')';
+  document.getElementById('lblLsuc').textContent = 'Liquid Level (' + U.len[s] + ')';
+  document.getElementById('lblDPsucLine').textContent = 'Line / Fittings \u0394P (' + U.pDiff[s] + ')';
+  document.getElementById('lblSucLength').textContent = 'Suction Line Length (' + U.len[s] + ')';
+  document.getElementById('lblSucID').textContent = 'Suction Line ID (' + U.dia[s] + ')';
+  document.getElementById('lblPdisVessel').textContent = 'Vessel Pressure (' + U.pAbs[s] + ')';
+  document.getElementById('lblLdis').textContent = 'Liquid Level (' + U.len[s] + ')';
+  document.getElementById('lblDPdisLine').textContent = 'Line / Fittings \u0394P (' + U.pDiff[s] + ')';
+  document.getElementById('lblDPCV').textContent = 'Control Valve \u0394P (' + U.pDiff[s] + ')';
+  document.getElementById('lblDPeq').textContent = 'Equipment \u0394P (' + U.pDiff[s] + ')';
+  document.getElementById('lblPSV').textContent = 'Max Suction Source Pressure (' + U.pAbs[s] + ' abs)';
+  document.getElementById('lblNPSHMargin').textContent = 'NPSH Margin Allowance (' + U.head[s] + ')';
+  document.getElementById('lblLHH').textContent = 'Vessel HH Level (' + U.len[s] + ')';
+  document.getElementById('lblSpeed').textContent = 'Pump Speed (rpm)';
+}
+
+function onPumpTypeChange() {
+  const t = document.getElementById('selPumpType').value;
+  document.getElementById('recipSucFields').style.display = t === 'reciprocating' ? 'block' : 'none';
+  document.getElementById('rowStages').style.display = t === 'centrifugal' ? 'block' : 'none';
+  document.getElementById('shutoffIsec').style.display = (t === 'centrifugal' || t === 'screw') ? 'block' : 'none';
+}
+
+function showErr(id) { const e = document.getElementById(id); if (e) e.style.display = 'block'; }
+function clearErrors() {
+  ['errRho','errFlow','errMu','errPvap','errTemp','errPsucVessel','errLsuc','errPdisVessel','errLdis'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.style.display = 'none';
+  });
+  document.getElementById('globalErr').style.display = 'none';
+}
+function hideResults() {
+  document.getElementById('placeholderCard').style.display = 'block';
+  ['summaryCard','suctionCard','dischargeCard','powerCard','shutoffCard','centCard','warningsCard','traceAccordion'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  document.getElementById('designQDisplay').style.display = 'none';
+  lucide.createIcons();
+}
+
+function calculate() {
+  clearErrors();
+  const imp = unitSys === 'IMP';
+
+  // Fluid
+  const rho_in = rv('inpRho');
+  const rho = imp ? rho_in * 16.0185 : rho_in;
+  const mu_cP = rv('inpMu');
+  const Pvap_in = rv('inpPvap');
+  const Pvap_kPa = isFinite(Pvap_in) ? (imp ? Pvap_in * 6.89476 : Pvap_in) : NaN;
+
+  // Flow
+  const Q_in = rv('inpFlow');
+  const Q_m3h = imp ? Q_in / 4.40287 : Q_in;
+  const mRec = readFinite('inpMarginRec', 0);
+  const mFlow = readFinite('inpMarginFlow', 0);
+  const Q_design_m3h = Q_m3h * (1 + mRec/100) * (1 + mFlow/100);
+  const Q_design_m3s = Q_design_m3h / 3600;
+  const Q_design_gpm = Q_design_m3h * 4.40287;
+
+  // Show design flowrate
+  if (isFinite(Q_design_m3h) && Q_design_m3h > 0) {
+    const qDisp = imp ? fmtN(Q_design_gpm, 3) + ' USgpm' : fmtN(Q_design_m3h, 3) + ' m\u00b3/h';
+    document.getElementById('designQVal').textContent = qDisp;
+    document.getElementById('designQDisplay').style.display = 'block';
+  }
+
+  // Config
+  const pumpType = document.getElementById('selPumpType').value;
+  const CL_in = rv('inpCL');
+  const CL_m = imp ? (isFinite(CL_in) ? CL_in * 0.3048 : 0) : (isFinite(CL_in) ? CL_in : 0);
+  const N_rpm = readFinite('inpSpeed', NaN);
+  const N_stages = parseInt(document.getElementById('inpStages').value, 10);
+
+  // Validation
+  let ok = true;
+  if (!isFinite(rho) || rho <= 0) { showErr('errRho'); ok = false; }
+  if (!isFinite(Q_m3h) || Q_m3h <= 0) { showErr('errFlow'); ok = false; }
+  if (!isFinite(mu_cP) || mu_cP <= 0) { showErr('errMu'); ok = false; }
+  if (!isFinite(Pvap_kPa) || Pvap_kPa < 0) { showErr('errPvap'); ok = false; }
+  if (!Number.isFinite(mRec) || mRec < 0 || !Number.isFinite(mFlow) || mFlow < 0) {
+    document.getElementById('globalErr').style.display = 'flex';
+    document.getElementById('globalErrText').textContent = 'Flow margins must be finite and non-negative.';
+    ok = false;
+  }
+  if (!Number.isFinite(N_rpm) || N_rpm <= 0) {
+    document.getElementById('globalErr').style.display = 'flex';
+    document.getElementById('globalErrText').textContent = 'Pump speed must be greater than zero for pump screening outputs.';
+    ok = false;
+  }
+  if (pumpType === 'centrifugal' && (!Number.isInteger(N_stages) || N_stages < 1)) {
+    document.getElementById('globalErr').style.display = 'flex';
+    document.getElementById('globalErrText').textContent = 'Number of stages must be an integer greater than or equal to 1.';
+    ok = false;
+  }
+
+  // Suction
+  const Pves_suc_in = rv('inpPsucVessel');
+  const Pves_suc_kPa = isFinite(Pves_suc_in) ? (imp ? Pves_suc_in * 6.89476 : Pves_suc_in) : NaN;
+  if (!isFinite(Pves_suc_kPa) || Pves_suc_kPa <= 0) { showErr('errPsucVessel'); ok = false; }
+
+  const Lsuc_in = rv('inpLsuc');
+  const Lsuc_m = isFinite(Lsuc_in) ? (imp ? Lsuc_in * 0.3048 : Lsuc_in) : NaN;
+  if (!isFinite(Lsuc_m)) { showErr('errLsuc'); ok = false; }
+
+  const DPline_suc_in = rv('inpDPsucLine');
+  const DPline_suc_kPa = isFinite(DPline_suc_in) ? (imp ? DPline_suc_in * 6.89476 : DPline_suc_in) : 0;
+
+  // Discharge
+  const Pves_dis_in = rv('inpPdisVessel');
+  const Pves_dis_kPa = isFinite(Pves_dis_in) ? (imp ? Pves_dis_in * 6.89476 : Pves_dis_in) : NaN;
+  if (!isFinite(Pves_dis_kPa) || Pves_dis_kPa <= 0) { showErr('errPdisVessel'); ok = false; }
+
+  const Ldis_in = rv('inpLdis');
+  const Ldis_m = isFinite(Ldis_in) ? (imp ? Ldis_in * 0.3048 : Ldis_in) : NaN;
+  if (!isFinite(Ldis_m)) { showErr('errLdis'); ok = false; }
+
+  const DPline_dis_in = rv('inpDPdisLine');
+  const DPline_dis_kPa = isFinite(DPline_dis_in) ? (imp ? DPline_dis_in * 6.89476 : DPline_dis_in) : 0;
+  const DPCV_in = rv('inpDPCV');
+  const DPCV_kPa = isFinite(DPCV_in) ? (imp ? DPCV_in * 6.89476 : DPCV_in) : 0;
+  const DPeq_in = rv('inpDPeq');
+  const DPeq_kPa = isFinite(DPeq_in) ? (imp ? DPeq_in * 6.89476 : DPeq_in) : 0;
+
+  if (!ok) { hideResults(); return; }
+
+  // Optional/documentation temperature inputs
+  const T_oper_in = readFinite('inpTemp', NaN);
+  const T_max_in = readFinite('inpTempMax', NaN);
+
+  // Acceleration head (reciprocating)
+  let Ha_kPa = 0, Ha_m = 0;
+  if (pumpType === 'reciprocating') {
+    const Lsline_in = rv('inpSucLength');
+    const Lsline_m = isFinite(Lsline_in) ? (imp ? Lsline_in * 0.3048 : Lsline_in) : 0;
+    const Dsline_in = rv('inpSucID');
+    const Dsline_mm = isFinite(Dsline_in) ? (imp ? Dsline_in * 25.4 : Dsline_in) : 200;
+    const Dsline_m_val = Dsline_mm / 1000;
+    const C_val = parseFloat(document.getElementById('selC').value);
+    const k_val = parseFloat(document.getElementById('selK').value);
+    if (Lsline_m > 0 && Dsline_m_val > 0) {
+      const A_sline = Math.PI * Dsline_m_val * Dsline_m_val / 4;
+      const v_sline = Q_design_m3s / A_sline;
+      Ha_m = Lsline_m * v_sline * N_rpm / (C_val * k_val * G);
+      Ha_kPa = Ha_m * rho * G / 1000;
+    }
+  }
+
+  // Suction head
+  const P_level_suc_kPa = rho * G * (Lsuc_m - CL_m) / 1000;
+  const P_suc_kPaa = Pves_suc_kPa + P_level_suc_kPa - DPline_suc_kPa - Ha_kPa;
+  const H_suc_m = P_suc_kPaa * 1000 / (rho * G);
+
+  // NPSH
+  const NPSH_calc_kPa = P_suc_kPaa - Pvap_kPa;
+  const NPSH_calc_m = NPSH_calc_kPa * 1000 / (rho * G);
+  const npshMargin_in = readFinite('inpNPSHMargin', NaN);
+  const NPSH_margin_m = imp ? npshMargin_in * 0.3048 : npshMargin_in;
+  const NPSHr_allow_m = NPSH_calc_m - NPSH_margin_m;
+  const NPSHr_allow_kPa = NPSHr_allow_m * rho * G / 1000;
+
+  // Discharge head
+  const P_level_dis_kPa = rho * G * (Ldis_m - CL_m) / 1000;
+  const P_dis_kPaa = Pves_dis_kPa + P_level_dis_kPa + DPline_dis_kPa + DPCV_kPa + DPeq_kPa;
+  const H_dis_m = P_dis_kPaa * 1000 / (rho * G);
+
+  // Differential
+  const dP_diff_kPa = P_dis_kPaa - P_suc_kPaa;
+  const dP_diff_bar = dP_diff_kPa / 100;
+  const H_diff_m = H_dis_m - H_suc_m;
+
+  if (!Number.isFinite(NPSH_margin_m) || NPSH_margin_m < 0) {
+    document.getElementById('globalErr').style.display = 'flex';
+    document.getElementById('globalErrText').textContent = 'NPSH margin allowance must be finite and non-negative.';
+    hideResults();
+    return;
+  }
+  if (dP_diff_kPa <= 0 || H_diff_m <= 0) {
+    document.getElementById('globalErr').style.display = 'flex';
+    document.getElementById('globalErrText').textContent = 'Calculation blocked: discharge pressure/head must be higher than suction pressure/head for pump sizing.';
+    hideResults();
+    return;
+  }
+
+  // Power
+  const P_hyd_kW = dP_diff_kPa * Q_design_m3s;
+  const etaInput = readFinite('inpEff', NaN);
+  let eta;
+  let etaBasis;
+  if (Number.isFinite(etaInput)) {
+    if (etaInput <= 0 || etaInput > 100) {
+      document.getElementById('globalErr').style.display = 'flex';
+      document.getElementById('globalErrText').textContent = 'Pump efficiency must be between 0 and 100%.';
+      hideResults();
+      return;
+    }
+    eta = etaInput / 100;
+    etaBasis = 'user-entered';
+  } else if (pumpType === 'reciprocating') {
+    eta = 0.90; etaBasis = 'assumed 90% screening';
+  } else if (pumpType === 'screw') {
+    eta = 0.85; etaBasis = 'assumed 85% screening';
+  } else {
+    eta = Math.min(0.87, Math.max(0.35, 0.20 + 0.25 * Math.log10(Math.max(0.1, Q_design_m3h))));
+    etaBasis = 'auto screening estimate';
+  }
+  const P_est_kW = P_hyd_kW / eta;
+
+  // Shut-off
+  let P_suc_max_kPaa = null, P_shutoff_kPaa = null, H_shutoff_m = null;
+  const PPSV_in = rv('inpPSV');
+  const LHH_in = rv('inpLHH');
+  if (isFinite(PPSV_in) && PPSV_in > 0 && isFinite(LHH_in)) {
+    const PPSV_kPa = imp ? PPSV_in * 6.89476 : PPSV_in;
+    const LHH_m = imp ? LHH_in * 0.3048 : LHH_in;
+    const P_HH_kPa = rho * G * (LHH_m - CL_m) / 1000;
+    P_suc_max_kPaa = PPSV_kPa + P_HH_kPa;
+    const soRatio = readFinite('inpSORatio', pumpType === 'centrifugal' ? 1.25 : 1.0);
+    if (!Number.isFinite(soRatio) || soRatio < 1) {
+      document.getElementById('globalErr').style.display = 'flex';
+      document.getElementById('globalErrText').textContent = 'Shut-off/rated head ratio must be at least 1.0.';
+      hideResults();
+      return;
+    }
+    const shutoffRatio = (pumpType === 'centrifugal') ? soRatio : 1.0;
+    P_shutoff_kPaa = P_suc_max_kPaa + shutoffRatio * dP_diff_kPa;
+    H_shutoff_m = P_shutoff_kPaa * 1000 / (rho * G);
+  }
+
+  // Centrifugal details
+  let centDetails = null;
+  if (pumpType === 'centrifugal' && N_rpm > 0 && N_stages >= 1 && H_diff_m > 0 && Q_design_m3s > 0) {
+    const H_ps = H_diff_m / N_stages;
+    const H_ps_ft = H_ps * 3.28084;
+    const Ns_SI = N_rpm * Math.sqrt(Q_design_m3s) / Math.pow(H_ps, 0.75);
+    const Ns_Eng = N_rpm * Math.sqrt(Q_design_gpm) / Math.pow(H_ps_ft, 0.75);
+    const pClass = Ns_SI < 15 ? 'Radial Flow' : (Ns_SI < 70 ? 'Mixed Flow' : 'Axial Flow');
+    const D_imp_m = (60 / (Math.PI * N_rpm)) * Math.sqrt(2 * G * H_ps / 0.75);
+    const D_imp_mm = D_imp_m * 1000;
+    const D_imp_in = D_imp_mm / 25.4;
+    centDetails = { N_stages, H_ps, H_ps_ft, Ns_SI, Ns_Eng, pClass, D_imp_mm, D_imp_in };
+  }
+
+  // Warnings
+  const warnings = [];
+  if (NPSH_calc_m <= 0) warnings.push('Calculated NPSHa is negative — pump will cavitate. Increase suction pressure or reduce flow.');
+  else if (NPSHr_allow_m < 0) warnings.push('NPSHa is less than the selected screening margin. Vendor NPSHr must be below NPSHa with project margin.');
+  else if (NPSHr_allow_m < 2.0) warnings.push('Maximum allowable vendor NPSHr after margin = ' + fmtN(NPSHr_allow_m, 2) + ' m — low margin. Verify against vendor NPSHr curve.');
+  if (P_hyd_kW > 500) warnings.push('Hydraulic power > 500 kW \u2014 verify motor sizing and derating factors.');
+  if (pumpType === 'centrifugal' && centDetails && (centDetails.Ns_SI > 100 || centDetails.Ns_SI < 2)) warnings.push('Specific speed N_s = ' + fmtN(centDetails.Ns_SI, 2) + ' is outside typical centrifugal range. Reconsider pump selection.');
+  if (Ha_m > 2) warnings.push('Acceleration head = ' + fmtN(Ha_m, 2) + ' m is significant — verify suction line length and diameter.');
+  if (pumpType === 'reciprocating') warnings.push('Reciprocating acceleration head is approximate screening only; final design requires vendor/pulsation study.');
+  if (pumpType === 'screw' || pumpType === 'reciprocating') warnings.push('Positive displacement pump maximum discharge pressure is governed by relief valve/blocked-discharge protection and vendor data.');
+  if (Number.isFinite(T_oper_in) && Number.isFinite(T_max_in) && T_max_in < T_oper_in) warnings.push('Maximum temperature is lower than operating temperature; verify vapor pressure and property basis.');
+  warnings.push('Temperature inputs are documentation basis only. Density, viscosity and vapor pressure must be entered at the applicable operating/maximum pumping temperature.');
+
+  // Build trace
+  const pF = imp ? 1/6.89476 : 1/100; // kPa → psi or bar
+  const pLbl = imp ? 'psi' : 'bar';
+  const hF = imp ? 3.28084 : 1;
+  const hLbl = imp ? 'ft' : 'm';
+  const powF = imp ? 1.34102 : 1;
+  const powLbl = imp ? 'hp' : 'kW';
+
+  const trace = [
+    'PUMP SIZING \u2014 ' + (pumpType === 'centrifugal' ? 'Centrifugal' : pumpType === 'reciprocating' ? 'Reciprocating' : 'Screw'),
+    '-----------------------------------------------------------',
+    '\u03c1       = ' + fmtN(rho) + ' kg/m\u00b3',
+    '\u03bc       = ' + fmtN(mu_cP) + ' cP',
+    'P_vap   = ' + fmtN(Pvap_kPa) + ' kPaa',
+    'Q       = ' + fmtN(Q_m3h) + ' m\u00b3/h  (nominal)',
+    'Q_des   = ' + fmtN(Q_design_m3h, 3) + ' m\u00b3/h  (with ' + mFlow + '% margin)',
+    'Q_des   = ' + fmtN(Q_design_m3s, 6) + ' m\u00b3/s',
+    'CL      = ' + fmtN(CL_m) + ' m  (pump centreline above grade)',
+    '-----------------------------------------------------------',
+    'SUCTION',
+    'P_vessel_suc = ' + fmtN(Pves_suc_kPa) + ' kPaa',
+    '\u03c1g\u00d7(Lsuc\u2212CL) = ' + fmtN(P_level_suc_kPa) + ' kPa  (Lsuc=' + fmtN(Lsuc_m) + ' m)',
+    '\u0394P_line_suc = ' + fmtN(DPline_suc_kPa) + ' kPa',
+    (Ha_kPa > 0 ? 'Ha (acc)  = ' + fmtN(Ha_kPa) + ' kPa  (' + fmtN(Ha_m) + ' m)' : ''),
+    'P_suc   = ' + fmtN(P_suc_kPaa) + ' kPaa  \u2192 H_suc = ' + fmtN(H_suc_m) + ' m',
+    '-----------------------------------------------------------',
+    'NPSH',
+    'NPSH_calc = P_suc \u2212 P_vap = ' + fmtN(NPSH_calc_kPa) + ' kPa  \u2192 ' + fmtN(NPSH_calc_m) + ' m',
+    'Margin allowance = ' + fmtN(NPSH_margin_m) + ' m  (screening input)',
+    'Max allowable NPSHr after margin = ' + fmtN(NPSHr_allow_kPa) + ' kPa  → ' + fmtN(NPSHr_allow_m) + ' m',
+    '-----------------------------------------------------------',
+    'DISCHARGE',
+    'P_vessel_dis = ' + fmtN(Pves_dis_kPa) + ' kPaa',
+    '\u03c1g\u00d7(Ldis\u2212CL) = ' + fmtN(P_level_dis_kPa) + ' kPa  (Ldis=' + fmtN(Ldis_m) + ' m)',
+    '\u0394P_line_dis = ' + fmtN(DPline_dis_kPa) + ' kPa',
+    '\u0394P_CV      = ' + fmtN(DPCV_kPa) + ' kPa',
+    '\u0394P_equip   = ' + fmtN(DPeq_kPa) + ' kPa',
+    'P_dis   = ' + fmtN(P_dis_kPaa) + ' kPaa  \u2192 H_dis = ' + fmtN(H_dis_m) + ' m',
+    '-----------------------------------------------------------',
+    'DIFFERENTIAL',
+    '\u0394P_diff = P_dis \u2212 P_suc = ' + fmtN(dP_diff_kPa) + ' kPa  \u2192 ' + fmtN(dP_diff_bar) + ' bar',
+    '\u0394H      = H_dis \u2212 H_suc = ' + fmtN(H_diff_m) + ' m',
+    '-----------------------------------------------------------',
+    'POWER',
+    'P_hyd  = \u0394P \u00d7 Q = ' + fmtN(dP_diff_kPa) + ' \u00d7 ' + fmtN(Q_design_m3s, 5) + ' = ' + fmtN(P_hyd_kW) + ' kW',
+    '\u03b7      = ' + fmtN(eta * 100, 1) + '%  (' + etaBasis + ')',
+    'P_est  = P_hyd / \u03b7 = ' + fmtN(P_est_kW) + ' kW',
+    (centDetails ? [
+      '-----------------------------------------------------------',
+      'CENTRIFUGAL DETAILS',
+      'N_stages = ' + N_stages,
+      'H/stage  = ' + fmtN(centDetails.H_ps) + ' m',
+      'N_s (SI) = N\u00d7\u221aQ[m\u00b3/s] / H_stage^0.75 = ' + fmtN(centDetails.Ns_SI),
+      'N_s (Eng)= ' + fmtN(centDetails.Ns_Eng),
+      'Type     = ' + centDetails.pClass,
+      'D_imp    = ' + fmtN(centDetails.D_imp_mm) + ' mm  (\u03c8=0.75)',
+    ].join('\n') : ''),
+    (P_shutoff_kPaa ? [
+      '-----------------------------------------------------------',
+      'SHUT-OFF PRESSURE',
+      'P_suc_max = PSV + \u03c1g(HH\u2212CL) = ' + fmtN(P_suc_max_kPaa) + ' kPaa',
+      'P_shutoff = P_suc_max + 1.25\u00d7\u0394P = ' + fmtN(P_shutoff_kPaa) + ' kPaa',
+      'H_shutoff = ' + fmtN(H_shutoff_m) + ' m',
+    ].join('\n') : ''),
+  ].filter(Boolean).join('\n');
+
+  renderResults({
+    Q_design_m3h, Q_design_gpm, Q_design_m3s,
+    Pves_suc_kPa, P_suc_kPaa, H_suc_m, Pvap_kPa, Ha_kPa, Ha_m,
+    NPSH_calc_kPa, NPSH_calc_m, NPSH_margin_m, NPSHr_allow_m, NPSHr_allow_kPa,
+    P_dis_kPaa, H_dis_m,
+    dP_diff_kPa, dP_diff_bar, H_diff_m,
+    P_hyd_kW, eta, etaBasis, P_est_kW,
+    P_suc_max_kPaa, P_shutoff_kPaa, H_shutoff_m,
+    pumpType, centDetails, warnings, trace,
+    rho, N_rpm, N_stages,
+  });
+}
+
+function rr(label, val, unit, cls='') {
+  return `<div class="res-row${cls ? ' ' + cls : ''}"><span class="res-lbl">${label}</span><span><span class="res-val">${val}</span><span class="res-unit">${unit}</span></span></div>`;
+}
+
+function renderResults(r) {
+  const imp = unitSys === 'IMP';
+  // Conversion factors
+  const pA = (v) => imp ? fmtN(v / 6.89476, 4) : fmtN(v / 100, 4);          // kPaa → psia or bar
+  const pAu = imp ? 'psia' : 'bar';
+  const pD = (v) => imp ? fmtN(v / 6.89476, 4) : fmtN(v / 100, 4);           // kPa diff → psi or bar
+  const pDu = imp ? 'psi' : 'bar';
+  const pAkPa = (v) => imp ? fmtN(v / 6.89476, 4) : fmtN(v, 4);              // kPaa → psia or kPaa
+  const pAkPAu = imp ? 'psia' : 'kPaa';
+  const pDkPa = (v) => imp ? fmtN(v / 6.89476, 4) : fmtN(v, 4);              // kPa → psi or kPa
+  const pDkPAu = imp ? 'psi' : 'kPa';
+  const h = (v) => fmtN(imp ? v * 3.28084 : v, 4);
+  const hu = imp ? 'ft' : 'm';
+  const q = (v_m3h) => fmtN(imp ? v_m3h * 4.40287 : v_m3h, 3);
+  const qu = imp ? 'USgpm' : 'm\u00b3/h';
+  const pw = (v_kW) => fmtN(imp ? v_kW * 1.34102 : v_kW, 3);
+  const pwu = imp ? 'hp' : 'kW';
+  const diam = (v_mm) => fmtN(imp ? v_mm / 25.4 : v_mm, 1);
+  const diamu = imp ? 'in' : 'mm';
+
+  // Big KPI
+  document.getElementById('bigDP').textContent = pD(r.dP_diff_kPa);
+  document.getElementById('kpiDPUnit').textContent = pDu;
+  document.getElementById('bigDPSub').innerHTML = 'Suc ' + pA(r.P_suc_kPaa) + ' ' + pAu + '\u00a0|\u00a0Dis ' + pA(r.P_dis_kPaa) + ' ' + pAu;
+  document.getElementById('bigHead').textContent = h(r.H_diff_m);
+  document.getElementById('kpiHeadUnit').textContent = hu;
+  document.getElementById('bigHeadSub').innerHTML = 'Suc ' + h(r.H_suc_m) + ' ' + hu + '\u00a0|\u00a0Dis ' + h(r.H_dis_m) + ' ' + hu;
+
+  // Power KPIs
+  document.getElementById('bigPower').textContent = pw(r.P_est_kW);
+  document.getElementById('kpiPowerUnit').textContent = pwu;
+  document.getElementById('bigPowerSub').textContent = '\u03b7 = ' + fmtN(r.eta * 100, 1) + '%';
+  document.getElementById('bigPowHyd').textContent = pw(r.P_hyd_kW);
+  document.getElementById('kpiPowHydUnit').textContent = pwu;
+  document.getElementById('bigPowHydSub').textContent = 'At design flowrate';
+
+  // Unit badge & pump badge
+  document.getElementById('unitBadge').textContent = imp ? 'Imperial' : 'SI';
+  const ptLabels = {centrifugal: 'Centrifugal', reciprocating: 'Reciprocating', screw: 'Screw'};
+  const ptCls = {centrifugal: 'pb-cent', reciprocating: 'pb-recip', screw: 'pb-screw'};
+  document.getElementById('pumpTypeBadge').innerHTML = `<span class="pump-badge ${ptCls[r.pumpType]}">${ptLabels[r.pumpType]}</span>`;
+
+  // Summary grid
+  document.getElementById('summaryGrid').innerHTML = [
+    rr('Design Flowrate', q(r.Q_design_m3h), qu, 'hl'),
+    rr('Differential Pressure', pD(r.dP_diff_kPa), pDu, 'hl'),
+    rr('Differential Head', h(r.H_diff_m), hu, 'hl'),
+    rr('Hydraulic Power', pw(r.P_hyd_kW), pwu),
+    rr('Pump Efficiency', fmtN(r.eta * 100, 1), '%'),
+    rr('Estimated Shaft Power', pw(r.P_est_kW), pwu, 'hl-amber'),
+  ].join('');
+
+  // Suction & NPSH
+  const npshCls = r.NPSHr_allow_m < 0 ? 'hl-red' : r.NPSHr_allow_m < 2 ? 'hl-amber' : 'hl-green';
+  document.getElementById('suctionGrid').innerHTML = [
+    rr('Suction Vessel Pressure', pAkPa(r.Pves_suc_kPa), pAkPAu),
+    rr('Pump Suction Pressure (abs)', pAkPa(r.P_suc_kPaa), pAkPAu, 'hl'),
+    rr('Suction Head', h(r.H_suc_m), hu),
+    r.Ha_m > 0 ? rr('Acceleration Head', h(r.Ha_m), hu) : '',
+    rr('Vapour Pressure', pAkPa(r.Pvap_kPa), pAkPAu),
+    rr('NPSHa Calculated', h(r.NPSH_calc_m), hu),
+    rr('Screening Margin Allowance', h(r.NPSH_margin_m), hu),
+    rr('Max Allowable Vendor NPSHr', h(r.NPSHr_allow_m), hu, npshCls),
+  ].filter(Boolean).join('');
+
+  // Discharge
+  document.getElementById('dischargeGrid').innerHTML = [
+    rr('Discharge Head (abs)', pAkPa(r.P_dis_kPaa), pAkPAu, 'hl-green'),
+    rr('Discharge Head', h(r.H_dis_m), hu),
+    rr('Differential Pressure', pD(r.dP_diff_kPa), pDu, 'hl'),
+    rr('Differential Head', h(r.H_diff_m), hu, 'hl'),
+  ].join('');
+
+  // Power
+  const etaNote = r.etaBasis || (r.pumpType === 'centrifugal' ? 'auto screening estimate' : r.pumpType === 'reciprocating' ? 'Assumed 90%' : 'Assumed 85%');
+  document.getElementById('powerGrid').innerHTML = [
+    rr('Hydraulic Power', pw(r.P_hyd_kW), pwu, 'hl'),
+    rr('Pump Efficiency', fmtN(r.eta * 100, 1) + '  \u2014  ' + etaNote, '%'),
+    rr('Estimated Shaft Power', pw(r.P_est_kW), pwu, 'hl-amber'),
+  ].join('');
+
+  // Shut-off
+  if (r.P_shutoff_kPaa) {
+    document.getElementById('shutoffGrid').innerHTML = [
+      rr('Max Suction Pressure', pAkPa(r.P_suc_max_kPaa), pAkPAu),
+      rr('Max Shut-off Pressure', pAkPa(r.P_shutoff_kPaa), pAkPAu, 'hl-red'),
+      rr('Max Shut-off Head', h(r.H_shutoff_m), hu),
+    ].join('');
+    document.getElementById('shutoffCard').style.display = 'block';
+  } else {
+    document.getElementById('shutoffCard').style.display = 'none';
+  }
+
+  // Centrifugal details
+  if (r.centDetails) {
+    const cd = r.centDetails;
+    const Disp_D = imp ? fmtN(cd.D_imp_in, 2) : fmtN(cd.D_imp_mm, 1);
+    const Disp_Du = imp ? 'in' : 'mm';
+    document.getElementById('centGrid').innerHTML = [
+      rr('Number of Stages', cd.N_stages, ''),
+      rr('Head per Stage', h(cd.H_ps), hu),
+      rr('Specific Speed N\u209b (SI)', fmtN(cd.Ns_SI, 3), ''),
+      rr('Specific Speed N\u209b (English)', fmtN(cd.Ns_Eng, 1), ''),
+      rr('Centrifugal Pump Type', cd.pClass, '', 'hl'),
+      rr('Impeller Diameter (est.)', Disp_D, Disp_Du),
+      rr('Pump Speed', fmtN(r.N_rpm, 0), 'rpm'),
+    ].join('');
+    document.getElementById('centCard').style.display = 'block';
+  } else {
+    document.getElementById('centCard').style.display = 'none';
+  }
+
+  // Warnings
+  const wb = document.getElementById('warningsCard');
+  if (r.warnings.length) {
+    wb.style.display = 'flex';
+    document.getElementById('warningsText').innerHTML = r.warnings.map((w, i) => `<span style="display:block">${i + 1}. ${w}</span>`).join('');
+  } else wb.style.display = 'none';
+
+  // Show/hide cards
+  document.getElementById('placeholderCard').style.display = 'none';
+  document.getElementById('summaryCard').style.display = 'block';
+  document.getElementById('suctionCard').style.display = 'block';
+  document.getElementById('dischargeCard').style.display = 'block';
+  document.getElementById('powerCard').style.display = 'block';
+  document.getElementById('traceAccordion').style.display = 'block';
+  document.getElementById('traceBox').textContent = r.trace;
+
+  lucide.createIcons();
+}
+
+function loadTestCase() {
+  if (unitSys !== 'SI') setUnits('SI');
+  document.getElementById('selPumpType').value = 'centrifugal';
+  onPumpTypeChange();
+  document.getElementById('inpTemp').value = '25';
+  document.getElementById('inpTempMax').value = '40';
+  document.getElementById('inpMu').value = '0.8904';
+  document.getElementById('inpRho').value = '1007';
+  document.getElementById('inpPvap').value = '7.294';
+  document.getElementById('inpFlow').value = '23';
+  document.getElementById('inpMarginRec').value = '0';
+  document.getElementById('inpMarginFlow').value = '10';
+  document.getElementById('inpCL').value = '0.61';
+  document.getElementById('inpSpeed').value = '180';
+  document.getElementById('inpStages').value = '39';
+  document.getElementById('inpNPSHMargin').value = '1.0';
+  document.getElementById('inpEff').value = '';
+  document.getElementById('inpSORatio').value = '1.25';
+  document.getElementById('inpPsucVessel').value = '101.325';
+  document.getElementById('inpLsuc').value = '8.0';
+  document.getElementById('inpDPsucLine').value = '2.8';
+  document.getElementById('inpPdisVessel').value = '700';
+  document.getElementById('inpLdis').value = '12.0';
+  document.getElementById('inpDPdisLine').value = '16.3';
+  document.getElementById('inpDPCV').value = '0';
+  document.getElementById('inpDPeq').value = '0';
+  document.getElementById('inpPSV').value = '300';
+  document.getElementById('inpLHH').value = '10.0';
+  calculate();
+}
+
+function resetForm() {
+  ['inpTemp','inpTempMax','inpMu','inpRho','inpPvap','inpFlow',
+   'inpCL','inpSpeed','inpPsucVessel','inpLsuc','inpDPsucLine',
+   'inpSucLength','inpSucID',
+   'inpPdisVessel','inpLdis','inpDPdisLine','inpDPCV','inpDPeq',
+   'inpPSV','inpLHH','inpEff','inpNPSHMargin','inpSORatio'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('inpMarginRec').value = '0';
+  document.getElementById('inpMarginFlow').value = '10';
+  document.getElementById('inpCL').value = '0';
+  document.getElementById('inpStages').value = '1';
+  document.getElementById('inpNPSHMargin').value = unitSys === 'SI' ? '1.0' : '3.281';
+  document.getElementById('inpSORatio').value = '1.25';
+  clearErrors();
+  hideResults();
+}
+
+function toggleAcc(bodyId, trigger) {
+  const body = document.getElementById(bodyId);
+  const open = body.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', open);
+}
+
+function toggleTheme() {
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  ['themeIconD','themeIconM'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('data-lucide', t === 'dark' ? 'moon' : 'sun');
+  });
+  lucide.createIcons();
+}
+
+function toggleMenu() {
+  const m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open') ? 'x' : 'menu');
+  lucide.createIcons();
+}
+
+function printCalc() {
+  const g = id => document.getElementById(id)?.value?.trim() || '\u2014';
+  document.getElementById('ph_company').textContent = g('docCompany');
+  document.getElementById('ph_project').textContent = g('docProject');
+  document.getElementById('ph_docname').textContent = g('docName');
+  document.getElementById('ph_number').textContent = g('docNumber');
+  document.getElementById('ph_rev').textContent = g('docRev');
+  document.getElementById('ph_line').textContent = g('docLine');
+  const _pd = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+  document.getElementById('ph_date').textContent = _pd;
+  document.getElementById('pf_docname').textContent = (g('docName') === '\u2014' ? 'Pump Sizing Calculation' : g('docName'));
+  document.getElementById('pf_docnumber').textContent = (g('docNumber') === '\u2014' ? '' : g('docNumber'));
+  document.getElementById('pf_date').textContent = _pd;
+
+  const imp = unitSys === 'IMP';
+  const pumpType = document.getElementById('selPumpType').value;
+  const rv2 = id => document.getElementById(id)?.value || '\u2014';
+
+  const rows = [
+    ['Fluid Temperature', rv2('inpTemp'), imp ? '\u00b0F' : '\u00b0C', ''],
+    ['Max Temperature', rv2('inpTempMax'), imp ? '\u00b0F' : '\u00b0C', ''],
+    ['Viscosity (\u03bc)', rv2('inpMu'), 'cP', ''],
+    ['Density (\u03c1)', rv2('inpRho'), imp ? 'lb/ft\u00b3' : 'kg/m\u00b3', ''],
+    ['Vapour Pressure', rv2('inpPvap'), imp ? 'psia' : 'kPaa', 'At max temperature'],
+    ['Volumetric Flowrate', rv2('inpFlow'), imp ? 'USgpm' : 'm\u00b3/h', ''],
+    ['Recycle Margin', rv2('inpMarginRec'), '%', 'Continuous flow recycle'],
+    ['Design Margin, Flow', rv2('inpMarginFlow'), '%', ''],
+    ['Pump Type', pumpType.charAt(0).toUpperCase() + pumpType.slice(1), '', ''],
+    ['Pump CL Elevation', rv2('inpCL'), imp ? 'ft' : 'm', 'Above grade'],
+    ['Pump Speed', rv2('inpSpeed'), 'rpm', ''],
+    pumpType === 'centrifugal' ? ['Number of Stages', rv2('inpStages'), '', ''] : null,
+    ['NPSH Margin Allowance', rv2('inpNPSHMargin'), imp ? 'ft' : 'm', 'Screening allowance only'],
+    ['Pump Efficiency', rv2('inpEff') || 'Auto', '%', 'Blank = screening estimate'],
+    ['Suction Vessel Pressure', rv2('inpPsucVessel'), imp ? 'psia' : 'kPaa', ''],
+    ['Suction Liquid Level', rv2('inpLsuc'), imp ? 'ft' : 'm', 'Above grade'],
+    ['Suction Line \u0394P', rv2('inpDPsucLine'), imp ? 'psi' : 'kPa', ''],
+    pumpType === 'reciprocating' ? ['Suction Line Length', rv2('inpSucLength'), imp ? 'ft' : 'm', ''] : null,
+    pumpType === 'reciprocating' ? ['Suction Line ID', rv2('inpSucID'), imp ? 'in' : 'mm', ''] : null,
+    pumpType === 'reciprocating' ? ['Pump Constant C', document.getElementById('selC').value, '', document.getElementById('selC').options[document.getElementById('selC').selectedIndex].text] : null,
+    pumpType === 'reciprocating' ? ['Compressibility k', document.getElementById('selK').value, '', document.getElementById('selK').options[document.getElementById('selK').selectedIndex].text] : null,
+    ['Discharge Vessel Pressure', rv2('inpPdisVessel'), imp ? 'psia' : 'kPaa', ''],
+    ['Discharge Liquid Level', rv2('inpLdis'), imp ? 'ft' : 'm', 'Above grade'],
+    ['Discharge Line \u0394P', rv2('inpDPdisLine'), imp ? 'psi' : 'kPa', ''],
+    ['Control Valve \u0394P', rv2('inpDPCV'), imp ? 'psi' : 'kPa', ''],
+    ['Equipment \u0394P', rv2('inpDPeq'), imp ? 'psi' : 'kPa', ''],
+    ['Max Suction Source Pressure', rv2('inpPSV'), imp ? 'psia' : 'kPaa', 'Absolute basis for shut-off screening'],
+    ['Vessel HH Level', rv2('inpLHH'), imp ? 'ft' : 'm', 'Above grade'],
+    ['Shut-off / Rated Head Ratio', rv2('inpSORatio'), '', 'Centrifugal screening assumption'],
+    ['Unit System', unitSys, '', ''],
+  ].filter(Boolean);
+
+  document.getElementById('printInputBody').innerHTML = rows.map((r, i) =>
+    `<tr style="background:${i % 2 === 0 ? '#fff' : '#f3f6fb'}">` +
+    `<td style="padding:3pt 6pt;border:1px solid #d0d7e3;font-weight:500;color:#111;font-size:8pt">${r[0]}</td>` +
+    `<td style="padding:3pt 6pt;border:1px solid #d0d7e3;text-align:right;font-variant-numeric:tabular-nums;color:#111;font-size:8pt">${r[1]}</td>` +
+    `<td style="padding:3pt 6pt;border:1px solid #d0d7e3;color:#444;font-size:8pt">${r[2]}</td>` +
+    `<td style="padding:3pt 6pt;border:1px solid #d0d7e3;color:#666;font-size:7.5pt">${r[3]}</td></tr>`
+  ).join('');
+
+  const _w = window.open('', '_blank', 'width=900,height=700');
+  _w.document.open();
+  _w.document.write('<!DOCTYPE html><html><head>'
+    + '<meta charset="UTF-8">'
+    + '<style>'
+    + '@page{size:A4;margin:1.1cm 1.2cm 1.3cm 1.2cm}'
+    + '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}'
+    + 'html,body{margin:0;padding:0;background:#fff}'
+    + '</style>'
+    + '</head><body>'
+    + document.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi, '')
+    + '</body></html>');
+  _w.document.close();
+  _w.focus();
+  setTimeout(() => { _w.print(); _w.close(); }, 600);
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+onPumpTypeChange();
+lucide.createIcons();
+</script>
+</body>
+</html>
