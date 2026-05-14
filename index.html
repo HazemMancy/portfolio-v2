@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hazem ElMancy — Oil & Gas Process Engineer</title>
   <meta name="description" content="Process Engineer specializing in Oil & Gas FEED and detailed design." />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="shortcut icon" type="image/png" href="favicon.png" />
+  <link rel="apple-touch-icon" href="favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -232,10 +235,10 @@
 
 <section class="section">
   <div class="container-md">
-    <div class="section-header"><p class="section-label mb-3">TOOLS</p><h2 class="section-title">Engineering Calculators</h2><p class="section-desc">42 process engineering screening tools built on industry-standard equations</p></div>
+    <div class="section-header"><p class="section-label mb-3">TOOLS</p><h2 class="section-title">Engineering Calculators</h2><p class="section-desc">7 live process engineering screening tools built on defensible screening-level calculations</p></div>
     <div id="calcPreviewContainer"></div>
     <div class="calc-actions">
-      <a href="calculators/index.html" class="btn btn-outline"><i data-lucide="calculator" style="width:16px;height:16px"></i>View All 42 Calculators</a>
+      <a href="calculators/index.html" class="btn btn-outline"><i data-lucide="calculator" style="width:16px;height:16px"></i>View All Calculators</a>
     </div>
     <div class="disclaimer">
       <i data-lucide="triangle-alert" style="width:16px;height:16px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
@@ -392,21 +395,17 @@ const projects = [
 ];
 const calcPreview = [
   { cat:'Fluids', items:[
-    { title:'Gas Mixing', icon:'blend', standard:'Mole fraction weighted MW · auto-normalisation', status:'live', href:'calculators/gas-mixing.html' },
+    { title:'Gas Mixing', icon:'blend', standard:'Gas composition · MW · Z-factor options', status:'live', href:'calculators/gas-mixing.html' },
     { title:'Gas Volume Conversion', icon:'arrow-left-right', standard:'Real gas · Z-factor correction', status:'live', href:'calculators/gas-volume.html' },
   ]},
-  { cat:'Piping', items:[
-    { title:'Pipe Wall Thickness', icon:'layers', standard:'ASME B31.3 / B31.4 / B31.8', status:'live', href:'calculators/pipe-wall-thickness.html' },
+  { cat:'Hydraulics', items:[
+    { title:'Single Phase Liquid Hydraulics', icon:'droplets', standard:'Darcy-Weisbach · fittings K-losses · service checks', status:'live', href:'calculators/liquid-hydraulics.html' },
+    { title:'Single Phase Gas Hydraulics', icon:'wind', standard:'Real-gas density · Darcy-Weisbach · fittings K-losses', status:'live', href:'calculators/gas-hydraulics.html' },
+    { title:'Mixed-Phase Line Sizing', icon:'waves', standard:'Friedel · Chisholm-Baroczy · Beggs & Brill screening', status:'live', href:'calculators/mixed-phase-hydraulics.html' },
+    { title:'Surge Pressure', icon:'activity', standard:'Joukowsky surge · wave celerity · pipe period', status:'live', href:'calculators/surge-pressure.html' },
   ]},
   { cat:'Equipment', items:[
-    { title:'Shell & Tube HEX Preliminary Sizing', icon:'thermometer', standard:'LMTD · TEMA fouling allowance', status:'wip', href:'#' },
-    { title:'Separator Sizing Calculation Sheets', icon:'container', standard:'API 12J', status:'wip', href:'#' },
-    { title:'Horizontal 2-Phase Separator Tool', icon:'container', standard:'API 12J · settling theory', status:'wip', href:'#' },
-  ]},
-  { cat:'Relief', items:[
-    { title:'PSV Relief Sizing Tool', icon:'shield', standard:'API 520 · API 521', status:'wip', href:'#' },
-    { title:'Atmospheric Tank Venting (API 2000)', icon:'cloud-rain', standard:'API 2000 5th Ed.', status:'wip', href:'#' },
-    { title:'Relief Valve Sizing', icon:'shield', standard:'API 520', status:'wip', href:'#' },
+    { title:'Pump Sizing', icon:'gauge', standard:'Head · NPSHa · hydraulic & shaft power', status:'live', href:'calculators/pump-sizing.html' },
   ]},
 ];
 function renderResponsibilities(id) {
