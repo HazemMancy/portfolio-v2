@@ -53,10 +53,10 @@
     .card-body{padding:1.25rem}
     .field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem;font-weight:500}
     .field-note{font-size:.62rem;color:var(--muted);margin-top:.25rem;line-height:1.5}
-    input[type=number],select{font-family:var(--font);padding:.45rem .65rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);outline:none;transition:border-color .15s;width:100%}
+    input[type=number],input[type=text],select{font-family:var(--font);padding:.45rem .65rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.8rem;color:var(--foreground);outline:none;transition:border-color .15s;width:100%}
     input[type=number]{-moz-appearance:textfield}
     input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
-    input[type=number]:focus,select:focus{border-color:var(--primary)}
+    input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--primary)}
     input.err{border-color:hsl(0,72%,55%)}
     input[type=number][readonly]{background:var(--secondary-bg);color:var(--primary);cursor:default;border-color:hsl(217,91%,60%,.3)}
     .err-msg{font-size:.65rem;color:hsl(0,72%,65%);margin-top:.25rem}
@@ -132,6 +132,43 @@
     .mini-btn:hover{background:var(--secondary-bg);color:var(--foreground)}
     .mini-total-row td{background:var(--secondary-bg);font-weight:600;font-size:.68rem}
     .norm-ok-mini{color:hsl(142,71%,55%)} .norm-warn-mini{color:hsl(38,92%,60%)}
+
+
+    /* Document / Project reference + one-page A4 print report */
+    .doc-hd-wrap{max-width:72rem;margin:0 auto;padding:.85rem 1rem 0}
+    .doc-hd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem}
+    .doc-hd-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+    .doc-grid{display:grid;gap:.55rem;grid-template-columns:1fr}
+    @media(min-width:640px){.doc-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1024px){.doc-grid{grid-template-columns:repeat(3,1fr)}}
+    .doc-grid input[type=text]{font-family:var(--font);padding:.42rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.78rem;color:var(--foreground);outline:none;width:100%}
+    .doc-grid input[type=text]:focus{border-color:var(--primary)}
+    #printReport{display:none}
+    @media print{
+      @page{size:A4;margin:.90cm .95cm .90cm .95cm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box!important}
+      html,body{background:#fff!important;color:#111!important;margin:0!important;padding:0!important;font-family:Inter,Arial,sans-serif!important;font-size:9.0pt!important;line-height:1.36!important;width:100%!important}
+      #navbar,.mobile-menu,.page-header,.calc-layout,footer,#docHdWrap{display:none!important}
+      #printReport{display:block!important;position:relative!important;width:100%!important;min-height:27.45cm!important;height:27.45cm!important;max-height:27.45cm!important;overflow:hidden!important;color:#111!important;background:#fff!important;break-after:avoid!important;page-break-after:avoid!important;padding-bottom:.58cm!important}
+      #printReport table{width:100%;border-collapse:collapse!important;table-layout:fixed!important;font-size:8.55pt!important;line-height:1.32!important}
+      #printReport th,#printReport td{border:1px solid #cfd7e6!important;padding:4.8pt 5.8pt!important;vertical-align:top!important;word-wrap:break-word!important;overflow-wrap:anywhere!important;color:#111!important}
+      #printReport th{background:#e8f0fe!important;color:#111!important;font-weight:800!important}
+      .pr-top{border-bottom:2px solid #1a56db!important;margin-bottom:.36cm!important;padding-bottom:.28cm!important}
+      .pr-title{font-size:18pt!important;font-weight:800!important;color:#1a56db!important;line-height:1.08!important;margin:0!important;letter-spacing:-.02em!important}
+      .pr-sub{font-size:8.6pt!important;color:#333!important;margin-top:4pt!important;line-height:1.35!important}
+      .pr-disclaimer{font-size:7.8pt!important;color:#666!important;font-style:italic!important;margin-top:3pt!important;line-height:1.35!important}
+      .pr-section-title{font-size:9.0pt!important;font-weight:800!important;letter-spacing:.055em!important;color:#1a56db!important;margin:.34cm 0 .13cm!important;text-transform:uppercase!important}
+      .pr-kpi-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:.24cm!important;margin:.15cm 0 .34cm!important}
+      .pr-kpi{border:1px solid #c5cfe8!important;background:#f3f6fb!important;border-radius:5px!important;padding:11pt 6pt!important;text-align:center!important;min-height:66pt!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+      .pr-kpi-lbl{font-size:8.0pt!important;color:#555!important;margin-bottom:5pt!important;font-weight:600!important}
+      .pr-kpi-val{font-size:15.2pt!important;font-weight:800!important;color:#1a56db!important;line-height:1.12!important;white-space:normal!important}
+      .pr-grid-2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:.32cm!important;margin-bottom:.14cm!important}
+      .pr-small{font-size:8pt!important;color:#444!important;line-height:1.35!important}
+      .pr-note{background:#fef7e0!important;border:1px solid #e0b64b!important;color:#5f4700!important;padding:7pt 8pt!important;border-radius:5px!important;font-size:8.15pt!important;line-height:1.36!important;min-height:1.15cm!important;max-height:2.10cm!important;overflow:hidden!important}
+      #prEquation{font-size:7.9pt!important;line-height:1.38!important}
+      #prUnitsBody td,#prCompBody td{padding-top:4.3pt!important;padding-bottom:4.3pt!important}
+      .pr-footer{position:absolute!important;left:0!important;right:0!important;bottom:0!important;border-top:1px solid #c5cfe8!important;padding-top:5pt!important;font-size:8.0pt!important;color:#555!important;display:flex!important;justify-content:space-between!important;gap:.5cm!important;background:#fff!important}
+    }
   </style>
 </head>
 <body>
@@ -164,6 +201,97 @@
     <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.4rem;margin-top:.5rem"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
   </div>
 </header>
+
+<!-- DOCUMENT HEADER — screen only -->
+<div class="doc-hd-wrap" id="docHdWrap">
+  <div class="doc-hd-card">
+    <div class="doc-hd-title">
+      <i data-lucide="file-text" style="width:12px;height:12px"></i>
+      Document / Project Reference
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="printCalc()">
+        <i data-lucide="printer" style="width:11px;height:11px"></i>Export PDF
+      </button>
+    </div>
+    <div class="doc-grid">
+      <div><label class="field-label">Company</label><input type="text" id="docCompany" placeholder="e.g. X" /></div>
+      <div><label class="field-label">Project Name</label><input type="text" id="docProject" placeholder="e.g. FEED — Gas Volume Conversion" /></div>
+      <div><label class="field-label">Document Name</label><input type="text" id="docName" placeholder="e.g. Gas Volume Conversion" /></div>
+      <div><label class="field-label">Document Number</label><input type="text" id="docNumber" placeholder="e.g. PRJ-PR-CAL-0040" /></div>
+      <div><label class="field-label">Revision</label><input type="text" id="docRev" placeholder="e.g. A0" /></div>
+      <div><label class="field-label">Line Number / Tag</label><input type="text" id="docLine" placeholder='e.g. 8&quot;-FG-1001-A1A' /></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT REPORT — generated before printing, hidden on screen -->
+<div id="printReport">
+  <div class="pr-top">
+    <table style="border-collapse:collapse;width:100%;table-layout:fixed">
+      <tr>
+        <td style="width:54%;border:none!important;padding:0 8pt 0 0!important">
+          <div class="pr-title">Gas Volume Conversion</div>
+          <div class="pr-sub">Real-gas volume conversion using PV = ZnRT &middot; Manual / Generalized Z / PR / SRK Z-factor basis</div>
+          <div class="pr-disclaimer">Screening-level calculation. Confirm project reference conditions, gas composition and simulator Z-factors for EPC deliverables.</div>
+        </td>
+        <td style="border:none!important;padding:0!important">
+          <table>
+            <tr><th>Company</th><td id="prCompany">—</td><th>Doc. No.</th><td id="prDocNo">—</td></tr>
+            <tr><th>Project</th><td id="prProject">—</td><th>Rev.</th><td id="prRev">—</td></tr>
+            <tr><th>Document</th><td id="prDocName">—</td><th>Line / Tag</th><td id="prLine">—</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="pr-section-title">Calculation Summary</div>
+  <div class="pr-kpi-grid">
+    <div class="pr-kpi"><div class="pr-kpi-lbl">Source</div><div class="pr-kpi-val" id="prSourceFlow">—</div></div>
+    <div class="pr-kpi"><div class="pr-kpi-lbl">Target Result</div><div class="pr-kpi-val" id="prTargetFlow">—</div></div>
+    <div class="pr-kpi"><div class="pr-kpi-lbl">Source Z</div><div class="pr-kpi-val" id="prZ1">—</div></div>
+    <div class="pr-kpi"><div class="pr-kpi-lbl">Target Z</div><div class="pr-kpi-val" id="prZ2">—</div></div>
+  </div>
+  <div class="pr-grid-2">
+    <div>
+      <div class="pr-section-title">Source / Target Basis</div>
+      <table>
+        <tr><th>Item</th><th>Source</th><th>Target</th></tr>
+        <tr><td>Unit</td><td id="prFromUnit">—</td><td id="prToUnit">—</td></tr>
+        <tr><td>Conditions</td><td id="prFromCond">—</td><td id="prToCond">—</td></tr>
+        <tr><td>Z basis</td><td id="prFromZBasis">—</td><td id="prToZBasis">—</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="pr-section-title">Conversion Equation</div>
+      <table>
+        <tr><th>Equation</th></tr>
+        <tr><td id="prEquation" style="font-family:'Courier New',monospace;font-size:6.8pt">—</td></tr>
+      </table>
+      <div class="pr-section-title">Warnings / Limitations</div>
+      <div class="pr-note" id="prWarnings">—</div>
+    </div>
+  </div>
+  <div class="pr-grid-2">
+    <div>
+      <div class="pr-section-title">All Units Summary</div>
+      <table>
+        <thead><tr><th>Unit</th><th>Value</th><th>Basis</th></tr></thead>
+        <tbody id="prUnitsBody"><tr><td colspan="3">—</td></tr></tbody>
+      </table>
+    </div>
+    <div>
+      <div class="pr-section-title">EoS Composition Summary</div>
+      <table>
+        <thead><tr><th>Side</th><th>Component</th><th>mol %</th></tr></thead>
+        <tbody id="prCompBody"><tr><td colspan="3">Manual / fixed reference Z basis — no composition table used.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="pr-section-title">Reference Conditions</div>
+  <table>
+    <tr><th>Nm³/h</th><td>0 °C, 101.325 kPa(a), Zref = 1.000</td><th>Sm³/h</th><td>15 °C, 101.325 kPa(a), Zref = 1.000</td><th>SCFM / MMSCFD</th><td>60 °F, 14.696 psia, Zref = 1.000</td></tr>
+  </table>
+  <div class="pr-footer"><span id="prFooterDoc">Gas Volume Conversion</span><span id="prFooterDate">—</span></div>
+</div>
 
 <div class="page-header">
   <div class="page-header-inner">
@@ -300,9 +428,13 @@
                 <!-- Full composition mode (PR / SRK) -->
                 <div id="fromCompPanel" style="display:none;margin-top:.6rem">
                   <div class="comp-mini-wrap">
-                    <div class="comp-mini-hdr">
-                      <span class="comp-mini-title">Mixture Composition (mol %)</span>
-                      <div style="display:flex;gap:.3rem">
+                    <div class="comp-mini-hdr" style="gap:.4rem;flex-wrap:wrap">
+                      <span class="comp-mini-title">Gas-Mixing Composition (mol %)</span>
+                      <div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">
+                        <select class="mini-sel" style="width:125px" onchange="loadGasPreset('from',this.value);this.value=''">
+                          <option value="">Preset...</option><option value="lean">Lean NG</option><option value="rich">Rich NG</option><option value="sour">Sour Gas</option><option value="fuelgas">Fuel Gas</option><option value="h2rich">H₂-rich</option><option value="air">Air</option><option value="n2">Nitrogen</option>
+                        </select>
+                        <button class="mini-btn" onclick="copyComposition('to','from')" title="Copy target composition into source">Copy Target</button>
                         <button class="mini-btn" onclick="addCompRow('from')">+ Add</button>
                         <button class="mini-btn" onclick="normaliseComp('from')">Norm.</button>
                         <button class="mini-btn" onclick="clearComp('from')">Clear</button>
@@ -442,9 +574,13 @@
                 <!-- Full composition mode (PR / SRK) -->
                 <div id="toCompPanel" style="display:none;margin-top:.6rem">
                   <div class="comp-mini-wrap">
-                    <div class="comp-mini-hdr">
-                      <span class="comp-mini-title">Mixture Composition (mol %)</span>
-                      <div style="display:flex;gap:.3rem">
+                    <div class="comp-mini-hdr" style="gap:.4rem;flex-wrap:wrap">
+                      <span class="comp-mini-title">Gas-Mixing Composition (mol %)</span>
+                      <div style="display:flex;gap:.3rem;flex-wrap:wrap;align-items:center">
+                        <select class="mini-sel" style="width:125px" onchange="loadGasPreset('to',this.value);this.value=''">
+                          <option value="">Preset...</option><option value="lean">Lean NG</option><option value="rich">Rich NG</option><option value="sour">Sour Gas</option><option value="fuelgas">Fuel Gas</option><option value="h2rich">H₂-rich</option><option value="air">Air</option><option value="n2">Nitrogen</option>
+                        </select>
+                        <button class="mini-btn" onclick="copyComposition('from','to')" title="Copy source composition into target">Copy Source</button>
                         <button class="mini-btn" onclick="addCompRow('to')">+ Add</button>
                         <button class="mini-btn" onclick="normaliseComp('to')">Norm.</button>
                         <button class="mini-btn" onclick="clearComp('to')">Clear</button>
@@ -636,6 +772,16 @@ const DB = {
 };
 const COMP_NAMES = Object.keys(DB);
 
+const GAS_PRESETS = {
+  lean:    [['Methane',91.00],['Ethane',4.50],['Propane',1.20],['Nitrogen',1.50],['Carbon Dioxide',1.80]],
+  rich:    [['Methane',75.00],['Ethane',10.00],['Propane',6.00],['i-Butane',1.50],['n-Butane',2.00],['i-Pentane',0.80],['n-Pentane',0.60],['n-Hexane',0.50],['Carbon Dioxide',2.00],['Nitrogen',0.80],['Hydrogen Sulfide',0.80]],
+  sour:    [['Methane',72.00],['Ethane',5.00],['Propane',2.50],['Carbon Dioxide',8.00],['Hydrogen Sulfide',10.00],['Nitrogen',2.50]],
+  fuelgas: [['Methane',50.00],['Hydrogen',25.00],['Ethane',10.00],['Propane',5.00],['Ethylene',4.00],['Nitrogen',3.00],['Carbon Dioxide',2.00],['n-Butane',1.00]],
+  h2rich:  [['Hydrogen',80.00],['Methane',10.00],['Ethane',5.00],['Propane',2.50],['n-Butane',1.50],['n-Pentane',1.00]],
+  air:     [['Nitrogen',78.08],['Oxygen',20.95],['Argon',0.93],['Carbon Dioxide',0.04]],
+  n2:      [['Nitrogen',99.50],['Oxygen',0.30],['Argon',0.10],['Water Vapor',0.10]]
+};
+
 // ══════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════
@@ -725,18 +871,19 @@ function pitzerZ(Tr,Pr,omega){
 // ══════════════════════════════════════════════════════
 //  COMPOSITION TABLE HELPERS
 // ══════════════════════════════════════════════════════
-function addCompRow(side, name, mol){
+function addCompRow(side, name, mol, silent=false){
   const id=compRowId++;
   compRows[side].push({id, name:name||'Methane', mol:mol!==undefined?mol:''});
-  renderCompTable(side); calculate();
+  renderCompTable(side);
+  if(!silent){ syncEosCompositionFrom(side); calculate(); }
 }
 function removeCompRow(side,id){
   compRows[side]=compRows[side].filter(r=>r.id!==id);
-  renderCompTable(side); calculate();
+  renderCompTable(side); syncEosCompositionFrom(side); calculate();
 }
 function onCompName(side,id,val){
   const r=compRows[side].find(r=>r.id===id);
-  if(r){ r.name=val; calculate(); }
+  if(r){ r.name=val; syncEosCompositionFrom(side); calculate(); }
 }
 // FIX: do NOT call renderCompTable() here — it destroys the tbody and causes focus loss.
 // Only update the running total display in-place, then recalculate.
@@ -751,6 +898,7 @@ function onCompMol(side,id,val){
       totalEl.textContent=total.toFixed(2);
       totalEl.className=Math.abs(total-100)<0.01?'norm-ok-mini':'norm-warn-mini';
     }
+    syncEosCompositionFrom(side);
     calculate();
   }
 }
@@ -758,9 +906,42 @@ function normaliseComp(side){
   const total=compRows[side].reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
   if(total<=0) return;
   compRows[side].forEach(r=>{ r.mol=parseFloat(((parseFloat(r.mol)||0)/total*100).toFixed(4)); });
-  renderCompTable(side); calculate();
+  renderCompTable(side); syncEosCompositionFrom(side); calculate();
 }
-function clearComp(side){ compRows[side]=[]; renderCompTable(side); calculate(); }
+function clearComp(side){ compRows[side]=[]; renderCompTable(side); syncEosCompositionFrom(side); calculate(); }
+
+function loadGasPreset(side,key){
+  if(!key || !GAS_PRESETS[key]) return;
+  compRows[side]=[];
+  GAS_PRESETS[key].forEach(([name,mol])=>addCompRow(side,name,mol,true));
+  renderCompTable(side);
+  syncEosCompositionFrom(side);
+  calculate();
+}
+function copyComposition(srcSide,dstSide){
+  compRows[dstSide]=compRows[srcSide].map(r=>({id:compRowId++, name:r.name, mol:r.mol}));
+  renderCompTable(dstSide);
+  calculate();
+}
+function seedLeanComposition(side){
+  compRows[side]=[];
+  GAS_PRESETS.lean.forEach(([name,mol])=>addCompRow(side,name,mol,true));
+  renderCompTable(side);
+  calculate();
+}
+function sanitizeCompMol(side,id,el){
+  const r=compRows[side].find(r=>r.id===id);
+  let v=parseFloat(el.value);
+  if(!Number.isFinite(v) || v<0) v=0;
+  if(v>100) v=100;
+  el.value=String(v);
+  if(r) r.mol=v;
+  const total=compRows[side].reduce((s,row)=>s+(parseFloat(row.mol)||0),0);
+  const totalEl=document.getElementById(side+'CompTotal');
+  if(totalEl){ totalEl.textContent=total.toFixed(2); totalEl.className=Math.abs(total-100)<0.01?'norm-ok-mini':'norm-warn-mini'; }
+  syncEosCompositionFrom(side);
+  calculate();
+}
 
 function renderCompTable(side){
   const tbody=document.getElementById(side+'CompBody');
@@ -770,7 +951,7 @@ function renderCompTable(side){
   totalEl.className=Math.abs(total-100)<0.01?'norm-ok-mini':'norm-warn-mini';
   tbody.innerHTML=compRows[side].map(r=>`<tr>
     <td><select class="mini-sel" onchange="onCompName('${side}',${r.id},this.value)">${COMP_NAMES.map(n=>`<option value="${n}"${n===r.name?' selected':''}>${n}</option>`).join('')}</select></td>
-    <td><input type="number" class="mini-mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onCompMol('${side}',${r.id},this.value)" /></td>
+    <td><input type="number" class="mini-mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onCompMol('${side}',${r.id},this.value)" onblur="sanitizeCompMol('${side}',${r.id},this)" /></td>
     <td><button onclick="removeCompRow('${side}',${r.id})" style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:.25rem;color:var(--muted);background:none;border:none;cursor:pointer;font-size:.8rem">✕</button></td>
   </tr>`).join('');
 }
@@ -797,14 +978,16 @@ function setZMode(side, mode){
     document.getElementById(side+'ZEosNote').textContent=EOS_NOTES[mode];
     document.getElementById(side+'PseudoPanel').style.display=isPitzer?'block':'none';
     document.getElementById(side+'CompPanel').style.display=isPitzer?'none':'block';
-    if((mode==='pr'||mode==='srk')&&compRows[side].length===0){
-      // Seed with lean natural gas
-      addCompRow(side,'Methane',91);
-      addCompRow(side,'Ethane',4.5);
-      addCompRow(side,'Propane',1.2);
-      addCompRow(side,'Nitrogen',1.5);
-      addCompRow(side,'Carbon Dioxide',1.8);
-      return; // calculate() called inside addCompRow
+    if(mode==='pr'||mode==='srk'){
+      const other=otherSide(side);
+      if(compRows[side].length===0 && compRows[other].length>0){
+        cloneComposition(other,side);
+        renderCompTable(side);
+      } else if(compRows[side].length===0){
+        seedLeanComposition(side);
+        return; // calculate() called inside seedLeanComposition
+      }
+      syncEosCompositionFrom(side);
     }
   }
   calculate();
@@ -835,6 +1018,22 @@ function getCompStats(side){
   const active=values.filter(v=>Number.isFinite(v.mol)&&v.mol>0).map(v=>v.row);
   const total=active.reduce((s,r)=>s+(parseFloat(r.mol)||0),0);
   return {negative, active, total};
+}
+function otherSide(side){ return side==='from' ? 'to' : 'from'; }
+function eosCompMode(side){ return zMode[side]==='pr' || zMode[side]==='srk'; }
+function cloneComposition(srcSide,dstSide){
+  compRows[dstSide]=compRows[srcSide].map(r=>({id:compRowId++, name:r.name, mol:r.mol}));
+}
+function syncEosCompositionFrom(side){
+  const dst=otherSide(side);
+  if(!eosCompMode(side) || !eosCompMode(dst)) return;
+  cloneComposition(side,dst);
+  renderCompTable(dst);
+}
+function compositionsDiffer(a,b){
+  const norm=side=>compRows[side].filter(r=>(parseFloat(r.mol)||0)>0).map(r=>[r.name,+(parseFloat(r.mol)||0).toFixed(6)]).sort((x,y)=>x[0].localeCompare(y[0]));
+  const A=JSON.stringify(norm(a)), B=JSON.stringify(norm(b));
+  return A!==B;
 }
 
 // ══════════════════════════════════════════════════════
@@ -881,9 +1080,16 @@ function resolveZ(side, T_K, P_bar, traceLines, warnings){
     Z=res.Z; roots=res.roots;
     if(!Number.isFinite(Z)||Z<=0) return {ok:false, error:`${label} ${isPR?'PR':'SRK'} EoS did not return a valid positive vapor-root Z.`};
     const eosName=isPR?'PR':'SRK';
+    const alt=eosZfromComposition(fracs,T_K,P_bar,!isPR);
+    const altName=isPR?'SRK':'PR';
+    const diffPct=(Number.isFinite(alt.Z)&&alt.Z>0) ? Math.abs(Z-alt.Z)/((Z+alt.Z)/2)*100 : NaN;
     note=`${label} Z (${eosName} vapor root, ${stats.active.length} components, P=${P_bar.toFixed(3)} bar, T=${T_K.toFixed(2)} K) = ${Z.toFixed(5)}; roots=[${roots.map(r=>r.toFixed(5)).join(', ')}]; kij=0`;
+    if(Number.isFinite(alt.Z)){
+      note += ` | Cross-check ${altName} Z=${alt.Z.toFixed(5)}; Δ=${diffPct.toFixed(2)}%`;
+    }
     updateZDisplay(side,Z);
     if(roots.length>1) warnings.push(`${label} ${eosName} EoS returned multiple real roots. Vapor/highest root is used for volume conversion; do not use for two-phase/bubble-point conditions.`);
+    if(Number.isFinite(diffPct)&&diffPct>8) warnings.push(`${label} PR/SRK Z-factor spread is ${diffPct.toFixed(1)}%. This usually indicates high-pressure, near-critical, sour/CO₂-rich or non-ideal service; use simulator/project Z for final conversion.`);
     warnings.push(`${label} ${eosName} EoS uses classical mixing rules with binary interaction parameters kij = 0. Validate for acid gas, CO₂-rich, H₂-rich, polar, wet-gas or near-critical systems.`);
   }
 
@@ -1144,6 +1350,102 @@ function clearResults(){
   document.getElementById('traceBox').textContent='—';
   document.getElementById('warningsBox').style.display='none';
 }
+
+
+
+// ══════════════════════════════════════════════════════
+//  ONE-PAGE A4 PRINT PACKAGE
+// ══════════════════════════════════════════════════════
+function htmlEsc(v){
+  return String(v==null?'':v).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function txt(id, fallback='—'){
+  const el=document.getElementById(id);
+  const v=el && 'value' in el ? el.value : (el ? el.textContent : '');
+  return (v==null || String(v).trim()==='') ? fallback : String(v).trim();
+}
+function selectText(id){
+  const el=document.getElementById(id);
+  if(!el) return '—';
+  return el.options && el.selectedIndex>=0 ? el.options[el.selectedIndex].text.replace(/\s+/g,' ').trim() : el.value;
+}
+function pressureText(side){
+  const unitKey=document.getElementById(side+'Unit') ? document.getElementById(side+'Unit').value : '';
+  const def=FLOW_UNITS[unitKey];
+  if(!def || !def.isActual) return def ? def.refDesc : '—';
+  return `${txt(side+'P')} ${selectText(side+'PUnit')} / ${txt(side+'T')} ${selectText(side+'TUnit')}`;
+}
+function sideZText(side){
+  const unitKey=document.getElementById(side+'Unit') ? document.getElementById(side+'Unit').value : '';
+  const def=FLOW_UNITS[unitKey];
+  if(!def || !def.isActual) return 'Fixed reference Z = 1.000';
+  const mode=zMode[side];
+  if(mode==='manual') return `Manual Z = ${txt(side+'Z')}`;
+  const label=mode==='pitzer'?'Generalized Z':mode==='pr'?'Peng-Robinson':'SRK';
+  return `${label}; computed Z = ${txt(side+'ZDisplay')}`;
+}
+function printCompositionRows(){
+  const rowsOut=[];
+  ['from','to'].forEach(side=>{
+    const unitKey=document.getElementById(side+'Unit') ? document.getElementById(side+'Unit').value : '';
+    const def=FLOW_UNITS[unitKey];
+    if(!def || !def.isActual || !['pr','srk'].includes(zMode[side])) return;
+    const active=compRows[side].filter(r=>(parseFloat(r.mol)||0)>0);
+    const total=active.reduce((s,r)=>s+(parseFloat(r.mol)||0),0) || 1;
+    active.slice(0,7).forEach(r=>rowsOut.push(`<tr><td>${side==='from'?'Source':'Target'}</td><td>${htmlEsc(r.name)}</td><td style="text-align:right">${((parseFloat(r.mol)||0)/total*100).toFixed(3)}</td></tr>`));
+    if(active.length>7){
+      const other=active.slice(7).reduce((s,r)=>s+(parseFloat(r.mol)||0),0)/total*100;
+      rowsOut.push(`<tr><td>${side==='from'?'Source':'Target'}</td><td>Other components</td><td style="text-align:right">${other.toFixed(3)}</td></tr>`);
+    }
+  });
+  return rowsOut.length ? rowsOut.join('') : '<tr><td colspan="3">Manual / fixed reference Z basis — no composition table used.</td></tr>';
+}
+function updatePrintReport(){
+  calculate();
+  const now=new Date();
+  const fromKey=document.getElementById('fromUnit').value;
+  const toKey=document.getElementById('toUnit').value;
+  ['Company','Project','DocName','DocNo','Rev','Line'].forEach(k=>{
+    const map={Company:'docCompany',Project:'docProject',DocName:'docName',DocNo:'docNumber',Rev:'docRev',Line:'docLine'};
+    const el=document.getElementById('pr'+k); if(el) el.textContent=txt(map[k]);
+  });
+  document.getElementById('prSourceFlow').textContent=`${txt('inpVolume')} ${fromKey}`;
+  document.getElementById('prTargetFlow').textContent=`${txt('bigVal')} ${txt('bigUnit','')}`;
+  const eq=(document.getElementById('bigEq')?.textContent||'').match(/Z1=([0-9.\-]+), Z2=([0-9.\-]+)/);
+  document.getElementById('prZ1').textContent=eq?eq[1]:'—';
+  document.getElementById('prZ2').textContent=eq?eq[2]:'—';
+  document.getElementById('prFromUnit').textContent=selectText('fromUnit');
+  document.getElementById('prToUnit').textContent=selectText('toUnit');
+  document.getElementById('prFromCond').textContent=pressureText('from');
+  document.getElementById('prToCond').textContent=pressureText('to');
+  document.getElementById('prFromZBasis').textContent=sideZText('from');
+  document.getElementById('prToZBasis').textContent=sideZText('to');
+  document.getElementById('prEquation').textContent=document.getElementById('bigEq')?.textContent || 'V2 = V1 × (P1/P2) × (T2/T1) × (Z2/Z1)';
+  const warningsText=(document.getElementById('warningsText')?.innerText||'').replace(/\n+/g,' | ').trim();
+  document.getElementById('prWarnings').textContent=warningsText || 'No active warnings. Screening-level calculation only; confirm project reference conditions and Z basis.';
+  const unitRows=[...document.querySelectorAll('#allUnitsTbody tr')].slice(0,7).map(tr=>{
+    const tds=[...tr.children].map(td=>td.innerText.replace(/\s+/g,' ').trim());
+    if(tds.length<3) return '';
+    return `<tr><td>${htmlEsc(tds[0])}</td><td style="text-align:right">${htmlEsc(tds[1])}</td><td>${htmlEsc(tds[2])}</td></tr>`;
+  }).join('');
+  document.getElementById('prUnitsBody').innerHTML=unitRows || '<tr><td colspan="3">—</td></tr>';
+  document.getElementById('prCompBody').innerHTML=printCompositionRows();
+  const docName=txt('docName','Gas Volume Conversion');
+  const docNo=txt('docNumber','');
+  document.getElementById('prFooterDoc').textContent=docNo ? `${docName} | ${docNo}` : docName;
+  document.getElementById('prFooterDate').textContent=`${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} | Hazem ElMancy — Gas Volume Conversion`;
+}
+function printCalc(){
+  updatePrintReport();
+  const html=document.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi,'');
+  const w=window.open('', '_blank');
+  if(!w) return;
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.onload=()=>{ setTimeout(()=>{ w.focus(); w.print(); setTimeout(()=>w.close(), 500); }, 250); };
+}
+
 
 document.getElementById('year').textContent=new Date().getFullYear();
 onFromUnitChange();

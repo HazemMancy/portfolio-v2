@@ -3,186 +3,1206 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Single Phase Gas Hydraulics — Hazem ElMancy</title>
-  <link rel="icon" type="image/png" href="../favicon.png" />
-  <link rel="apple-touch-icon" href="../favicon.png" />
-  <meta name="description" content="Single-phase gas hydraulics calculator using Darcy-Weisbach, Swamee-Jain friction factor, real-gas density, Mach number, rho-v-squared and industry best-practice service checks." />
+  <title>Gas Mixing Calculator — Hazem ElMancy</title>
+  <meta name="description" content="Gas mixture MW, density, Cp, Z-factor, vapor fraction and composition calculator with PR/SRK EoS and Rachford-Rice flash." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root{--radius:.5rem;--font:'Inter',system-ui,sans-serif;--navbar-h:3.5rem}
-    [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--border:hsl(222,30%,18%);--fg:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,.1);--sec-bg:hsl(222,41%,16%);--inp-bg:hsl(222,47%,9%);--green:hsl(142,71%,45%);--green-bg:hsl(142,71%,45%,.06);--green-border:hsl(142,71%,45%,.25);--amber:hsl(38,92%,50%);--amber-bg:hsl(38,92%,50%,.05);--amber-border:hsl(38,92%,50%,.25);--red:hsl(0,72%,55%);--red-bg:hsl(0,72%,55%,.07);--red-border:hsl(0,72%,55%,.3)}
-    [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--border:hsl(214,32%,88%);--fg:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,.08);--sec-bg:hsl(210,40%,94%);--inp-bg:hsl(0,0%,100%);--green:hsl(142,71%,38%);--green-bg:hsl(142,71%,38%,.06);--green-border:hsl(142,71%,38%,.3);--amber:hsl(38,92%,40%);--amber-bg:hsl(38,92%,40%,.06);--amber-border:hsl(38,92%,40%,.3);--red:hsl(0,72%,48%);--red-bg:hsl(0,72%,48%,.07);--red-border:hsl(0,72%,48%,.3)}
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:var(--font);background:var(--bg);color:var(--fg);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-    #navbar{position:sticky;top:0;z-index:100;width:100%;background:var(--bg);transition:background .25s}#navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}.nav-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}.logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}nav.desktop{display:none;align-items:center;gap:.25rem}@media(min-width:1024px){nav.desktop{display:flex}}.nav-link{padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s}.nav-link:hover{color:var(--fg);background:var(--sec-bg)}.nav-link-calc{display:flex;align-items:center;gap:.35rem;padding:.375rem .65rem;font-size:.68rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}.theme-toggle{width:2.1rem;height:2.1rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;border:none;cursor:pointer}.theme-toggle:hover{background:var(--sec-bg);color:var(--fg)}.desktop-th{display:none}@media(min-width:1024px){.desktop-th{display:flex}}.mob-ctrl{display:flex;align-items:center;gap:.25rem}@media(min-width:1024px){.mob-ctrl{display:none}}.mob-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}.mob-menu.open{display:block}@media(min-width:1024px){.mob-menu{display:none!important}}.mob-menu a{display:block;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}.mob-menu a:hover{background:var(--sec-bg);color:var(--fg)}
-    .doc-hd-wrap{max-width:72rem;margin:0 auto;padding:.85rem 1rem 0}.doc-hd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem}.doc-hd-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}.doc-grid{display:grid;gap:.55rem;grid-template-columns:1fr}@media(min-width:640px){.doc-grid{grid-template-columns:1fr 1fr}}@media(min-width:1024px){.doc-grid{grid-template-columns:repeat(3,1fr)}}
-    .ph{padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--border)}.ph-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}.breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.68rem;color:var(--muted);margin-bottom:.5rem}.breadcrumb a:hover{color:var(--primary)}.sec-label{font-size:.65rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.35rem}.page-title{font-size:clamp(1.3rem,2.8vw,1.85rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.35rem}.page-desc{color:var(--muted);font-size:.78rem;max-width:42rem;line-height:1.6}.badge-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}.badge{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .55rem;border-radius:9999px;font-size:.58rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--sec-bg)}
-    .unit-pill{display:inline-flex;align-items:center;background:var(--sec-bg);border:1px solid var(--border);border-radius:9999px;padding:2px}.unit-pill button{padding:.22rem .75rem;font-size:.65rem;font-weight:600;letter-spacing:.06em;border-radius:9999px;color:var(--muted);transition:background .15s,color .15s;border:none;background:none;cursor:pointer}.unit-pill button.active{background:var(--primary);color:#fff;box-shadow:0 1px 4px hsl(217,91%,60%,.35)}
-    .calc-wrap{max-width:72rem;margin:0 auto;padding:1.25rem 1rem 1rem}.calc-grid{display:grid;gap:1.25rem;grid-template-columns:1fr}@media(min-width:768px){.calc-grid{grid-template-columns:1fr 1fr;align-items:start}}@media(min-width:1024px){.calc-grid{grid-template-columns:1fr 390px;align-items:start}}@media(min-width:768px) and (min-height:600px){.col-inputs{position:sticky;top:calc(var(--navbar-h) + .75rem);max-height:calc(100vh - var(--navbar-h) - 1.5rem);overflow-y:auto;scrollbar-width:thin}}.meta-wrap{max-width:72rem;margin:0 auto;padding:0 1rem 2rem}.meta-grid{display:grid;gap:1rem;grid-template-columns:1fr}@media(min-width:640px){.meta-grid{grid-template-columns:1fr 1fr}}
-    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}.card-hd{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.55rem;flex-wrap:wrap}.hd-icon{width:1.6rem;height:1.6rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}.card-title{font-size:.78rem;font-weight:600;flex:1;min-width:0}.card-body{padding:1rem 1.1rem}.flabel{font-size:.68rem;color:var(--muted);display:block;margin-bottom:.3rem;font-weight:500}.fnote{font-size:.6rem;color:var(--muted);margin-top:.2rem;line-height:1.4}.mini-table{width:100%;border-collapse:collapse;font-size:.68rem;margin-top:.55rem}.mini-table th{padding:.28rem .35rem;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);font-size:.6rem;font-weight:600}.mini-table td{padding:.28rem .35rem;border-bottom:1px solid var(--border);vertical-align:middle}.mini-table tr:last-child td{border-bottom:none}.mini-del{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:.25rem;color:var(--muted);border:1px solid var(--border);font-size:.78rem;line-height:1}.mini-del:hover{background:var(--red-bg);color:hsl(0,72%,65%);border-color:var(--red-border)}.gas-prop-btn{padding:.24rem .62rem;font-size:.64rem;font-weight:600;border-radius:9999px;color:var(--muted);border:1px solid var(--border);background:transparent}.gas-prop-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}.eos-btn{padding:.22rem .58rem;font-size:.62rem;font-weight:600;border-radius:9999px;color:var(--muted);border:1px solid var(--border);background:transparent}.eos-btn.active{background:var(--primary-bg);color:var(--primary);border-color:hsl(217,91%,60%,.35)}.props-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:.35rem;margin-top:.55rem}@media(max-width:520px){.props-summary{grid-template-columns:1fr 1fr}}.props-mini{background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.35rem .45rem}.props-mini span{display:block;font-size:.55rem;color:var(--muted)}.props-mini strong{font-size:.7rem;color:var(--fg);font-variant-numeric:tabular-nums}input[type=number],input[type=text],select{font-family:var(--font);padding:.42rem .6rem;background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.78rem;color:var(--fg);outline:none;transition:border-color .15s;width:100%}input[type=number]{-moz-appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}input:focus,select:focus{border-color:var(--primary)}.err-msg{font-size:.62rem;color:hsl(0,72%,65%);margin-top:.2rem;display:none}.g2{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem}@media(max-width:480px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}}.isec{padding:.85rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--sec-bg);margin-bottom:.75rem}.isec-title{font-size:.65rem;font-weight:600;letter-spacing:.08em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{opacity:.88}.btn-outline{background:transparent;border:1px solid var(--border);color:var(--fg)}.btn-outline:hover{background:var(--sec-bg)}.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}.btn-ghost:hover{background:var(--sec-bg);color:var(--fg)}.btn-sm{padding:.28rem .65rem;font-size:.68rem}.btn-full{width:100%;justify-content:center}
-    .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:.75rem}@media(max-width:400px){.kpi-row{grid-template-columns:1fr}}.kpi{text-align:center;padding:1rem .75rem;border-radius:var(--radius)}.kpi-blue{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.25)}.kpi-green{background:var(--green-bg);border:1px solid var(--green-border)}.kpi-amber{background:var(--amber-bg);border:1px solid var(--amber-border)}.kpi-lbl{font-size:.62rem;color:var(--muted);margin-bottom:.25rem}.kpi-val{font-size:1.65rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}.kpi-blue .kpi-val{color:var(--primary)}.kpi-green .kpi-val{color:var(--green)}.kpi-amber .kpi-val{color:var(--amber)}.kpi-unit{font-size:.75rem;font-weight:400;color:var(--muted);margin-left:.3rem}.kpi-sub{font-size:.6rem;color:var(--muted);margin-top:.25rem;line-height:1.5}.res-grid{display:grid;gap:.4rem}.res-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;border-radius:var(--radius);background:var(--sec-bg);font-size:.73rem}.res-row.hl{background:var(--primary-bg);border:1px solid hsl(217,91%,60%,.18)}.res-row.hl-green{background:var(--green-bg);border:1px solid var(--green-border)}.res-row.hl-amber{background:var(--amber-bg);border:1px solid var(--amber-border)}.res-row.hl-red{background:var(--red-bg);border:1px solid var(--red-border)}.res-lbl{color:var(--muted)}.res-val{font-weight:600;color:var(--fg);font-variant-numeric:tabular-nums}.res-row.hl .res-val{color:var(--primary)}.res-row.hl-green .res-val{color:var(--green)}.res-row.hl-amber .res-val{color:var(--amber)}.res-row.hl-red .res-val{color:hsl(0,72%,65%)}.res-unit{font-size:.6rem;color:var(--muted);margin-left:.25rem}.box{display:flex;align-items:flex-start;gap:.55rem;border-radius:var(--radius);padding:.65rem .8rem;margin-bottom:.65rem}.box p,.box span{font-size:.67rem;line-height:1.75}.box-warn{background:var(--amber-bg);border:1px solid var(--amber-border)}.box-warn p{color:var(--muted)}.box-err{background:var(--red-bg);border:1px solid var(--red-border)}.box-err p{color:hsl(0,72%,65%)}.lbadge{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .5rem;border-radius:9999px;font-size:.58rem;font-weight:600;border:1px solid;white-space:nowrap}.lbadge-ok{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.08)}.lbadge-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}.lbadge-hi{border-color:hsl(0,72%,55%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,55%,.07)}.regime{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid}.r-lam{border-color:hsl(217,91%,60%,.4);color:hsl(217,91%,70%);background:hsl(217,91%,60%,.08)}.r-trans{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}.r-turb{border-color:hsl(142,71%,45%,.4);color:hsl(142,71%,55%);background:hsl(142,71%,45%,.07)}
-    .accordion{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}.acc-trigger{width:100%;display:flex;align-items:center;gap:.55rem;padding:.85rem 1.1rem;cursor:pointer;background:none;border:none;font-family:var(--font);font-size:.78rem;font-weight:600;color:var(--fg);transition:background .15s}.acc-trigger:hover{background:var(--sec-bg)}.acc-trigger .acc-icon{margin-left:auto;color:var(--muted);transition:transform .2s}.acc-trigger[aria-expanded="true"] .acc-icon{transform:rotate(180deg)}.acc-body{display:none;padding:.85rem 1.1rem;border-top:1px solid var(--border)}.acc-body.open{display:block}.trace-box{background:var(--inp-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.65rem .85rem;font-size:.65rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.9;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all}.ref-panel{font-size:.67rem;color:var(--muted);line-height:1.85}.ref-panel h4{font-size:.68rem;font-weight:600;color:var(--fg);margin:1rem 0 .35rem}.ref-panel h4:first-child{margin-top:0}.ref-panel li{margin-left:1.1rem;padding:.08rem 0}.placeholder{padding:2.5rem 1rem;text-align:center}.placeholder p{font-size:.78rem;color:var(--muted);margin-top:.5rem}footer{border-top:1px solid var(--border);padding:1.1rem 1rem;margin-top:1rem}.ft-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem}.ft-links{display:flex;align-items:center;gap:.65rem}.ft-icon{width:2rem;height:2rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}.ft-icon:hover{color:var(--fg);border-color:var(--fg)}.text-primary{color:var(--primary)}.fw7{font-weight:700}.fs-sm{font-size:.875rem}.fs-xs{font-size:.72rem}
-    #printHeader{display:none}#printInputTable{display:none}#printFooter{display:none}
-    @media print{ @page{size:A4;margin:1.1cm 1.2cm 1.3cm 1.2cm} *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important} html,body{background:#fff!important;color:#111!important;font-size:9pt;margin:0;padding:0} body{padding-bottom:1.2cm!important} [data-theme="dark"],[data-theme="light"]{--bg:#fff;--bg-card:#fff;--border:#d0d7e3;--fg:#111;--muted:#555;--primary:#1a56db;--primary-bg:#e8f0fe;--sec-bg:#f3f6fb;--inp-bg:#fff;--green:#137333;--green-bg:#e6f4ea;--green-border:#34a853;--amber:#b45309;--amber-bg:#fef7e0;--amber-border:#f59e0b;--red:#c0392b;--red-bg:#fce8e6;--red-border:#ea4335} #navbar,.mob-menu,.mob-ctrl,.desktop-th,.breadcrumb,.page-desc,.badge-row,.sec-label,footer,#placeholderCard,#traceAccordion,#globalErr,.theme-toggle,.btn-ghost,.btn-primary,.col-inputs,.ph .btn-outline,#docHdWrap,.meta-wrap{display:none!important} #printHeader{display:block!important;padding:0 0 .3cm;border-bottom:2px solid #1a56db;margin-bottom:.35cm} #printFooter{display:block!important;position:fixed;bottom:0;left:1.2cm;right:1.2cm;padding:3pt 0;background:#fff} #printInputTable{display:table!important;width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:.35cm} #printInputTable thead{display:table-header-group} #printInputTable tr{break-inside:avoid;page-break-inside:avoid} .ph{padding:.2cm 0 .2cm;border:none;display:block!important;break-after:avoid;page-break-after:avoid}.ph-inner{display:block;max-width:100%;break-inside:avoid}.page-title{font-size:13pt;font-weight:700;color:#111;margin:0;display:block!important}.calc-wrap{max-width:100%;padding:.15cm 0 0}.calc-grid{display:block}.col-results{display:block;width:100%}.card{border:1px solid #d0d7e3!important;border-radius:3px!important;margin-bottom:.3cm;break-inside:avoid;page-break-inside:avoid;background:#fff!important}.card-hd{background:#e8f0fe!important;padding:.22cm .35cm!important;border-bottom:1px solid #c5cfe8!important}.card-title{color:#111!important;font-size:9pt!important}.card-body{padding:.25cm .35cm!important}.kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:.2cm;break-inside:avoid}.kpi{border-radius:3px!important;padding:.22cm!important;text-align:center;break-inside:avoid}.kpi-blue{background:#e8f0fe!important;border:1px solid #4285f4!important}.kpi-green{background:#e6f4ea!important;border:1px solid #34a853!important}.kpi-amber{background:#fef7e0!important;border:1px solid #f59e0b!important}.kpi-val{font-size:15pt!important;font-weight:700!important;line-height:1.2!important}.kpi-blue .kpi-val{color:#1a56db!important}.kpi-green .kpi-val{color:#137333!important}.kpi-amber .kpi-val{color:#b45309!important}.kpi-lbl,.kpi-unit,.kpi-sub{color:#555!important;font-size:7pt!important}.res-grid{display:grid;gap:2pt}.res-row{background:#f3f6fb!important;border:1px solid #d0d7e3!important;border-radius:2px!important;padding:3pt 6pt!important;font-size:8pt!important;display:flex;justify-content:space-between;align-items:center;break-inside:avoid}.res-row.hl{background:#e8f0fe!important;border-color:#4285f4!important}.res-row.hl-green{background:#e6f4ea!important;border-color:#34a853!important}.res-row.hl-amber{background:#fef7e0!important;border-color:#f59e0b!important}.res-row.hl-red{background:#fce8e6!important;border-color:#ea4335!important}.res-lbl{color:#555!important}.res-val{color:#111!important;font-weight:600!important}.res-unit{color:#777!important;font-size:6.5pt!important;margin-left:3pt}#warningsCard{background:#fef7e0!important;border:1px solid #e0b64b!important;margin-bottom:.25cm!important;break-inside:avoid}#warningsCard p,#warningsCard span{color:#6b4f00!important;font-size:7.5pt!important}#limitsCard .card-hd{background:#fef7e0!important;border-bottom:1px solid #e0b64b!important}.limit-row-print{display:flex!important;justify-content:space-between!important;align-items:center!important;background:#f3f6fb!important;border:1px solid #d0d7e3!important;border-radius:2px!important;padding:3pt 6pt!important;font-size:8pt!important;margin-bottom:2pt!important;color:#111!important}.lbadge{font-size:7pt!important;padding:1pt 5pt!important}.lbadge-ok{background:#e6f4ea!important;color:#137333!important;border-color:#34a853!important}.lbadge-warn{background:#fef7e0!important;color:#b45309!important;border-color:#f59e0b!important}.lbadge-hi{background:#fce8e6!important;color:#c0392b!important;border-color:#ea4335!important}.regime{font-size:7pt!important}.r-lam{background:#e8f0fe!important;color:#1a56db!important;border-color:#4285f4!important}.r-trans{background:#fef7e0!important;color:#b45309!important;border-color:#f59e0b!important}.r-turb{background:#e6f4ea!important;color:#137333!important;border-color:#34a853!important}#unitBadge{background:#e8f0fe!important;color:#1a56db!important;border-color:#4285f4!important;font-size:7pt!important}.ph{display:block!important}}
+    [data-theme="dark"]{--bg:hsl(222,47%,7%);--bg-card:hsl(222,41%,11%);--bg-card-hover:hsl(222,41%,13%);--border:hsl(222,30%,18%);--foreground:hsl(210,40%,98%);--muted:hsl(215,20%,55%);--primary:hsl(217,91%,60%);--primary-bg:hsl(217,91%,60%,0.1);--secondary-bg:hsl(222,41%,16%);--input-bg:hsl(222,47%,9%)}
+    [data-theme="light"]{--bg:hsl(0,0%,100%);--bg-card:hsl(0,0%,98%);--bg-card-hover:hsl(0,0%,95%);--border:hsl(214,32%,88%);--foreground:hsl(222,47%,11%);--muted:hsl(215,16%,45%);--primary:hsl(217,91%,50%);--primary-bg:hsl(217,91%,50%,0.08);--secondary-bg:hsl(210,40%,94%);--input-bg:hsl(0,0%,100%)}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--foreground);min-height:100vh;line-height:1.6;transition:background .3s,color .3s}
+    a{color:inherit;text-decoration:none} button{font-family:inherit;cursor:pointer;border:none;background:none}
+    ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    #navbar{position:sticky;top:0;z-index:50;width:100%;background:var(--bg);transition:background .25s,border-color .25s}
+    #navbar.scrolled{background:color-mix(in srgb,var(--bg) 95%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .navbar-inner{max-width:72rem;margin:0 auto;padding:0 1rem;height:var(--navbar-h);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .logo{display:flex;align-items:center;flex-shrink:0} .logo span{font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+    nav.desktop{display:none;align-items:center;gap:.25rem} @media(min-width:1024px){nav.desktop{display:flex}}
+    .nav-link{padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--muted);border-radius:var(--radius);transition:color .15s,background .15s;background:none}
+    .nav-link:hover{color:var(--foreground);background:var(--secondary-bg)}
+    .nav-link-calc{display:flex;align-items:center;gap:.4rem;padding:.375rem .75rem;font-size:.7rem;font-weight:500;letter-spacing:.08em;color:var(--primary);border-radius:var(--radius);background:var(--primary-bg)}
+    .theme-toggle{width:2.25rem;height:2.25rem;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);color:var(--muted);transition:background .15s,color .15s;background:none;border:none;cursor:pointer}
+    .theme-toggle:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .desktop-th{display:none} @media(min-width:1024px){.desktop-th{display:flex}}
+    .mobile-controls{display:flex;align-items:center;gap:.25rem} @media(min-width:1024px){.mobile-controls{display:none}}
+    .mobile-menu{display:none;border-top:1px solid var(--border);background:var(--bg-card);padding:.75rem 1rem}
+    .mobile-menu.open{display:block} @media(min-width:1024px){.mobile-menu{display:none!important}}
+    .mobile-menu a,.mobile-menu button{display:block;width:100%;text-align:left;padding:.5rem .75rem;font-size:.875rem;color:var(--muted);border-radius:var(--radius);transition:background .15s}
+    .mobile-menu a:hover,.mobile-menu button:hover{background:var(--secondary-bg);color:var(--foreground)}
+
+    .doc-hd-wrap{max-width:72rem;margin:0 auto;padding:.85rem 1rem 0}
+    .doc-hd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:.85rem 1.1rem}
+    .doc-hd-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;color:var(--primary);text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.35rem}
+    .doc-grid{display:grid;gap:.55rem;grid-template-columns:1fr}
+    @media(min-width:640px){.doc-grid{grid-template-columns:1fr 1fr}}
+    @media(min-width:1024px){.doc-grid{grid-template-columns:repeat(3,1fr)}}
+    .doc-grid label{font-size:.68rem;color:var(--muted);display:block;margin-bottom:.3rem;font-weight:500}
+    .doc-grid input[type=text]{font-family:var(--font);padding:.42rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.78rem;color:var(--foreground);outline:none;width:100%}
+    .doc-grid input[type=text]:focus{border-color:var(--primary)}
+    .page-header{padding:2.5rem 1rem 2rem;border-bottom:1px solid var(--border)}
+    .page-header-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .breadcrumb{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--muted);margin-bottom:.75rem}
+    .breadcrumb a:hover{color:var(--primary)}
+    .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;color:var(--primary);text-transform:uppercase;margin-bottom:.5rem}
+    .page-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
+    .page-desc{color:var(--muted);font-size:.8rem;max-width:40rem;line-height:1.6}
+    .badge-std{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .65rem;border-radius:9999px;font-size:.6rem;font-weight:500;border:1px solid var(--border);color:var(--muted);background:var(--secondary-bg);margin-top:.75rem}
+    .calc-layout{max-width:72rem;margin:0 auto;padding:1.5rem 1rem;display:grid;gap:1.25rem}
+    @media(min-width:1024px){.calc-layout{grid-template-columns:1fr 400px;align-items:start}}
+    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius)}
+    .card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+    .card-header-icon{width:1.75rem;height:1.75rem;border-radius:var(--radius);background:var(--primary-bg);display:flex;align-items:center;justify-content:center;color:var(--primary);flex-shrink:0}
+    .card-title{font-size:.8rem;font-weight:600}
+    .card-body{padding:1.25rem}
+    .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{width:100%;border-collapse:collapse;font-size:.75rem}
+    thead th{padding:.5rem .6rem;text-align:left;font-size:.65rem;font-weight:600;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+    tbody td{padding:.35rem .4rem;border-bottom:1px solid hsl(222,30%,14%);vertical-align:middle}
+    [data-theme="light"] tbody td{border-bottom:1px solid hsl(214,32%,93%)}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:var(--secondary-bg)}
+    .comp-formula{font-size:.62rem;color:var(--muted)}
+    input[type=number]{width:100%;padding:.3rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none;transition:border-color .15s;-moz-appearance:textfield}
+    input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+    input[type=number]:focus{border-color:var(--primary)}
+    input[type=number]:read-only{background:var(--secondary-bg);color:var(--muted);cursor:default}
+    .mol-input{width:74px}
+    .prop-cell{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.7rem}
+    .total-row td{background:var(--secondary-bg);font-weight:600}
+    .total-row .prop-cell{color:var(--primary)}
+    .ctrl-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;border-radius:var(--radius);font-size:.75rem;font-weight:500;cursor:pointer;border:none;transition:opacity .15s,background .15s}
+    .btn-primary{background:var(--primary);color:#fff} .btn-primary:hover{opacity:.88}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--foreground)} .btn-outline:hover{background:var(--secondary-bg)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent} .btn-ghost:hover{background:var(--secondary-bg);color:var(--foreground)}
+    .btn-sm{padding:.3rem .65rem;font-size:.7rem}
+    .norm-bar{margin-top:.75rem;padding:.5rem .75rem;border-radius:var(--radius);font-size:.72rem;display:flex;align-items:center;gap:.5rem;transition:background .2s}
+    .norm-ok{background:hsl(142,71%,45%,.08);border:1px solid hsl(142,71%,45%,.25);color:hsl(142,71%,55%)}
+    .norm-warn{background:hsl(38,92%,50%,.08);border:1px solid hsl(38,92%,50%,.3);color:hsl(38,92%,60%)}
+    .norm-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    /* TABS */
+    .tab-bar{display:flex;gap:.25rem;padding:.5rem .75rem;border-bottom:1px solid var(--border);background:var(--bg-card);flex-wrap:wrap}
+    .tab-btn{padding:.35rem .8rem;font-size:.72rem;font-weight:500;border-radius:.35rem;color:var(--muted);background:none;border:none;cursor:pointer;transition:color .15s,background .15s}
+    .tab-btn.active{color:var(--primary);background:var(--primary-bg)}
+    .tab-panel{display:none} .tab-panel.active{display:block}
+    /* EoS SELECTOR */
+    .eos-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap}
+    .eos-btn{padding:.3rem .75rem;font-size:.72rem;font-weight:500;border-radius:.35rem;border:1px solid var(--border);color:var(--muted);background:none;cursor:pointer;transition:all .15s}
+    .eos-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
+    /* RESULTS */
+    .results-grid{display:grid;gap:.6rem}
+    .res-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:var(--secondary-bg);border-radius:var(--radius);gap:.5rem}
+    .res-label{font-size:.7rem;color:var(--muted);flex:1}
+    .res-value{font-size:.95rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums;white-space:nowrap}
+    .res-unit{font-size:.65rem;color:var(--muted);font-weight:400;margin-left:.25rem}
+    .res-divider{height:1px;background:var(--border);margin:.25rem 0}
+    /* PHASE BADGE */
+    .phase-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border-radius:9999px;font-size:.72rem;font-weight:600}
+    .phase-vapor{background:hsl(217,91%,60%,.1);border:1px solid hsl(217,91%,60%,.3);color:hsl(217,91%,70%)}
+    .phase-liquid{background:hsl(271,81%,60%,.1);border:1px solid hsl(271,81%,60%,.3);color:hsl(271,81%,70%)}
+    .phase-two{background:hsl(38,92%,50%,.1);border:1px solid hsl(38,92%,50%,.3);color:hsl(38,92%,60%)}
+    .phase-super{background:hsl(142,71%,45%,.08);border:1px solid hsl(142,71%,45%,.3);color:hsl(142,71%,55%)}
+    /* VAPOR FRACTION GAUGE */
+    .vf-gauge-wrap{margin:.75rem 0}
+    .vf-gauge-track{height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+    .vf-gauge-fill{height:100%;border-radius:5px;transition:width .4s}
+    .vf-gauge-labels{display:flex;justify-content:space-between;font-size:.62rem;color:var(--muted);margin-top:.3rem}
+    /* COMPOSITION BARS */
+    .comp-bars{display:flex;flex-direction:column;gap:.4rem;margin-top:.75rem}
+    .comp-bar-row{display:flex;align-items:center;gap:.6rem}
+    .comp-bar-label{font-size:.65rem;color:var(--muted);width:80px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .comp-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .comp-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+    .comp-bar-pct{font-size:.65rem;color:var(--muted);width:40px;text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums}
+    /* WARNINGS */
+    .warn-box{display:flex;align-items:flex-start;gap:.6rem;background:hsl(38,92%,50%,.05);border:1px solid hsl(38,92%,50%,.2);border-radius:var(--radius);padding:.75rem;margin-top:.75rem}
+    .warn-box p{font-size:.65rem;color:var(--muted);line-height:1.6}
+    .flag-pill{display:inline-flex;align-items:center;padding:.15rem .5rem;border-radius:9999px;font-size:.6rem;font-weight:600;border:1px solid;margin:.15rem}
+    .flag-sour{border-color:hsl(0,72%,50%,.4);color:hsl(0,72%,65%);background:hsl(0,72%,50%,.07)}
+    .flag-warn{border-color:hsl(38,92%,50%,.4);color:hsl(38,92%,60%);background:hsl(38,92%,50%,.07)}
+    .flag-info{border-color:var(--border);color:var(--muted);background:var(--secondary-bg)}
+    /* PRESET DROPDOWN */
+    .preset-select{padding:.4rem .6rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);font-family:var(--font);outline:none;max-width:220px}
+    /* CALC TRACE */
+    .trace-box{background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);padding:.75rem;font-size:.68rem;color:var(--muted);font-family:'Courier New',monospace;line-height:1.8;margin-top:.75rem;max-height:220px;overflow-y:auto}
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:1.25rem 1rem;margin-top:2rem}
+    .footer-inner{max-width:72rem;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+    .footer-links{display:flex;align-items:center;gap:.75rem}
+    .footer-icon{width:2.25rem;height:2.25rem;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);transition:color .15s,border-color .15s}
+    .footer-icon:hover{color:var(--foreground);border-color:var(--foreground)}
+    .text-primary{color:var(--primary)} .font-bold{font-weight:700} .text-sm{font-size:.875rem} .text-xs{font-size:.75rem}
+    select{font-family:var(--font)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:640px){.grid-2{grid-template-columns:1fr}}
+    label.field-label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:.35rem}
+    .field-row{display:flex;gap:.4rem;align-items:center}
+    .field-row input{flex:1}
+    .field-row select{padding:.4rem .5rem;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);font-size:.75rem;color:var(--foreground);outline:none}
+
+
+    /* PRINT REPORT — compact one-page A4 package */
+    #printOnePageReport{display:none}
+    @media print{
+      @page{size:A4 portrait;margin:.55cm .65cm .55cm .65cm}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      html,body{background:#fff!important;color:#111!important;margin:0!important;padding:0!important;width:100%!important;min-height:0!important;overflow:hidden!important;font-family:Arial,Helvetica,sans-serif!important}
+      body > *:not(#printOnePageReport){display:none!important}
+      #printOnePageReport{display:block!important;color:#111!important;background:#fff!important;width:100%!important;height:285mm!important;overflow:hidden!important;page-break-after:avoid!important;break-after:avoid!important;}
+      .pr-sheet{height:285mm!important;overflow:hidden!important;font-size:7.25pt!important;line-height:1.18!important;color:#111!important;background:#fff!important;}
+      .pr-head{display:grid!important;grid-template-columns:1.25fr .9fr!important;gap:5mm!important;border-bottom:2px solid #1a56db!important;padding-bottom:3mm!important;margin-bottom:3mm!important;break-inside:avoid!important;}
+      .pr-title{font-size:13pt!important;font-weight:800!important;color:#1a56db!important;line-height:1.1!important;margin:0 0 1mm 0!important;}
+      .pr-sub{font-size:7.2pt!important;color:#444!important;margin:0!important;}
+      .pr-note{font-size:6.6pt!important;color:#777!important;font-style:italic!important;margin-top:1mm!important;}
+      .pr-meta{width:100%!important;border-collapse:collapse!important;font-size:6.8pt!important;}
+      .pr-meta td{border:1px solid #c5cfe8!important;padding:1.2pt 4pt!important;vertical-align:top!important;}
+      .pr-meta td:first-child{background:#f3f6fb!important;color:#444!important;width:34%!important;white-space:nowrap!important;}
+      .pr-section{border:1px solid #d0d7e3!important;border-radius:2px!important;margin-bottom:2.2mm!important;break-inside:avoid!important;page-break-inside:avoid!important;overflow:hidden!important;}
+      .pr-section-h{background:#e8f0fe!important;border-bottom:1px solid #c5cfe8!important;color:#111!important;font-size:7.4pt!important;font-weight:700!important;padding:2.3pt 5pt!important;letter-spacing:.03em!important;text-transform:uppercase!important;}
+      .pr-body{padding:3pt 5pt!important;}
+      .pr-grid2{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2.2mm!important;}
+      .pr-kpis{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:2mm!important;margin-bottom:2.2mm!important;break-inside:avoid!important;}
+      .pr-kpi{border:1px solid #d0d7e3!important;background:#f3f6fb!important;border-radius:2px!important;padding:3pt 4pt!important;text-align:center!important;min-height:10mm!important;}
+      .pr-kpi-l{font-size:6.2pt!important;color:#555!important;margin-bottom:1pt!important;}
+      .pr-kpi-v{font-size:10.5pt!important;font-weight:800!important;color:#1a56db!important;line-height:1.05!important;}
+      .pr-kpi-u{font-size:6pt!important;color:#777!important;font-weight:400!important;margin-left:1pt!important;}
+      .pr-table{width:100%!important;border-collapse:collapse!important;font-size:6.8pt!important;}
+      .pr-table th{background:#1a56db!important;color:#fff!important;border:1px solid #1a56db!important;text-align:left!important;padding:1.8pt 3pt!important;font-weight:700!important;}
+      .pr-table td{border:1px solid #d0d7e3!important;padding:1.6pt 3pt!important;vertical-align:top!important;color:#111!important;}
+      .pr-table tr:nth-child(even) td{background:#f8fafc!important;}
+      .pr-val{text-align:right!important;font-variant-numeric:tabular-nums!important;white-space:nowrap!important;font-weight:600!important;}
+      .pr-comp-name{max-width:38mm!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+      .pr-warn{border:1px solid #e0b64b!important;background:#fef7e0!important;color:#6b4f00!important;padding:2.5pt 4pt!important;font-size:6.6pt!important;border-radius:2px!important;max-height:22mm!important;overflow:hidden!important;}
+      .pr-footer{position:fixed!important;bottom:.22cm!important;left:.65cm!important;right:.65cm!important;border-top:1px solid #c5cfe8!important;padding-top:2pt!important;display:flex!important;justify-content:space-between!important;color:#777!important;font-size:6.5pt!important;background:#fff!important;}
+      .pr-compact{font-size:6.6pt!important;color:#555!important;line-height:1.25!important;}
+    }
   </style>
 </head>
 <body>
-<header id="navbar"><div class="nav-inner"><a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a><nav class="desktop"><a href="../index.html" class="nav-link">HOME</a><a href="../index.html#about" class="nav-link">ABOUT</a><a href="../index.html#experience" class="nav-link">EXPERIENCE</a><a href="../index.html#projects" class="nav-link">PROJECTS</a><a href="../index.html#skills" class="nav-link">SKILLS</a><a href="../index.html#contact" class="nav-link">CONTACT</a><a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS</a><button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:15px;height:15px"></i></button></nav><div class="mob-ctrl"><button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:15px;height:15px"></i></button><button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:15px;height:15px"></i></button></div></div><div class="mob-menu" id="mobileMenu"><a href="../index.html">HOME</a><a href="../index.html#about">ABOUT</a><a href="../index.html#experience">EXPERIENCE</a><a href="../index.html#projects">PROJECTS</a><a href="../index.html#skills">SKILLS</a><a href="../index.html#contact">CONTACT</a><a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.35rem;margin-top:.4rem"><i data-lucide="calculator" style="width:13px;height:13px"></i>CALCULATORS</a></div></header>
-<div class="doc-hd-wrap" id="docHdWrap"><div class="doc-hd-card"><div class="doc-hd-title"><i data-lucide="file-text" style="width:12px;height:12px"></i>Document / Project Reference<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="printCalc()"><i data-lucide="printer" style="width:11px;height:11px"></i>Export PDF</button></div><div class="doc-grid"><div><label class="flabel">Company</label><input type="text" id="docCompany" placeholder="e.g. X" /></div><div><label class="flabel">Project Name</label><input type="text" id="docProject" placeholder="e.g. FEED — Gas Pipeline" /></div><div><label class="flabel">Document Name</label><input type="text" id="docName" placeholder="e.g. Gas Hydraulic Calculation" /></div><div><label class="flabel">Document Number</label><input type="text" id="docNumber" placeholder="e.g. PRJ-PR-CAL-0020" /></div><div><label class="flabel">Revision</label><input type="text" id="docRev" placeholder="e.g. A0" /></div><div><label class="flabel">Line Number / Tag</label><input type="text" id="docLine" placeholder='e.g. 8&quot;-FG-1001-A1A' /></div></div></div></div>
-<div id="printHeader"><table style="width:100%;border-collapse:collapse;font-size:8.5pt;color:#111"><tr><td style="width:55%;vertical-align:top;padding-right:.5cm"><div style="font-size:13pt;font-weight:700;color:#1a56db;line-height:1.2">Single Phase Gas Hydraulics</div><div style="font-size:7.5pt;color:#444;margin-top:3pt">Darcy-Weisbach &middot; Swamee-Jain &middot; Real-Gas Density &middot; Mach Screening</div><div style="font-size:7pt;color:#888;margin-top:2pt;font-style:italic">Screening-level calculation — not a code-compliant design document</div><div style="font-size:8pt;color:#333;margin-top:4pt;font-weight:600" id="ph_docname"></div></td><td style="vertical-align:top"><table style="margin-left:auto;border-collapse:collapse;font-size:8pt;width:100%"><tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Company</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8;min-width:3cm" id="ph_company"></td></tr><tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Project</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_project"></td></tr><tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Doc. No.</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8" id="ph_number"></td></tr><tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Revision</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_rev"></td></tr><tr style="background:#e8f0fe"><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #c5cfe8;white-space:nowrap">Line / Tag</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #c5cfe8" id="ph_line"></td></tr><tr><td style="padding:2pt 8pt 2pt 6pt;color:#444;border:1px solid #d0d7e3;white-space:nowrap;background:#f3f6fb">Date</td><td style="padding:2pt 6pt;font-weight:600;border:1px solid #d0d7e3" id="ph_date"></td></tr></table></td></tr></table></div>
-<table id="printInputTable"><thead><tr style="background:#1a56db"><th colspan="4" style="padding:4pt 6pt;text-align:left;font-size:9pt;color:#fff;border:1px solid #1a56db;letter-spacing:.04em">INPUT PARAMETERS</th></tr><tr style="background:#e8f0fe"><th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;width:32%;font-size:8pt;color:#111">Parameter</th><th style="padding:3pt 6pt;text-align:right;border:1px solid #c5cfe8;width:18%;font-size:8pt;color:#111">Value</th><th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;width:14%;font-size:8pt;color:#111">Unit</th><th style="padding:3pt 6pt;text-align:left;border:1px solid #c5cfe8;font-size:8pt;color:#111">Notes</th></tr></thead><tbody id="printInputBody"></tbody></table>
-<div id="printFooter"><table style="width:100%;border-collapse:collapse"><tr><td style="font-size:7.5pt;color:#444;padding:3pt 0;border-top:1px solid #c5cfe8"><span id="pf_docname" style="font-weight:600;color:#1a56db"></span><span id="pf_docnumber" style="color:#888;margin-left:8pt"></span></td><td style="text-align:right;font-size:7.5pt;color:#888;padding:3pt 0;border-top:1px solid #c5cfe8"><span id="pf_date"></span>&nbsp;&nbsp;|&nbsp;&nbsp;Hazem ElMancy &mdash; Gas Hydraulics</td></tr></table></div>
-<div class="ph"><div class="ph-inner"><div><div class="breadcrumb"><a href="../index.html">Home</a><i data-lucide="chevron-right" style="width:11px;height:11px"></i><a href="index.html">Calculators</a><i data-lucide="chevron-right" style="width:11px;height:11px"></i><span style="color:var(--fg)">Gas Hydraulics</span></div><p class="sec-label">HYDRAULICS</p><h1 class="page-title">Single Phase Gas Hydraulics</h1><p class="page-desc">Single-phase gas line hydraulics using Darcy-Weisbach friction, Swamee-Jain friction factor, real-gas density, Mach number, rho-v-squared and industry best-practice service checks.</p><div class="badge-row"><span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>Crane TP-410</span><span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>API RP 14E</span><span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>Swamee-Jain</span><span class="badge"><i data-lucide="book-open" style="width:10px;height:10px"></i>GPSA</span></div></div><a href="index.html" class="btn btn-outline btn-sm" style="align-self:flex-start;margin-top:.25rem"><i data-lucide="arrow-left" style="width:13px;height:13px"></i>All Calculators</a></div></div>
-<div class="calc-wrap"><div class="calc-grid"><div class="col-inputs"><div class="card"><div class="card-hd"><div class="hd-icon"><i data-lucide="wind" style="width:14px;height:14px"></i></div><span class="card-title">Input Parameters</span><div class="unit-pill"><button id="btnSI" class="active" onclick="setUnits('SI')">SI</button><button id="btnIMP" onclick="setUnits('IMP')">Imperial</button></div><div style="display:flex;gap:.3rem;margin-left:.4rem"><button class="btn btn-outline btn-sm" onclick="loadTestCase()"><i data-lucide="flask-conical" style="width:11px;height:11px"></i>Test</button><button class="btn btn-ghost btn-sm" onclick="resetForm()" title="Reset"><i data-lucide="rotate-ccw" style="width:11px;height:11px"></i></button></div></div><div class="card-body">
-<div class="isec"><div class="isec-title"><i data-lucide="gauge" style="width:12px;height:12px"></i>Flow & Operating Conditions</div><div class="g2"><div><label class="flabel" id="lblFlow">Mass Flow Rate (kg/h)</label><input type="number" id="inpFlow" min="0" step="any" oninput="calculate()" placeholder="e.g. 50000" /><div class="err-msg" id="errFlow">Must be &gt; 0</div><div class="fnote">Mass flow basis; not Sm³/h or MMSCFD.</div></div><div><label class="flabel" id="lblPressure">Operating Pressure — absolute (bara)</label><input type="number" id="inpPressure" min="0" step="any" oninput="calculate()" placeholder="e.g. 30" /><div class="err-msg" id="errPressure">Must be &gt; 0 absolute</div><div class="fnote">Absolute pressure basis only. Convert barg/psig before entry.</div></div><div><label class="flabel" id="lblTemp">Operating Temperature (°C)</label><input type="number" id="inpTemp" step="any" oninput="calculate()" placeholder="e.g. 40" /><div class="err-msg" id="errTemp">Required; absolute temperature must be &gt; 0 K</div></div><div><label class="flabel" id="lblLen">Pipe Length (m)</label><input type="number" id="inpLen" min="0" step="any" oninput="calculate()" placeholder="e.g. 500" /><div class="err-msg" id="errLen">Must be &gt; 0</div></div></div></div>
-<div class="isec"><div class="isec-title"><i data-lucide="circle-dashed" style="width:12px;height:12px"></i>Pipe Selection</div><div class="g3"><div><label class="flabel">NPS</label><select id="selNPS" onchange="onNPSChange()"><option value="custom">— Custom —</option></select></div><div><label class="flabel">Schedule</label><select id="selSch" onchange="onSchChange()"><option value="custom">— Custom —</option></select></div><div><label class="flabel" id="lblDia">ID (mm)</label><input type="number" id="inpDia" min="0" step="any" oninput="onCustomDia()" placeholder="e.g. 202.7" /><div class="err-msg" id="errDia">Must be &gt; 0</div></div></div><div class="g2" style="margin-top:.55rem"><div><label class="flabel">Pipe Material / Roughness Basis</label><select id="selMaterial" onchange="onMaterialChange()"></select><div class="fnote">Screening defaults only; confirm project piping class and vendor data.</div></div><div><label class="flabel" id="lblRough">ε Roughness (mm)</label><input type="number" id="inpRough" value="0.0457" min="0" step="any" oninput="onRoughnessInput()" /><div class="fnote" id="noteRough">Default clean commercial carbon steel.</div><div class="err-msg" id="errRough">Must be ≥ 0</div></div></div>
-<div class="isec" style="margin-top:.75rem;margin-bottom:0"><div class="isec-title"><i data-lucide="git-branch" style="width:12px;height:12px"></i>Fittings / Minor Losses</div><div class="g3" style="margin-bottom:.55rem"><div><label class="flabel">Fitting Type</label><select id="selFitType"></select></div><div><label class="flabel">Quantity</label><input type="number" id="inpFitQty" min="1" step="1" value="1" /></div><div style="display:flex;align-items:end"><button type="button" class="btn btn-outline btn-sm" onclick="addFitting()"><i data-lucide="plus" style="width:11px;height:11px"></i>Add</button></div></div><table class="mini-table"><thead><tr><th>Fitting / Item</th><th style="text-align:right">Qty</th><th style="text-align:right">K each</th><th style="text-align:right">K total</th><th style="width:32px;text-align:center">Remove</th></tr></thead><tbody id="fittingBody"></tbody><tfoot><tr><td colspan="3" style="font-weight:600;color:var(--muted)">ΣK</td><td style="text-align:right;font-weight:700" id="fitKTotal">0.000</td><td></td></tr></tfoot></table><div class="fnote">Minor losses are added as ΔP<sub>K</sub> = ΣK × ρv²/2 using calculated gas density and line velocity. K-values are screening defaults; use project/vendor values for final design.</div></div></div>
-<div class="isec"><div class="isec-title"><i data-lucide="atom" style="width:12px;height:12px"></i>Gas Properties</div>
-<div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.65rem"><button type="button" class="gas-prop-btn active" id="propManualBtn" onclick="setGasPropMode('manual')">Manual</button><button type="button" class="gas-prop-btn" id="propMixBtn" onclick="setGasPropMode('mix')">Gas Mixing / EoS</button></div>
-<div id="manualGasProps"><div class="g2"><div><label class="flabel">Molecular Weight (kg/kmol)</label><input type="number" id="inpMW" min="0" step="any" value="18.5" oninput="calculate()" /><div class="err-msg" id="errMW">Must be &gt; 0</div></div><div><label class="flabel">Z-Factor</label><input type="number" id="inpZ" min="0" step="any" value="0.92" oninput="calculate()" /><div class="err-msg" id="errZ">Must be &gt; 0</div></div><div><label class="flabel">Cp/Cv, k</label><input type="number" id="inpK" min="1" step="any" value="1.27" oninput="calculate()" /><div class="err-msg" id="errK">Must be &gt; 1</div></div><div><label class="flabel">Viscosity (cP)</label><input type="number" id="inpMu" min="0" step="any" value="0.012" oninput="calculate()" /><div class="err-msg" id="errMu">Must be &gt; 0</div></div></div><div class="fnote">Manual gas-property mode. Enter MW, Z, k and viscosity from validated project basis, gas-mixing tool, HYSYS or UniSim.</div></div>
-<div id="mixGasProps" style="display:none"><div style="display:flex;gap:.35rem;flex-wrap:wrap;margin-bottom:.55rem"><button type="button" class="eos-btn active" data-eos="pitzer" onclick="setEosMode('pitzer')">Generalized Z</button><button type="button" class="eos-btn" data-eos="pr" onclick="setEosMode('pr')">Peng-Robinson</button><button type="button" class="eos-btn" data-eos="srk" onclick="setEosMode('srk')">SRK</button></div><div class="g3" style="margin-bottom:.55rem"><div><label class="flabel">Add Component</label><select id="selGasComponentAdd"></select></div><div style="display:flex;align-items:end"><button type="button" class="btn btn-outline btn-sm" onclick="addGasComponent()"><i data-lucide="plus" style="width:11px;height:11px"></i>Add</button></div><div style="display:flex;align-items:end;justify-content:flex-end"><button type="button" class="btn btn-ghost btn-sm" onclick="resetGasComponents()">Reset Components</button></div></div><table class="mini-table"><thead><tr><th>Component</th><th style="text-align:right">mol %</th><th style="width:32px;text-align:center">Remove</th></tr></thead><tbody id="gasCompBody"></tbody><tfoot><tr><td style="font-weight:600;color:var(--muted)">Total</td><td style="text-align:right;font-weight:700" id="gasCompTotal">0.000</td><td></td></tr></tfoot></table><div class="props-summary"><div class="props-mini"><span>MW</span><strong id="propMWOut">—</strong></div><div class="props-mini"><span>Z</span><strong id="propZOut">—</strong></div><div class="props-mini"><span>k</span><strong id="propKOut">—</strong></div><div class="props-mini"><span>μ</span><strong id="propMuOut">—</strong></div></div><div class="fnote" id="eosNote">Gas-mixing mode derives MW, Z, k and viscosity from composition. PR/SRK report vapor-root Z only with kij = 0; final properties require project property-package validation.</div><div class="err-msg" id="errGasComp">Invalid gas composition</div></div></div>
-<div class="isec" style="margin-bottom:0"><div class="isec-title"><i data-lucide="shield-check" style="width:12px;height:12px"></i>Service Check</div><label class="flabel">Service Type</label><select id="selService" onchange="calculate()"><option value="">— None —</option></select><div class="fnote">Industry best-practice velocity, Mach, rho-v² and ΔP/km screening only.</div></div>
-<div id="globalErr" class="box box-err" style="display:none;margin-top:.65rem"><i data-lucide="circle-x" style="width:13px;height:13px;color:hsl(0,72%,65%);flex-shrink:0;margin-top:2px"></i><p id="globalErrText"></p></div><button class="btn btn-primary btn-full" style="margin-top:.75rem" onclick="calculate()"><i data-lucide="zap" style="width:13px;height:13px"></i>Calculate</button>
-</div></div></div>
-<div class="col-results"><div id="placeholderCard" class="card"><div class="placeholder"><i data-lucide="wind" style="width:32px;height:32px;color:var(--muted);opacity:.25;display:block;margin:0 auto"></i><p>Enter parameters and click Calculate.</p></div></div><div id="warningsCard" class="box box-warn" style="display:none"><i data-lucide="triangle-alert" style="width:13px;height:13px;color:var(--amber);flex-shrink:0;margin-top:2px"></i><p id="warningsText"></p></div><div id="limitsCard" class="card" style="display:none;margin-bottom:.75rem"><div class="card-hd"><div class="hd-icon" style="background:hsl(38,92%,50%,.1)"><i data-lucide="shield-check" style="width:14px;height:14px;color:var(--amber)"></i></div><span class="card-title">Service Limit Check</span><span id="limitsServiceName" style="font-size:.63rem;color:var(--muted);margin-left:.35rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span></div><div class="card-body" style="padding:.75rem 1rem"><div id="limitsBody"></div></div></div><div id="resultsCard" class="card" style="display:none"><div class="card-hd"><div class="hd-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div><span class="card-title">Gas Hydraulics Results</span><span id="regimeChip" style="margin-left:.4rem"></span><span id="unitBadge" style="margin-left:auto;font-size:.6rem;font-weight:600;padding:.15rem .5rem;border-radius:9999px;background:var(--primary-bg);color:var(--primary);border:1px solid hsl(217,91%,60%,.3)">SI</span></div><div class="card-body"><div class="kpi-row"><div class="kpi kpi-blue"><div class="kpi-lbl">Pressure Drop</div><div><span class="kpi-val" id="bigDP">—</span><span class="kpi-unit" id="kpiDPUnit">bar</span></div><div class="kpi-sub" id="bigDPSub"></div></div><div class="kpi kpi-green"><div class="kpi-lbl" style="color:var(--green)">Velocity</div><div><span class="kpi-val" id="bigVel">—</span><span class="kpi-unit" id="kpiVelUnit">m/s</span></div><div class="kpi-sub" id="bigVelSub"></div></div></div><div class="res-grid" id="detailGrid"></div></div></div></div></div></div>
-<div class="meta-wrap"><div class="meta-grid"><div id="traceAccordion" class="accordion" style="display:none"><button class="acc-trigger" onclick="toggleAcc('traceBody',this)" aria-expanded="false"><div class="hd-icon"><i data-lucide="file-code" style="width:14px;height:14px"></i></div>Calculation Trace<i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i></button><div class="acc-body" id="traceBody"><div class="trace-box" id="traceBox"></div></div></div><div class="accordion"><button class="acc-trigger" onclick="toggleAcc('methBody',this)" aria-expanded="false"><div class="hd-icon"><i data-lucide="book-open" style="width:14px;height:14px"></i></div>Methodology &amp; Assumptions<i data-lucide="chevron-down" class="acc-icon" style="width:14px;height:14px"></i></button><div class="acc-body" id="methBody"><div class="ref-panel"><h4>Methodology</h4><ul><li>Gas density: ρ = P·MW/(Z·R·T), using absolute pressure and Kelvin temperature.</li><li>Velocity from actual volumetric flow: Q = ṁ/ρ, v = Q/A.</li><li>Darcy-Weisbach friction pressure drop: ΔP = f·(L/D)·(ρv²/2).</li><li>Friction factor: Swamee-Jain explicit approximation for turbulent flow; laminar flow uses f = 64/Re.</li><li>Mach number screening: a ≈ √(k·Z·R·T/MW), Mach = v/a.</li></ul><h4>Assumptions</h4><ul><li>Steady-state, single-phase gas; no liquid entrainment.</li><li>Isothermal, constant-density screening using inlet pressure and temperature.</li><li>Acceptable for preliminary line sizing where ΔP/P_in is low, typically below about 10%.</li><li>Pressure input is absolute. Gauge pressure must be converted before entry.</li><li>Flow basis is mass flow, not standard volumetric flow.</li><li>Gas properties may be entered manually or estimated from embedded gas-mixing composition. PR/SRK use vapor-root Z only with kij = 0 and are screening-level, not rigorous flash calculations.</li></ul><h4>References</h4><ul><li>Crane TP-410: Flow of Fluids Through Valves, Fittings, and Pipe.</li><li>API RP 14E: Offshore Production Platform Piping Systems.</li><li>Swamee & Jain (1976): explicit equations for pipe-flow problems.</li><li>GPSA Engineering Data Book and Perry's Chemical Engineers' Handbook.</li></ul></div></div></div></div></div>
-<footer><div class="ft-inner"><div class="logo"><span class="text-primary fw7 fs-sm">Hazem</span><span class="fw7 fs-sm">ElMancy</span></div><div class="ft-links"><a href="tel:+201096597449" class="ft-icon"><i data-lucide="phone" style="width:13px;height:13px"></i></a><a href="mailto:hazemmancy@outlook.com" class="ft-icon"><i data-lucide="mail" style="width:13px;height:13px"></i></a><a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="ft-icon"><svg style="width:13px;height:13px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a></div><p class="fs-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p></div></footer>
+<header id="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="logo"><span class="text-primary">H</span><span>E</span></a>
+    <nav class="desktop">
+      <a href="../index.html" class="nav-link">HOME</a>
+      <a href="../index.html#about" class="nav-link">ABOUT</a>
+      <a href="../index.html#experience" class="nav-link">EXPERIENCE</a>
+      <a href="../index.html#projects" class="nav-link">PROJECTS</a>
+      <a href="../index.html#skills" class="nav-link">SKILLS</a>
+      <a href="../index.html#contact" class="nav-link">CONTACT</a>
+      <a href="index.html" class="nav-link-calc"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+      <button class="theme-toggle desktop-th" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconD" style="width:16px;height:16px"></i></button>
+    </nav>
+    <div class="mobile-controls">
+      <button class="theme-toggle" onclick="toggleTheme()"><i data-lucide="moon" id="themeIconM" style="width:16px;height:16px"></i></button>
+      <button class="theme-toggle" onclick="toggleMenu()"><i data-lucide="menu" id="menuIcon" style="width:16px;height:16px"></i></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="../index.html">HOME</a>
+    <a href="../index.html#about">ABOUT</a>
+    <a href="../index.html#experience">EXPERIENCE</a>
+    <a href="../index.html#projects">PROJECTS</a>
+    <a href="../index.html#skills">SKILLS</a>
+    <a href="../index.html#contact">CONTACT</a>
+    <a href="index.html" style="color:var(--primary);font-weight:500;display:flex;align-items:center;gap:.4rem;margin-top:.5rem"><i data-lucide="calculator" style="width:14px;height:14px"></i>CALCULATORS</a>
+  </div>
+</header>
+
+<!-- DOCUMENT HEADER — screen only -->
+<div class="doc-hd-wrap" id="docHdWrap">
+  <div class="doc-hd-card">
+    <div class="doc-hd-title">
+      <i data-lucide="file-text" style="width:12px;height:12px"></i>
+      Document / Project Reference
+      <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="printCalc()">
+        <i data-lucide="printer" style="width:11px;height:11px"></i>Export PDF
+      </button>
+    </div>
+    <div class="doc-grid">
+      <div><label>Company</label><input type="text" id="docCompany" placeholder="e.g. X" /></div>
+      <div><label>Project Name</label><input type="text" id="docProject" placeholder="e.g. FEED — Gas Composition" /></div>
+      <div><label>Document Name</label><input type="text" id="docName" placeholder="e.g. Gas Mixing Calculation" /></div>
+      <div><label>Document Number</label><input type="text" id="docNumber" placeholder="e.g. PRJ-PR-CAL-0010" /></div>
+      <div><label>Revision</label><input type="text" id="docRev" placeholder="e.g. A0" /></div>
+      <div><label>Line Number / Tag</label><input type="text" id="docLine" placeholder='e.g. FG-1001 / Gas Mix Basis' /></div>
+    </div>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <a href="index.html">Calculators</a>
+        <i data-lucide="chevron-right" style="width:12px;height:12px"></i>
+        <span style="color:var(--foreground)">Gas Mixing</span>
+      </div>
+      <p class="section-label">FLUID PROPERTIES</p>
+      <h1 class="page-title">Gas Mixing Calculator</h1>
+      <p class="page-desc">Full mixture property calculator with PR / SRK EoS, Rachford-Rice vapor fraction flash, Lee-Gonzalez-Eakin viscosity, Joule-Thomson coefficient, speed of sound, and 13 industry presets.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem">
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Peng-Robinson (1976) &amp; SRK (Soave 1972)</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>GPSA Engineering Data Book</span>
+        <span class="badge-std"><i data-lucide="book-open" style="width:11px;height:11px"></i>Lee-Gonzalez-Eakin (1966)</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:.45rem;align-items:flex-start;margin-top:auto;flex-wrap:wrap">
+      <a href="index.html" class="btn btn-outline"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>All Calculators</a>
+    </div>
+  </div>
+</div>
+
+<div class="calc-layout">
+  <!-- LEFT COLUMN -->
+  <div>
+    <!-- COMPOSITION -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="table" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Component Composition</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem">
+          <select class="preset-select" id="presetSelect" onchange="loadPreset(this.value)">
+            <option value="">Load Preset...</option>
+            <optgroup label="Natural Gas">
+              <option value="lean">Lean Natural Gas</option>
+              <option value="rich">Rich Natural Gas</option>
+              <option value="lpg">LPG Vapor</option>
+            </optgroup>
+            <optgroup label="Acid / Sour">
+              <option value="sour">Sour Natural Gas</option>
+              <option value="acidgas">Acid Gas (Amine Off-Gas)</option>
+              <option value="tailgas">Tail Gas (SRU)</option>
+            </optgroup>
+            <optgroup label="Refinery">
+              <option value="fuelgas">Fuel Gas (Refinery)</option>
+              <option value="fcc">FCC Off-Gas</option>
+              <option value="h2rich">H₂-Rich (Reformer)</option>
+              <option value="syngas">Synthesis Gas (SMR)</option>
+            </optgroup>
+            <optgroup label="Flare / Relief">
+              <option value="flare">Flare Gas (Emergency)</option>
+            </optgroup>
+            <optgroup label="Utility">
+              <option value="n2">Nitrogen Blanket Gas</option>
+              <option value="air">Instrument Air (Dry)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="card-body" style="padding:.75rem">
+        <div class="tbl-wrap">
+          <table id="compTable">
+            <thead>
+              <tr>
+                <th style="width:145px">Component</th>
+                <th style="width:50px">Formula</th>
+                <th style="width:80px">Mole %</th>
+                <th class="prop-cell" style="width:55px">MW<br><span style="font-weight:400;font-size:.6rem">(g/mol)</span></th>
+                <th class="prop-cell" style="width:52px">Tc<br><span style="font-weight:400;font-size:.6rem">(K)</span></th>
+                <th class="prop-cell" style="width:52px">Pc<br><span style="font-weight:400;font-size:.6rem">(bar)</span></th>
+                <th class="prop-cell" style="width:42px">ω<br><span style="font-weight:400;font-size:.6rem">—</span></th>
+                <th class="prop-cell" style="width:60px">LHV<br><span style="font-weight:400;font-size:.6rem">(MJ/Nm³)</span></th>
+                <th style="width:32px"></th>
+              </tr>
+            </thead>
+            <tbody id="compBody"></tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="2" style="padding:.5rem .6rem;font-size:.72rem">TOTAL</td>
+                <td style="padding:.5rem .4rem"><input type="number" id="totalMol" value="100.00" readonly style="width:74px;font-weight:700;font-size:.75rem;background:var(--secondary-bg);border:1px solid var(--border);border-radius:.3rem;padding:.3rem .5rem;color:var(--primary);font-family:var(--font);outline:none;-moz-appearance:textfield"></td>
+                <td class="prop-cell" id="totalMW" style="padding:.5rem .4rem">—</td>
+                <td colspan="5"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div id="normBar" class="norm-bar norm-ok" style="display:none">
+          <span class="norm-dot" id="normDot" style="background:hsl(142,71%,50%)"></span>
+          <span id="normMsg">Composition total = 100.00 %</span>
+        </div>
+        <div class="ctrl-row">
+          <button class="btn btn-primary" onclick="addComponent()"><i data-lucide="plus" style="width:13px;height:13px"></i>Add Component</button>
+          <button class="btn btn-outline" onclick="normalise()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i>Normalise</button>
+          <button class="btn btn-ghost" onclick="clearAll()"><i data-lucide="trash-2" style="width:13px;height:13px"></i>Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONDITIONS + EoS -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="thermometer" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Operating Conditions &amp; EoS</span>
+      </div>
+      <div class="card-body">
+        <div class="eos-row">
+          <span style="font-size:.7rem;color:var(--muted);margin-right:.25rem">Model:</span>
+          <button class="eos-btn active" id="eosPitzer" onclick="setEos('pitzer')">Pitzer (ideal)</button>
+          <button class="eos-btn" id="eosPR" onclick="setEos('pr')">Peng-Robinson</button>
+          <button class="eos-btn" id="eosSRK" onclick="setEos('srk')">SRK</button>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="field-label">Temperature</label>
+            <div class="field-row">
+              <input type="number" id="inpT" value="15" step="any" oninput="calculate()" onblur="sanitizeOperatingInput('inpT')">
+              <select id="unitT" onchange="calculate()">
+                <option value="C">°C</option>
+                <option value="K">K</option>
+                <option value="F">°F</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="field-label">Pressure</label>
+            <div class="field-row">
+              <input type="number" id="inpP" value="101.325" step="any" oninput="calculate()" onblur="sanitizeOperatingInput('inpP')">
+              <select id="unitP" onchange="calculate()">
+                <option value="kPa">kPa (abs)</option>
+                <option value="bara">bara</option>
+                <option value="psia">psia</option>
+                <option value="barg">barg</option>
+                <option value="psig">psig</option>
+                <option value="MPa">MPa</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:.75rem;padding:.5rem .75rem;background:var(--secondary-bg);border-radius:var(--radius);font-size:.68rem;color:var(--muted)" id="eosNote">
+          Pitzer (simplified Lee-Kesler): Z⁰ + ω·Z¹. Valid for Pr &lt; 10, Tr &gt; 0.7. Switch to PR or SRK for accurate real-gas properties.
+        </div>
+      </div>
+    </div>
+
+    <!-- VAPOR FRACTION -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="droplets" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Vapor Fraction &amp; Phase State</span>
+        <span style="margin-left:auto;font-size:.6rem;color:var(--muted)">Rachford-Rice flash (PR/SRK Ki)</span>
+      </div>
+      <div class="card-body">
+        <div id="phasePanel">
+          <div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.75rem">Enter composition and conditions to calculate phase state.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN: RESULTS -->
+  <div>
+    <!-- MIXTURE PROPERTIES -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="bar-chart-2" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Mixture Properties</span>
+        <span id="eosLabel" style="margin-left:auto;font-size:.6rem;color:var(--muted);padding:.15rem .5rem;border-radius:9999px;border:1px solid var(--border)">Pitzer</span>
+      </div>
+      <div class="card-body">
+        <div class="results-grid" id="resultsGrid">
+          <div class="res-item"><span class="res-label">Molecular Weight</span><span><span class="res-value" id="resMW">—</span><span class="res-unit">g/mol</span></span></div>
+          <div class="res-item"><span class="res-label">Specific Gravity (rel. air)</span><span><span class="res-value" id="resSG">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Density @ conditions</span><span><span class="res-value" id="resDens">—</span><span class="res-unit">kg/m³</span></span></div>
+          <div class="res-item"><span class="res-label">Density @ Nm³ (0 °C, 1 atm)</span><span><span class="res-value" id="resDensN">—</span><span class="res-unit">kg/Nm³</span></span></div>
+          <div class="res-divider"></div>
+          <div class="res-item"><span class="res-label">Compressibility Factor (Z)</span><span><span class="res-value" id="resZ">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Pseudo-critical Tc</span><span><span class="res-value" id="resTpc">—</span><span class="res-unit">K</span></span></div>
+          <div class="res-item"><span class="res-label">Pseudo-critical Pc</span><span><span class="res-value" id="resPpc">—</span><span class="res-unit">bar</span></span></div>
+          <div class="res-item"><span class="res-label">Acentric Factor (ω)</span><span><span class="res-value" id="resOmega">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-divider"></div>
+          <div class="res-item"><span class="res-label">Mixture Cp (ideal)</span><span><span class="res-value" id="resCp">—</span><span class="res-unit">kJ/(kg·K)</span></span></div>
+          <div class="res-item"><span class="res-label">Cp/Cv (γ) — ideal gas</span><span><span class="res-value" id="resGamma">—</span><span class="res-unit">—</span></span></div>
+          <div class="res-item"><span class="res-label">Speed of Sound</span><span><span class="res-value" id="resSos">—</span><span class="res-unit">m/s</span></span></div>
+          <div class="res-item"><span class="res-label">Dynamic Viscosity</span><span><span class="res-value" id="resVisc">—</span><span class="res-unit">cP</span></span></div>
+          <div class="res-item"><span class="res-label">Joule-Thomson Coeff.</span><span><span class="res-value" id="resJT">—</span><span class="res-unit">K/bar</span></span></div>
+          <div class="res-divider"></div>
+          <div class="res-item"><span class="res-label">LHV (molar basis)</span><span><span class="res-value" id="resLHVmol">—</span><span class="res-unit">MJ/Nm³</span></span></div>
+          <div class="res-item"><span class="res-label">LHV (mass basis)</span><span><span class="res-value" id="resLHVmass">—</span><span class="res-unit">MJ/kg</span></span></div>
+          <div class="res-item"><span class="res-label">Wobbe Index</span><span><span class="res-value" id="resWobbe">—</span><span class="res-unit">MJ/Nm³</span></span></div>
+        </div>
+        <div id="flagsRow" style="margin-top:.75rem;display:flex;flex-wrap:wrap;gap:.25rem"></div>
+        <div id="warningsBox" style="display:none" class="warn-box">
+          <i data-lucide="triangle-alert" style="width:14px;height:14px;color:hsl(38,92%,50%);flex-shrink:0;margin-top:2px"></i>
+          <p id="warningsText" style="font-size:.65rem;color:var(--muted);line-height:1.8"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALC TRACE -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="file-code" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Calculation Trace</span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toggleTrace()">Toggle</button>
+      </div>
+      <div id="tracePanel" style="display:none">
+        <div class="card-body" style="padding:.75rem">
+          <div class="trace-box" id="traceBox">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPOSITION BARS -->
+    <div class="card" style="margin-top:1.25rem">
+      <div class="card-header">
+        <div class="card-header-icon"><i data-lucide="align-left" style="width:15px;height:15px"></i></div>
+        <span class="card-title">Composition Profile</span>
+      </div>
+      <div class="card-body">
+        <div class="comp-bars" id="compBars"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- PRINT REPORT — populated by JS, hidden on screen -->
+<div id="printOnePageReport" aria-hidden="true">
+  <div class="pr-sheet">
+    <div class="pr-head">
+      <div>
+        <div class="pr-title">Gas Mixing Calculator</div>
+        <p class="pr-sub">Mixture MW, real-gas density, Z-factor, phase-state screening, LHV/Wobbe, viscosity and acoustic velocity</p>
+        <p class="pr-note">Screening-level property calculation. Not a substitute for HYSYS / UniSim / REFPROP / project property-package validation.</p>
+      </div>
+      <table class="pr-meta">
+        <tr><td>Company</td><td id="prCompany">—</td></tr>
+        <tr><td>Project</td><td id="prProject">—</td></tr>
+        <tr><td>Doc. Name</td><td id="prDocName">—</td></tr>
+        <tr><td>Doc. No. / Rev.</td><td><span id="prDocNo">—</span> / <span id="prRev">—</span></td></tr>
+        <tr><td>Line / Tag</td><td id="prLine">—</td></tr>
+        <tr><td>Model</td><td id="prModel">—</td></tr>
+        <tr><td>T / P</td><td><span id="prTemp">—</span> / <span id="prPress">—</span></td></tr>
+        <tr><td>Composition / Date</td><td><span id="prTotal">—</span> / <span id="prDate">—</span></td></tr>
+      </table>
+    </div>
+
+    <div class="pr-kpis">
+      <div class="pr-kpi"><div class="pr-kpi-l">Molecular Weight</div><div><span class="pr-kpi-v" id="prKpiMW">—</span><span class="pr-kpi-u">g/mol</span></div></div>
+      <div class="pr-kpi"><div class="pr-kpi-l">Z-Factor</div><div><span class="pr-kpi-v" id="prKpiZ">—</span><span class="pr-kpi-u">—</span></div></div>
+      <div class="pr-kpi"><div class="pr-kpi-l">Density</div><div><span class="pr-kpi-v" id="prKpiDens">—</span><span class="pr-kpi-u">kg/m³</span></div></div>
+      <div class="pr-kpi"><div class="pr-kpi-l">Phase State</div><div><span class="pr-kpi-v" id="prKpiPhase">—</span></div></div>
+    </div>
+
+    <div class="pr-grid2">
+      <div class="pr-section">
+        <div class="pr-section-h">Mixture Properties</div>
+        <div class="pr-body">
+          <table class="pr-table"><tbody id="prPropRows"></tbody></table>
+        </div>
+      </div>
+      <div class="pr-section">
+        <div class="pr-section-h">Phase / Flash Summary</div>
+        <div class="pr-body">
+          <table class="pr-table"><tbody id="prPhaseRows"></tbody></table>
+          <div class="pr-compact" style="margin-top:2mm">PR/SRK vapor fraction uses Wilson Ki + Rachford-Rice screening. Cubic EoS uses classical mixing rules with kij = 0.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pr-section">
+      <div class="pr-section-h">Composition</div>
+      <div class="pr-body">
+        <table class="pr-table">
+          <thead><tr><th>Component</th><th>Formula</th><th>Mole %</th><th>MW</th><th>Tc, K</th><th>Pc, bar</th><th>ω</th><th>LHV, MJ/Nm³</th></tr></thead>
+          <tbody id="prCompRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="pr-section" id="prWarningsSection">
+      <div class="pr-section-h">Warnings / Limitations</div>
+      <div class="pr-body"><div class="pr-warn" id="prWarnings">—</div></div>
+    </div>
+
+    <div class="pr-footer"><span>Gas Mixing Calculator</span><span>Hazem ElMancy — Process Engineering Calculators</span></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="logo"><span class="text-primary font-bold text-sm">Hazem</span><span class="font-bold text-sm">ElMancy</span></div>
+    <div class="footer-links">
+      <a href="tel:+201096597449" class="footer-icon"><i data-lucide="phone" style="width:14px;height:14px"></i></a>
+      <a href="mailto:hazemmancy@outlook.com" class="footer-icon"><i data-lucide="mail" style="width:14px;height:14px"></i></a>
+      <a href="https://www.linkedin.com/in/hazemmancy" target="_blank" rel="noopener noreferrer" class="footer-icon"><svg style="width:14px;height:14px;fill:currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77Z"/></svg></a>
+    </div>
+    <p class="text-xs" style="color:var(--muted)">&copy; <span id="year"></span> Hazem ElMancy. All rights reserved.</p>
+  </div>
+</footer>
 
 <script>
-const G=9.80665, RU=8314.46;
-let unitSys='SI';
-let gasPropMode='manual';
-let eosMode='pitzer';
+// ═══════════════════════════════════════════════════════════════════
+const DB = {
+  'Methane':         { f:'CH₄',    MW:16.043,  Cp:2.226,  LHV:35.883, Tc:190.56, Pc:45.99, w:0.0115, g:1.307 },
+  'Ethane':          { f:'C₂H₆',   MW:30.070,  Cp:1.744,  LHV:64.346, Tc:305.32, Pc:48.72, w:0.0995, g:1.187 },
+  'Propane':         { f:'C₃H₈',   MW:44.097,  Cp:1.669,  LHV:93.212, Tc:369.83, Pc:42.48, w:0.1523, g:1.131 },
+  'i-Butane':        { f:'iC₄H₁₀', MW:58.124,  Cp:1.648,  LHV:121.81, Tc:408.14, Pc:36.48, w:0.1808, g:1.101 },
+  'n-Butane':        { f:'nC₄H₁₀', MW:58.124,  Cp:1.694,  LHV:123.57, Tc:425.12, Pc:37.96, w:0.2002, g:1.094 },
+  'i-Pentane':       { f:'iC₅H₁₂', MW:72.151,  Cp:1.620,  LHV:152.23, Tc:460.43, Pc:33.81, w:0.2275, g:1.074 },
+  'n-Pentane':       { f:'nC₅H₁₂', MW:72.151,  Cp:1.664,  LHV:154.00, Tc:469.70, Pc:33.70, w:0.2515, g:1.073 },
+  'n-Hexane':        { f:'nC₆H₁₄', MW:86.178,  Cp:1.615,  LHV:183.07, Tc:507.60, Pc:30.25, w:0.3013, g:1.062 },
+  'n-Heptane':       { f:'nC₇H₁₆', MW:100.205, Cp:1.617,  LHV:212.00, Tc:540.20, Pc:27.40, w:0.3495, g:1.053 },
+  'n-Octane':        { f:'nC₈H₁₈', MW:114.232, Cp:1.641,  LHV:240.83, Tc:568.70, Pc:24.90, w:0.3996, g:1.044 },
+  'Nitrogen':        { f:'N₂',     MW:28.014,  Cp:1.040,  LHV:0.000,  Tc:126.20, Pc:33.98, w:0.0372, g:1.400 },
+  'Carbon Dioxide':  { f:'CO₂',    MW:44.010,  Cp:0.837,  LHV:0.000,  Tc:304.13, Pc:73.77, w:0.2239, g:1.289 },
+  'Hydrogen Sulfide':{ f:'H₂S',    MW:34.082,  Cp:1.003,  LHV:23.359, Tc:373.20, Pc:89.63, w:0.0942, g:1.320 },
+  'Hydrogen':        { f:'H₂',     MW:2.016,   Cp:14.307, LHV:10.784, Tc:33.19,  Pc:13.13, w:-0.2160,g:1.405 },
+  'Oxygen':          { f:'O₂',     MW:31.999,  Cp:0.919,  LHV:0.000,  Tc:154.58, Pc:50.46, w:0.0222, g:1.394 },
+  'Water Vapor':     { f:'H₂O',    MW:18.015,  Cp:1.864,  LHV:0.000,  Tc:647.10, Pc:220.64,w:0.3449, g:1.329 },
+  'Argon':           { f:'Ar',     MW:39.948,  Cp:0.520,  LHV:0.000,  Tc:150.86, Pc:48.74, w:-0.0022,g:1.667 },
+  'Carbon Monoxide': { f:'CO',     MW:28.010,  Cp:1.040,  LHV:11.965, Tc:132.85, Pc:34.53, w:0.0481, g:1.400 },
+  'Ethylene':        { f:'C₂H₄',   MW:28.054,  Cp:1.528,  LHV:59.464, Tc:282.34, Pc:50.41, w:0.0862, g:1.240 },
+  'Propylene':       { f:'C₃H₆',   MW:42.081,  Cp:1.510,  LHV:87.593, Tc:364.90, Pc:46.00, w:0.1420, g:1.155 },
+  'Sulfur Dioxide':  { f:'SO₂',    MW:64.065,  Cp:0.622,  LHV:0.000,  Tc:430.80, Pc:78.84, w:0.2557, g:1.264 },
+  'Carbonyl Sulfide':{ f:'COS',    MW:60.075,  Cp:0.621,  LHV:19.657, Tc:378.80, Pc:63.49, w:0.0978, g:1.262 },
+};
 
-const GAS_COMPONENT_LIBRARY=[
-  {id:'CH4',name:'Methane',MW:16.043,Tc:190.56,Pc:45.99,omega:0.011,k:1.31,mu:0.0110,mol:85},
-  {id:'C2H6',name:'Ethane',MW:30.070,Tc:305.32,Pc:48.72,omega:0.099,k:1.20,mu:0.0092,mol:7},
-  {id:'C3H8',name:'Propane',MW:44.097,Tc:369.83,Pc:42.48,omega:0.152,k:1.13,mu:0.0082,mol:3},
-  {id:'iC4',name:'i-Butane',MW:58.124,Tc:407.81,Pc:36.48,omega:0.184,k:1.10,mu:0.0077,mol:0},
-  {id:'nC4',name:'n-Butane',MW:58.124,Tc:425.12,Pc:37.96,omega:0.200,k:1.09,mu:0.0076,mol:0},
-  {id:'iC5',name:'i-Pentane',MW:72.151,Tc:460.35,Pc:33.78,omega:0.227,k:1.08,mu:0.0072,mol:0},
-  {id:'nC5',name:'n-Pentane',MW:72.151,Tc:469.70,Pc:33.70,omega:0.251,k:1.07,mu:0.0071,mol:0},
-  {id:'C6+',name:'Hexanes+',MW:86.178,Tc:507.60,Pc:30.25,omega:0.301,k:1.06,mu:0.0068,mol:0},
-  {id:'N2',name:'Nitrogen',MW:28.014,Tc:126.20,Pc:33.98,omega:0.037,k:1.40,mu:0.0176,mol:3},
-  {id:'CO2',name:'Carbon dioxide',MW:44.010,Tc:304.13,Pc:73.77,omega:0.225,k:1.29,mu:0.0148,mol:1.5},
-  {id:'H2S',name:'Hydrogen sulfide',MW:34.081,Tc:373.20,Pc:89.40,omega:0.100,k:1.32,mu:0.0120,mol:0},
-  {id:'H2',name:'Hydrogen',MW:2.016,Tc:33.19,Pc:12.96,omega:-0.216,k:1.41,mu:0.0089,mol:0},
-  {id:'He',name:'Helium',MW:4.003,Tc:5.20,Pc:2.28,omega:-0.390,k:1.66,mu:0.0196,mol:0}
-];
-const DEFAULT_GAS_COMPONENT_IDS=['CH4','C2H6','C3H8','iC4','nC4','iC5','nC5','C6+','N2','CO2','H2S','H2','He'];
-let gasComponents=DEFAULT_GAS_COMPONENT_IDS.map(id=>({...GAS_COMPONENT_LIBRARY.find(c=>c.id===id)})).filter(Boolean);
+const MW_AIR = 28.966;
+const R_U    = 8.31446;
+const R_J    = 8314.46;
 
-const U={flow:{SI:'kg/h',IMP:'lb/h'},pressure:{SI:'bara',IMP:'psia'},temp:{SI:'°C',IMP:'°F'},len:{SI:'m',IMP:'ft'},dia:{SI:'mm',IMP:'in'},rough:{SI:'mm',IMP:'in'},dp:{SI:'bar',IMP:'psi'},vel:{SI:'m/s',IMP:'ft/s'},density:{SI:'kg/m³',IMP:'lb/ft³'},dp100:{SI:'bar/100m',IMP:'psi/100ft'}};
-const GAS_LIMITS={min:3,max:25,warning:20};
-const MACH_LIMIT=0.3;
-const RHOV2_LIMIT=6000;
+const COLORS = [
+  'hsl(217,91%,60%)','hsl(142,71%,50%)','hsl(38,92%,55%)','hsl(271,81%,70%)',
+  'hsl(0,72%,65%)','hsl(187,71%,55%)','hsl(48,96%,53%)','hsl(25,95%,58%)',
+  'hsl(330,80%,65%)','hsl(100,60%,55%)','hsl(200,80%,60%)','hsl(60,90%,55%)',
+];
 
-const PIPE_DB={'0.5"':{OD:21.3,SCH:{'5S':1.65,'10S':2.11,'40':2.77,'80':3.73,'160':4.78,'XXS':7.47}},'0.75"':{OD:26.7,SCH:{'5S':1.65,'10S':2.11,'40':2.87,'80':3.91,'160':5.56,'XXS':7.82}},'1"':{OD:33.4,SCH:{'5S':1.65,'10S':2.77,'40':3.38,'80':4.55,'160':6.35,'XXS':9.09}},'1.5"':{OD:48.3,SCH:{'5S':1.65,'10S':2.77,'40':3.68,'80':5.08,'160':7.14,'XXS':10.16}},'2"':{OD:60.3,SCH:{'5S':1.65,'10S':2.77,'40':3.91,'80':5.54,'160':8.74,'XXS':11.07}},'3"':{OD:88.9,SCH:{'5S':2.11,'10S':3.05,'40':5.49,'80':7.62,'160':11.13,'XXS':15.24}},'4"':{OD:114.3,SCH:{'5S':2.11,'10S':3.05,'40':6.02,'80':8.56,'120':11.13,'160':13.49,'XXS':17.12}},'6"':{OD:168.3,SCH:{'5S':2.77,'10S':3.40,'40':7.11,'80':10.97,'120':14.27,'160':18.26,'XXS':21.95}},'8"':{OD:219.1,SCH:{'5S':2.77,'10S':3.76,'20':6.35,'30':7.04,'40':8.18,'60':10.31,'80':12.70,'100':15.09,'120':18.26,'140':20.62,'160':23.01,'XXS':22.23}},'10"':{OD:273.1,SCH:{'5S':3.40,'10S':4.19,'20':6.35,'30':7.80,'40':9.27,'60':12.70,'80':15.09,'100':18.26,'120':21.44,'140':25.40,'160':28.58,'XXS':25.40}},'12"':{OD:323.9,SCH:{'5S':3.96,'10S':4.57,'20':6.35,'30':8.38,'40':10.31,'60':14.27,'80':17.48,'100':21.44,'120':25.40,'140':28.58,'160':33.32,'XXS':25.40}},'14"':{OD:355.6,SCH:{'5S':3.96,'10S':4.78,'10':6.35,'20':7.92,'30':9.53,'40':11.13,'60':15.09,'80':19.05,'100':23.83,'120':27.79,'140':31.75,'160':35.71}},'16"':{OD:406.4,SCH:{'5S':4.19,'10S':4.78,'10':6.35,'20':7.92,'30':9.53,'40':12.70,'60':16.66,'80':21.44,'100':26.19,'120':30.96,'140':36.53,'160':40.49}},'18"':{OD:457.0,SCH:{'5S':4.19,'10S':4.78,'10':6.35,'20':7.92,'30':11.13,'40':14.27,'60':19.05,'80':23.83,'100':29.36,'120':34.93,'140':39.67,'160':45.24}},'20"':{OD:508.0,SCH:{'5S':4.78,'10S':5.54,'10':6.35,'20':9.53,'30':12.70,'40':15.09,'60':20.62,'80':26.19,'100':32.54,'120':38.10,'140':44.45,'160':50.01}},'24"':{OD:609.6,SCH:{'5S':5.54,'10S':6.35,'10':6.35,'20':9.53,'30':14.27,'40':17.48,'60':24.61,'80':30.96,'100':38.89,'120':46.02,'140':52.37,'160':59.54}}};
-const MATERIAL_ROUGHNESS=[{name:'Commercial Carbon Steel (clean)',eps_mm:0.0457,note:'Moody/GPSA clean commercial steel screening value'},{name:'Stainless Steel (clean)',eps_mm:0.015,note:'typical clean stainless steel screening value'},{name:'Drawn Tubing / Very Smooth Pipe',eps_mm:0.0015,note:'smooth pipe screening value'},{name:'HDPE / Plastic',eps_mm:0.007,note:'typical smooth plastic screening value'},{name:'FRP / GRE / Fibre Glass',eps_mm:0.005,note:'typical non-metallic/fibre glass screening value; confirm vendor data'},{name:'Galvanized Steel',eps_mm:0.15,note:'typical galvanized steel screening value'},{name:'Aged Carbon Steel / Light Corrosion',eps_mm:0.10,note:'indicative aged/roughened CS value'},{name:'Custom',eps_mm:null,note:'user-specified roughness'}];
-const FITTINGS_DB=[
-  {id:'elbow90',name:'90° elbow, standard radius',K:0.90},
-  {id:'elbow90lr',name:'90° elbow, long radius',K:0.45},
-  {id:'elbow45',name:'45° elbow',K:0.35},
-  {id:'teeRun',name:'Tee through run',K:0.60},
-  {id:'teeBranch',name:'Tee through branch',K:1.80},
-  {id:'gateValveOpen',name:'Gate valve, fully open',K:0.15},
-  {id:'ballValveOpen',name:'Ball valve, fully open',K:0.05},
-  {id:'globeValveOpen',name:'Globe valve, fully open',K:10.0},
-  {id:'checkSwing',name:'Swing check valve',K:2.0},
-  {id:'entranceSharp',name:'Sharp-edged entrance',K:0.50},
-  {id:'exit',name:'Pipe exit',K:1.0},
-  {id:'reducer',name:'Reducer / expander, screening',K:0.50},
-  {id:'custom',name:'Custom K item',K:1.0}
-];
-let fittings=[];
-const SERVICE_LIMITS=[
-{service:'Continuous – Vacuum',dpType:'%Pop',dpLimit:10,velocityLimit:60},{service:'Continuous – Pop atm to 2 barg',dpLimit:.5,dpType:'bar/km',velocityLimit:50},{service:'Continuous – Pop 2 to 7 barg',dpLimit:1,dpType:'bar/km',velocityLimit:45},{service:'Continuous – Pop 7 to 35 barg',dpLimit:1.5,dpType:'bar/km',rhoV2Limit:15000},{service:'Continuous – Pop 35 to 140 barg',dpLimit:3,dpType:'bar/km',rhoV2Limit:20000},{service:'Continuous – Pop above 140 barg',dpLimit:5,dpType:'bar/km',rhoV2Limit:25000},
-{service:'Compressor suction – Vacuum',dpLimit:.05,dpType:'bar/km',velocityLimit:35},{service:'Compressor suction – Pop atm to 2 barg',dpLimit:.15,dpType:'bar/km',velocityLimit:30},{service:'Compressor suction – Pop 2 to 7 barg',dpLimit:.4,dpType:'bar/km',velocityLimit:25},{service:'Compressor suction – Pop 7 to 35 barg',dpLimit:1,dpType:'bar/km',rhoV2Limit:6000},{service:'Compressor suction – Pop > 35 barg',dpLimit:2,dpType:'bar/km',rhoV2Limit:15000},
-{service:'Column overhead to condenser',notes:'Same criteria as compressor suction (select matching pressure range above)'},{service:'Kettle reboiler return',notes:'Same criteria as compressor suction (select matching pressure range above)'},{service:'Discontinuous – Pop < 35 barg',velocityLimit:60,rhoV2Limit:15000},{service:'Discontinuous – Pop >= 35 barg',rhoV2Limit:25000},
-{service:'Flare – upstream PSV',dpLimit:3,dpType:'%Pop',notes:'DP < 3% of PRV set pressure (based on set pressure, not operating)'},{service:'Flare – upstream BDV',velocityLimit:60,rhoV2Limit:30000},{service:'Flare tail pipe',machLimit:.7},{service:'Flare tail pipe (downstream BDV)',machLimit:1},{service:'Flare header',machLimit:.5},
-{service:'Steam – Superheated 150#',dpLimit:2,dpType:'bar/km',velocityLimit:45},{service:'Steam – Superheated 300#',dpLimit:3,dpType:'bar/km',velocityLimit:60},{service:'Steam – Superheated 600#',dpLimit:6,dpType:'bar/km',velocityLimit:60},{service:'Steam – Superheated >= 900#',dpLimit:8,dpType:'bar/km',velocityLimit:70},
-{service:'Steam – Saturated 150#',dpLimit:1,dpType:'bar/km',velocityLimit:45},{service:'Steam – Saturated 300#',dpLimit:3,dpType:'bar/km',velocityLimit:35},{service:'Steam – Saturated 600#',dpLimit:6,dpType:'bar/km',velocityLimit:30},
-{service:'Superheated steam header – 150#',dpLimit:1,dpType:'bar/km',velocityLimit:45},{service:'Superheated steam header – 300#',dpLimit:1.5,dpType:'bar/km',velocityLimit:45},{service:'Superheated steam header – 600#',dpLimit:2,dpType:'bar/km',velocityLimit:45},
-{service:'Fuel Gas – Vacuum',dpType:'%Pop',dpLimit:10,velocityLimit:60},{service:'Fuel Gas – Pop atm to 2 barg',dpLimit:.5,dpType:'bar/km',velocityLimit:50},{service:'Fuel Gas – Pop 2 to 7 barg',dpLimit:1,dpType:'bar/km',velocityLimit:45},{service:'Fuel Gas – Pop 7 to 35 barg',dpLimit:1.5,dpType:'bar/km',rhoV2Limit:15000},{service:'Fuel Gas – Pop 35 to 140 barg',dpLimit:3,dpType:'bar/km',rhoV2Limit:20000},{service:'Fuel Gas – Pop above 140 barg',dpLimit:5,dpType:'bar/km',rhoV2Limit:25000}
-];
-function fmtN(n,d=4){if(!isFinite(n))return '—';const a=Math.abs(n);if(a===0)return '0';if(a>=10000)return n.toFixed(0);if(a>=1000)return n.toFixed(1);if(a>=100)return n.toFixed(2);if(a>=1)return n.toFixed(d<3?3:d);return n.toPrecision(4)}
-function fmtInput(v){if(!isFinite(v))return '';const a=Math.abs(v);if(a>=1000)return v.toFixed(1);if(a>=1)return v.toFixed(3);return v.toPrecision(4)}
-function readNum(id){const v=parseFloat(document.getElementById(id)?.value);return Number.isFinite(v)?v:NaN}
-function convertField(id,f){const el=document.getElementById(id);if(!el)return;const v=parseFloat(el.value);if(Number.isFinite(v))el.value=fmtInput(v*f)}
-function convertTemp(id,toIMP){const el=document.getElementById(id);if(!el)return;const v=parseFloat(el.value);if(!Number.isFinite(v))return;el.value=fmtInput(toIMP?v*9/5+32:(v-32)*5/9)}
-function safeCompDomId(id){return String(id).replace(/[^A-Za-z0-9_]/g,'_')}
-function fittingSumK(){return fittings.reduce((s,f)=>s+(Number(f.qty)||0)*(Number(f.K)||0),0)}
-function renderFittings(){
-  const body=document.getElementById('fittingBody');
-  if(!body)return;
-  body.innerHTML=fittings.map((f,i)=>`<tr>
-    <td>${f.name}</td>
-    <td><input type="number" min="0" step="1" value="${f.qty}" style="text-align:right;padding:.25rem .35rem;font-size:.68rem" oninput="updateFitting(${i},'qty',this.value)" /></td>
-    <td><input type="number" min="0" step="any" value="${f.K}" style="text-align:right;padding:.25rem .35rem;font-size:.68rem" oninput="updateFitting(${i},'K',this.value)" /></td>
-    <td style="text-align:right;font-weight:600">${fmtN((Number(f.qty)||0)*(Number(f.K)||0),4)}</td>
-    <td style="text-align:center"><button type="button" class="mini-del" onclick="removeFitting(${i})" title="Remove fitting">×</button></td>
-  </tr>`).join('');
-  const t=document.getElementById('fitKTotal');
-  if(t)t.textContent=fmtN(fittingSumK(),4);
+const PRESETS = {
+  lean:    [['Methane',91.00],['Ethane',4.50],['Propane',1.20],['i-Butane',0.25],['n-Butane',0.30],['i-Pentane',0.10],['n-Pentane',0.08],['Carbon Dioxide',1.50],['Nitrogen',1.00],['n-Hexane',0.07]],
+  rich:    [['Methane',75.00],['Ethane',10.00],['Propane',6.00],['i-Butane',1.50],['n-Butane',2.00],['i-Pentane',0.80],['n-Pentane',0.60],['n-Hexane',0.50],['n-Heptane',0.30],['Carbon Dioxide',2.00],['Nitrogen',0.80],['Hydrogen Sulfide',0.50]],
+  lpg:     [['Propane',60.00],['i-Butane',15.00],['n-Butane',22.00],['Ethane',2.00],['i-Pentane',1.00]],
+  sour:    [['Methane',72.00],['Ethane',5.00],['Propane',2.50],['i-Butane',0.50],['n-Butane',0.60],['Carbon Dioxide',8.00],['Hydrogen Sulfide',10.00],['Nitrogen',1.00],['Water Vapor',0.40]],
+  acidgas: [['Hydrogen Sulfide',65.00],['Carbon Dioxide',32.00],['Methane',1.50],['Water Vapor',1.50]],
+  tailgas: [['Nitrogen',55.00],['Water Vapor',25.00],['Carbon Dioxide',8.00],['Hydrogen Sulfide',1.50],['Sulfur Dioxide',0.50],['Hydrogen',4.00],['Carbon Monoxide',2.00],['Carbonyl Sulfide',0.50],['Methane',3.50]],
+  fuelgas: [['Methane',50.00],['Hydrogen',25.00],['Ethane',10.00],['Propane',5.00],['Ethylene',4.00],['Nitrogen',3.00],['Carbon Dioxide',2.00],['n-Butane',1.00]],
+  fcc:     [['Nitrogen',78.00],['Carbon Dioxide',12.00],['Oxygen',3.00],['Carbon Monoxide',4.00],['Water Vapor',2.00],['Sulfur Dioxide',1.00]],
+  h2rich:  [['Hydrogen',80.00],['Methane',10.00],['Ethane',5.00],['Propane',2.50],['n-Butane',1.50],['n-Pentane',1.00]],
+  syngas:  [['Hydrogen',74.00],['Carbon Monoxide',8.00],['Carbon Dioxide',10.00],['Methane',4.00],['Nitrogen',2.00],['Water Vapor',2.00]],
+  flare:   [['Methane',40.00],['Ethane',15.00],['Propane',12.00],['n-Butane',8.00],['n-Pentane',4.00],['Hydrogen',5.00],['Nitrogen',10.00],['Carbon Dioxide',4.00],['Hydrogen Sulfide',2.00]],
+  n2:      [['Nitrogen',99.50],['Oxygen',0.30],['Argon',0.10],['Water Vapor',0.10]],
+  air:     [['Nitrogen',78.08],['Oxygen',20.95],['Argon',0.93],['Carbon Dioxide',0.04]],
+};
+
+const EOS_NOTES = {
+  pitzer: 'Pitzer (simplified Lee-Kesler): Z = Z⁰ + ω·Z¹. Valid for Pr < 10, Tr > 0.7. Switch to PR or SRK for accurate real-gas properties.',
+  pr: 'Peng-Robinson (1976/1978): cubic EoS with van der Waals mixing rules. Best for hydrocarbons. Vapor fraction via Wilson Ki + Rachford-Rice.',
+  srk: 'Soave-Redlich-Kwong (1972): cubic EoS. Good for H₂S, CO₂ streams. Vapor fraction via Wilson Ki + Rachford-Rice.',
+};
+
+let rows = [], rowId = 0, eosMode = 'pitzer';
+
+function setEos(m) {
+  eosMode = ['pitzer','pr','srk'].includes(m) ? m : 'pitzer';
+  const eosIds = { pitzer:'eosPitzer', pr:'eosPR', srk:'eosSRK' };
+  Object.entries(eosIds).forEach(([key,id]) => {
+    const btn = document.getElementById(id);
+    if(btn) btn.classList.toggle('active', key === eosMode);
+  });
+  const note = document.getElementById('eosNote');
+  if(note) note.textContent = EOS_NOTES[eosMode];
+  const label = document.getElementById('eosLabel');
+  if(label) label.textContent = eosMode==='pitzer' ? 'Pitzer' : eosMode==='pr' ? 'PR EoS' : 'SRK EoS';
+  calculate();
 }
-function addFitting(){const id=document.getElementById('selFitType')?.value;const qty=Math.max(1,parseInt(document.getElementById('inpFitQty')?.value||'1',10)||1);const src=FITTINGS_DB.find(x=>x.id===id)||FITTINGS_DB[0];fittings.push({name:src.name,qty:qty,K:src.K});renderFittings();calculate()}
-function updateFitting(i,field,value){if(!fittings[i])return;const v=parseFloat(value);fittings[i][field]=Number.isFinite(v)&&v>=0?v:0;renderFittings();calculate()}
-function removeFitting(i){fittings.splice(i,1);renderFittings();calculate()}
-function updateGasComponentsFromInputs(){gasComponents=gasComponents.map(c=>{const v=parseFloat(document.getElementById('gc_'+safeCompDomId(c.id))?.value);return {...c,mol:Number.isFinite(v)?v:c.mol}})}
-function refreshGasCompAddDropdown(){const sel=document.getElementById('selGasComponentAdd');if(!sel)return;const active=new Set(gasComponents.map(c=>c.id));const opts=GAS_COMPONENT_LIBRARY.filter(c=>!active.has(c.id));sel.innerHTML=opts.length?opts.map(c=>'<option value="'+c.id+'">'+c.name+' ('+c.id+')</option>').join(''):'<option value="">All components added</option>'}
-function addGasComponent(){updateGasComponentsFromInputs();const id=document.getElementById('selGasComponentAdd')?.value;if(!id)return;const src=GAS_COMPONENT_LIBRARY.find(c=>c.id===id);if(!src||gasComponents.some(c=>c.id===id))return;gasComponents.push({...src,mol:0});renderGasCompTable()}
-function removeGasComponent(id){updateGasComponentsFromInputs();gasComponents=gasComponents.filter(c=>c.id!==id);renderGasCompTable()}
-function resetGasComponents(){gasComponents=DEFAULT_GAS_COMPONENT_IDS.map(id=>({...GAS_COMPONENT_LIBRARY.find(c=>c.id===id)})).filter(Boolean);renderGasCompTable()}
-function setGasPropMode(m){gasPropMode=m;document.getElementById('propManualBtn').classList.toggle('active',m==='manual');document.getElementById('propMixBtn').classList.toggle('active',m==='mix');document.getElementById('manualGasProps').style.display=m==='manual'?'block':'none';document.getElementById('mixGasProps').style.display=m==='mix'?'block':'none';calculate()}
-function setEosMode(m){eosMode=m;document.querySelectorAll('.eos-btn').forEach(b=>b.classList.toggle('active',b.dataset.eos===m));calculate()}
-function renderGasCompTable(){const body=document.getElementById('gasCompBody');if(!body)return;body.innerHTML=gasComponents.map(c=>'<tr><td>'+c.name+' <span style="color:var(--muted);font-size:.58rem">('+c.id+')</span></td><td><input type="number" id="gc_'+safeCompDomId(c.id)+'" min="0" step="any" value="'+c.mol+'" style="text-align:right;padding:.25rem .35rem;font-size:.68rem" oninput="onGasCompInput()" /></td><td style="text-align:center"><button type="button" class="mini-del" onclick="removeGasComponent(\''+c.id+'\')" title="Remove component">×</button></td></tr>').join('');refreshGasCompAddDropdown();onGasCompInput()}
-function gasCompRows(){return gasComponents.map(c=>{const id='gc_'+safeCompDomId(c.id);const v=parseFloat(document.getElementById(id)?.value);return {...c,mol:Number.isFinite(v)?v:0};});}
-function onGasCompInput(){const rows=gasCompRows();const total=rows.reduce((a,r)=>a+(Number.isFinite(r.mol)?r.mol:0),0);const el=document.getElementById('gasCompTotal');if(el){el.textContent=fmtN(total,4);el.style.color=Math.abs(total-100)>0.001?'var(--amber)':'var(--green)'}calculate()}
-function cubicRealRoots(a,b,c){const Q=(3*b-a*a)/9,R=(9*a*b-27*c-2*a*a*a)/54,D=Q*Q*Q+R*R;if(D>=0){const S=Math.cbrt(R+Math.sqrt(D)),T=Math.cbrt(R-Math.sqrt(D));return [(-a/3)+(S+T)].filter(Number.isFinite)}const th=Math.acos(R/Math.sqrt(-Q*Q*Q));return [2*Math.sqrt(-Q)*Math.cos(th/3)-a/3,2*Math.sqrt(-Q)*Math.cos((th+2*Math.PI)/3)-a/3,2*Math.sqrt(-Q)*Math.cos((th+4*Math.PI)/3)-a/3].sort((x,y)=>x-y)}
-function zPitzer(Pr,Tr,omega){if(!(Pr>0&&Tr>0))return 1;const B0=0.083-0.422/Math.pow(Tr,1.6),B1=0.139-0.172/Math.pow(Tr,4.2);return Math.max(0.2,Math.min(2.0,1+(B0+omega*B1)*Pr/Tr))}
-function eosZ(rows,T,Pbar,method){const R=8.314462618;let a=[],b=[];for(const r of rows){if(method==='pr'){const kappa=0.37464+1.54226*r.omega-0.26992*r.omega*r.omega,alpha=Math.pow(1+kappa*(1-Math.sqrt(T/r.Tc)),2);a.push(0.45724*R*R*r.Tc*r.Tc/r.Pc*alpha);b.push(0.07780*R*r.Tc/r.Pc)}else{const m=0.480+1.574*r.omega-0.176*r.omega*r.omega,alpha=Math.pow(1+m*(1-Math.sqrt(T/r.Tc)),2);a.push(0.42747*R*R*r.Tc*r.Tc/r.Pc*alpha);b.push(0.08664*R*r.Tc/r.Pc)}}let am=0,bm=0;for(let i=0;i<rows.length;i++){bm+=rows[i].y*b[i];for(let j=0;j<rows.length;j++)am+=rows[i].y*rows[j].y*Math.sqrt(a[i]*a[j])}const A=am*Pbar/(R*R*T*T),B=bm*Pbar/(R*T);let roots=method==='pr'?cubicRealRoots(B-1,A-3*B*B-2*B,-(A*B-B*B-B*B*B)):cubicRealRoots(-1,A-B-B*B,-A*B);const valid=roots.filter(z=>Number.isFinite(z)&&z>B*0.999).sort((x,y)=>x-y);return {Z:valid.length?valid[valid.length-1]:1,roots:valid,A,B}}
-function resolveGasPropsSI(P_bara,T_C){const warnings=[];if(gasPropMode==='manual')return {MW:readNum('inpMW'),Z:readNum('inpZ'),k:readNum('inpK'),mu_cP:readNum('inpMu'),warnings,basis:'Manual'};const raw=gasCompRows();if(raw.some(r=>r.mol<0))return {MW:NaN,Z:NaN,k:NaN,mu_cP:NaN,warnings:['Negative gas composition is invalid.'],basis:'Gas Mixing'};const total=raw.reduce((s,r)=>s+r.mol,0);if(!(total>0))return {MW:NaN,Z:NaN,k:NaN,mu_cP:NaN,warnings:['Gas composition total must be greater than zero.'],basis:'Gas Mixing'};const rows=raw.filter(r=>r.mol>0).map(r=>({...r,y:r.mol/total}));const MW=rows.reduce((s,r)=>s+r.y*r.MW,0);const k=rows.reduce((s,r)=>s+r.y*r.k,0);const mu_cP=rows.reduce((s,r)=>s+r.y*r.mu*Math.sqrt(r.MW),0)/rows.reduce((s,r)=>s+r.y*Math.sqrt(r.MW),0);const T=T_C+273.15;let Z=1,basis='Gas Mixing';if(eosMode==='pitzer'){const Tpc=rows.reduce((s,r)=>s+r.y*r.Tc,0),Ppc=rows.reduce((s,r)=>s+r.y*r.Pc,0),omega=rows.reduce((s,r)=>s+r.y*r.omega,0);Z=zPitzer(P_bara/Ppc,T/Tpc,omega);basis='Generalized Pitzer-type Z'}else{const er=eosZ(rows,T,P_bara,eosMode);Z=er.Z;basis=(eosMode==='pr'?'PR':'SRK')+' vapor-root Z';if(er.roots&&er.roots.length>1)warnings.push('Multiple cubic EoS real roots detected. Vapor/highest root used; not a rigorous flash.')}if(Math.abs(total-100)>0.001)warnings.push('Gas composition total = '+fmtN(total,3)+' mol%; internally normalized to 100 mol%.');if(raw.some(r=>['CO2','H2S','H2'].includes(r.id)&&r.mol>0))warnings.push('Acid gas / hydrogen component present. Validate Z, viscosity and binary interaction parameters against project property package.');const set=(id,val,unit='')=>{const e=document.getElementById(id);if(e)e.textContent=Number.isFinite(val)?fmtN(val,4)+unit:'—'};set('propMWOut',MW);set('propZOut',Z);set('propKOut',k);set('propMuOut',mu_cP,' cP');return {MW,Z,k,mu_cP,warnings,basis,total}}
-function setUnits(sys){if(unitSys===sys)return;const toIMP=unitSys==='SI';unitSys=sys;document.getElementById('btnSI').classList.toggle('active',sys==='SI');document.getElementById('btnIMP').classList.toggle('active',sys==='IMP');convertField('inpFlow',toIMP?2.20462:1/2.20462);convertField('inpPressure',toIMP?14.5038:1/14.5038);convertTemp('inpTemp',toIMP);convertField('inpLen',toIMP?3.28084:0.3048);convertField('inpDia',toIMP?1/25.4:25.4);convertField('inpRough',toIMP?1/25.4:25.4);updateLabels();refreshSchDropdown();updateRoughnessNote();calculate()}
-function updateLabels(){const s=unitSys;document.getElementById('lblFlow').textContent='Mass Flow Rate ('+U.flow[s]+')';document.getElementById('lblPressure').textContent='Operating Pressure — absolute ('+U.pressure[s]+')';document.getElementById('lblTemp').textContent='Operating Temperature ('+U.temp[s]+')';document.getElementById('lblLen').textContent='Pipe Length ('+U.len[s]+')';document.getElementById('lblDia').textContent='ID ('+U.dia[s]+')';document.getElementById('lblRough').textContent='ε Roughness ('+U.rough[s]+')'}
-function initPickers(){const n=document.getElementById('selNPS');n.innerHTML='<option value="custom">— Custom —</option>';Object.keys(PIPE_DB).forEach(x=>{const o=document.createElement('option');o.value=x;o.textContent='NPS '+x;n.appendChild(o)});const m=document.getElementById('selMaterial');MATERIAL_ROUGHNESS.forEach(x=>{const o=document.createElement('option');o.value=x.name;o.textContent=x.name+(x.eps_mm!==null?' — ε '+x.eps_mm+' mm':'');m.appendChild(o)});m.value='Commercial Carbon Steel (clean)';const fs=document.getElementById('selFitType');if(fs){fs.innerHTML=FITTINGS_DB.map(x=>'<option value="'+x.id+'">'+x.name+' — K '+x.K+'</option>').join('')}const svc=document.getElementById('selService');SERVICE_LIMITS.forEach(x=>{const o=document.createElement('option');o.value=x.service;o.textContent=x.service;svc.appendChild(o)});updateRoughnessNote();renderFittings()}
-function refreshSchDropdown(){const nps=document.getElementById('selNPS').value,cur=document.getElementById('selSch').value;if(nps==='custom'||!PIPE_DB[nps])return;const sel=document.getElementById('selSch');sel.innerHTML='<option value="custom">— Custom —</option>';Object.keys(PIPE_DB[nps].SCH).forEach(s=>{const id=PIPE_DB[nps].OD-2*PIPE_DB[nps].SCH[s];const o=document.createElement('option');o.value=s;o.textContent='SCH '+s+' (ID '+(unitSys==='SI'?id.toFixed(1)+' mm':(id/25.4).toFixed(3)+' in')+')';sel.appendChild(o)});sel.value=cur}
-function onNPSChange(){const nps=document.getElementById('selNPS').value,sel=document.getElementById('selSch');sel.innerHTML='<option value="custom">— Custom —</option>';if(nps!=='custom'&&PIPE_DB[nps]){Object.keys(PIPE_DB[nps].SCH).forEach(s=>{const id=PIPE_DB[nps].OD-2*PIPE_DB[nps].SCH[s];const o=document.createElement('option');o.value=s;o.textContent='SCH '+s+' (ID '+(unitSys==='SI'?id.toFixed(1)+' mm':(id/25.4).toFixed(3)+' in')+')';sel.appendChild(o)});if(PIPE_DB[nps].SCH['40'])sel.value='40';onSchChange()}else calculate()}
-function onSchChange(){const nps=document.getElementById('selNPS').value,sch=document.getElementById('selSch').value;if(nps!=='custom'&&sch!=='custom'&&PIPE_DB[nps]?.SCH[sch]){const id=PIPE_DB[nps].OD-2*PIPE_DB[nps].SCH[sch];document.getElementById('inpDia').value=unitSys==='SI'?id.toFixed(1):(id/25.4).toFixed(4)}calculate()}
-function onCustomDia(){document.getElementById('selNPS').value='custom';document.getElementById('selSch').innerHTML='<option value="custom">— Custom —</option>';calculate()}
-function onMaterialChange(){const m=MATERIAL_ROUGHNESS.find(x=>x.name===document.getElementById('selMaterial').value);if(m&&m.eps_mm!==null)document.getElementById('inpRough').value=unitSys==='SI'?fmtInput(m.eps_mm):fmtInput(m.eps_mm/25.4);updateRoughnessNote();calculate()}
-function onRoughnessInput(){document.getElementById('selMaterial').value='Custom';updateRoughnessNote();calculate()}
-function updateRoughnessNote(){const m=MATERIAL_ROUGHNESS.find(x=>x.name===document.getElementById('selMaterial').value);document.getElementById('noteRough').textContent=(m?m.note:'User-specified roughness')+' | current ε = '+(document.getElementById('inpRough').value||'—')+' '+U.rough[unitSys]}
-function clearErrors(){['errFlow','errPressure','errTemp','errLen','errDia','errRough','errMW','errZ','errK','errMu','errGasComp'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});document.getElementById('globalErr').style.display='none'}
-function showErr(id){const e=document.getElementById(id);if(e)e.style.display='block'}
-function hideResults(){document.getElementById('placeholderCard').style.display='block';['resultsCard','warningsCard','limitsCard','traceAccordion'].forEach(id=>document.getElementById(id).style.display='none');lucide.createIcons()}
-function getSI(){const imp=unitSys==='IMP',roughRaw=readNum('inpRough');const base={mdot_kgph:imp?readNum('inpFlow')/2.20462:readNum('inpFlow'),P_bara:imp?readNum('inpPressure')/14.5038:readNum('inpPressure'),T_C:imp?(readNum('inpTemp')-32)*5/9:readNum('inpTemp'),L_m:imp?readNum('inpLen')*0.3048:readNum('inpLen'),D_mm:imp?readNum('inpDia')*25.4:readNum('inpDia'),eps_mm:imp?roughRaw*25.4:roughRaw,Ksum:fittingSumK()};const gp=resolveGasPropsSI(base.P_bara,base.T_C);return Object.assign(base,gp)}
-function frictionFactor(Re,eps,D){if(Re<2300)return 64/Re;const rr=eps/D;const x=Math.log10(rr/3.7+5.74/Math.pow(Re,0.9));return 0.25/Math.pow(x,2)}
-function flowRegime(Re){if(Re<2300)return{label:'Laminar',cls:'r-lam',method:'f = 64/Re'};return{label:'Turbulent',cls:'r-turb',method:'Swamee-Jain'}}
-function getStatus(val,max){if(max===null||max===undefined||!Number.isFinite(max))return 'ok';return val>max?'warn':'ok'}
-function lbadgeHTML(s){const m={ok:['lbadge-ok','✓ OK'],warn:['lbadge-warn','⚠ Exceeds'],hi:['lbadge-hi','✕ High']};const c=m[s]||['lbadge-warn',s];return '<span class="lbadge '+c[0]+'">'+c[1]+'</span>'}
-function checkGasLimits(service,velocity,dpBarPerKm,rhoV2,mach,Pbara){const rows=[];if(service.velocityLimit!==undefined)rows.push({param:'Velocity',val:fmtN(velocity,3)+' m/s',max:fmtN(service.velocityLimit,3)+' m/s',status:getStatus(velocity,service.velocityLimit)});if(service.dpLimit!==undefined&&service.dpType==='bar/km')rows.push({param:'Pressure Drop',val:fmtN(dpBarPerKm,3)+' bar/km',max:fmtN(service.dpLimit,3)+' bar/km',status:getStatus(dpBarPerKm,service.dpLimit)});if(service.dpLimit!==undefined&&service.dpType==='%Pop'&&Pbara>0){const pct=dpBarPerKm/Pbara*100;rows.push({param:'Pressure Drop (% Pop)',val:fmtN(pct,3)+' % of Pop per km',max:fmtN(service.dpLimit,3)+' %',status:getStatus(pct,service.dpLimit)})}if(service.rhoV2Limit!==undefined)rows.push({param:'ρv²',val:fmtN(rhoV2,1)+' kg/(m·s²)',max:fmtN(service.rhoV2Limit,0)+' kg/(m·s²)',status:getStatus(rhoV2,service.rhoV2Limit)});if(service.machLimit!==undefined)rows.push({param:'Mach Number',val:fmtN(mach,4),max:fmtN(service.machLimit,3),status:getStatus(mach,service.machLimit)});return rows}
-function calculate(){clearErrors();const s=getSI();let ok=true;if(!Number.isFinite(s.mdot_kgph)||s.mdot_kgph<=0){showErr('errFlow');ok=false}if(!Number.isFinite(s.P_bara)||s.P_bara<=0){showErr('errPressure');ok=false}if(!Number.isFinite(s.T_C)||s.T_C<=-273.15){showErr('errTemp');ok=false}if(!Number.isFinite(s.L_m)||s.L_m<=0){showErr('errLen');ok=false}if(!Number.isFinite(s.D_mm)||s.D_mm<=0){showErr('errDia');ok=false}if(!Number.isFinite(s.eps_mm)||s.eps_mm<0){showErr('errRough');ok=false}if(gasPropMode==='manual'){if(!Number.isFinite(s.MW)||s.MW<=0){showErr('errMW');ok=false}if(!Number.isFinite(s.Z)||s.Z<=0){showErr('errZ');ok=false}if(!Number.isFinite(s.k)||s.k<=1){showErr('errK');ok=false}if(!Number.isFinite(s.mu_cP)||s.mu_cP<=0){showErr('errMu');ok=false}}else{if(!Number.isFinite(s.MW)||!Number.isFinite(s.Z)||!Number.isFinite(s.k)||!Number.isFinite(s.mu_cP)||s.Z<=0||s.k<=1||s.mu_cP<=0){showErr('errGasComp');ok=false}}if(!ok){hideResults();return}
-const T=s.T_C+273.15,P=s.P_bara*1e5,D=s.D_mm/1000,eps=s.eps_mm/1000,A=Math.PI*Math.pow(D,2)/4,mdot=s.mdot_kgph/3600,rho=P*s.MW/(s.Z*RU*T);if(!Number.isFinite(rho)||rho<=0){document.getElementById('globalErr').style.display='flex';document.getElementById('globalErrText').textContent='Computed gas density is invalid — check pressure, temperature, MW, and Z.';hideResults();return}const velocity=mdot/(rho*A),mu=s.mu_cP*0.001,Re=rho*velocity*D/mu,f=frictionFactor(Re,eps,D),dP_pipe_bar=f*(s.L_m/D)*0.5*rho*Math.pow(velocity,2)/1e5,dP_K_bar=s.Ksum*0.5*rho*Math.pow(velocity,2)/1e5,dP_bar=dP_pipe_bar+dP_K_bar,dP_pipe_100=s.L_m>0?dP_pipe_bar/s.L_m*100:0,dP_100=s.L_m>0?dP_bar/s.L_m*100:0,dP_km=dP_pipe_100*10,dP_total_km=dP_100*10,dPfrac=dP_bar/s.P_bara,Pout_bara=s.P_bara-dP_bar,a=Math.sqrt(s.k*s.Z*RU*T/s.MW),Mach=velocity/a,rhoV2=rho*Math.pow(velocity,2),Q=mdot/rho,regime=flowRegime(Re);
-const warnings=[];if(dPfrac>.4)warnings.push('ΔP/P_in = '+fmtN(dPfrac*100,1)+'% — HIGH: constant-density Darcy screening is unreliable at this pressure drop. Results are indicative only. Use a rigorous compressible-flow solver or process simulator.');else if(dPfrac>.1)warnings.push('ΔP/P_in = '+fmtN(dPfrac*100,1)+'% — CAUTION: significant fraction of inlet pressure lost. Constant-density screening assumption introduces increasing error. Consider segmented calculation.');if(velocity>GAS_LIMITS.max)warnings.push('Velocity '+fmtN(velocity,1)+' m/s exceeds maximum recommended limit of '+GAS_LIMITS.max+' m/s');else if(velocity>GAS_LIMITS.warning)warnings.push('Velocity '+fmtN(velocity,1)+' m/s is approaching the upper limit of '+GAS_LIMITS.max+' m/s');if(velocity<GAS_LIMITS.min)warnings.push('Velocity '+fmtN(velocity,1)+' m/s is below minimum recommended velocity of '+GAS_LIMITS.min+' m/s');if(Mach>MACH_LIMIT)warnings.push('Mach number '+fmtN(Mach,3)+' exceeds '+MACH_LIMIT+' — risk of choking/noise issues');if(rhoV2>RHOV2_LIMIT)warnings.push('ρv² = '+fmtN(rhoV2,0)+' kg/(m·s²) exceeds '+RHOV2_LIMIT+' — potential AIV/FIV concern');if(Re<2300)warnings.push('Laminar flow regime detected (Re < 2300). Verify operating conditions.');if(Pout_bara<=0)warnings.push('Calculated outlet pressure is non-physical. Increase pressure or line size.');if(s.Ksum>0)warnings.push('Fittings/minor-loss DP is included using ΔP_K = ΣK × ρv²/2. K-values are screening defaults; use project/vendor K-values for final design.');warnings.push('Gas-property basis: '+(s.basis||'Manual')+'. For FEED/detail design, validate MW, Z, k and viscosity using project property package or simulator.');(s.warnings||[]).forEach(w=>warnings.push(w));
-const svc=SERVICE_LIMITS.find(x=>x.service===document.getElementById('selService').value);const limitRows=svc?checkGasLimits(svc,velocity,dP_km,rhoV2,Mach,s.P_bara):[];if(svc&&svc.notes)warnings.push(svc.service+': '+svc.notes);
-const trace=['SINGLE PHASE GAS HYDRAULICS — Gas Line Sizing technical basis','-----------------------------------------------------------','Basis: identical to attached portfolio Gas Line Sizing core solver','m_dot   = '+fmtN(s.mdot_kgph)+' kg/h = '+fmtN(mdot,6)+' kg/s','P_in    = '+fmtN(s.P_bara)+' bara = '+fmtN(P,1)+' Pa','T       = '+fmtN(T)+' K','MW      = '+fmtN(s.MW)+' kg/kmol','Z       = '+fmtN(s.Z),'k       = '+fmtN(s.k),'mu      = '+fmtN(s.mu_cP)+' cP = '+fmtN(mu,6)+' Pa.s','rho     = P*MW/(Z*R*T) = '+fmtN(rho,5)+' kg/m3','Q_actual= m_dot/rho = '+fmtN(Q,6)+' m3/s','D       = '+fmtN(D,5)+' m','epsilon = '+fmtN(eps,8)+' m | epsilon/D = '+fmtN(eps/D,6),'A       = πD²/4 = '+fmtN(A,6)+' m2','v       = m_dot/(rho*A) = '+fmtN(velocity,5)+' m/s','Re      = rho*v*D/mu = '+Math.round(Re).toLocaleString(),'f       = '+fmtN(f,6)+' ('+regime.method+')','dP_pipe = f*(L/D)*(rho*v²/2) = '+fmtN(dP_pipe_bar,5)+' bar','Sigma K = '+fmtN(s.Ksum,4),'dP_K    = SigmaK*(rho*v²/2) = '+fmtN(dP_K_bar,5)+' bar','dP_total= dP_pipe + dP_K = '+fmtN(dP_bar,5)+' bar','dP_pipe/100m = '+fmtN(dP_pipe_100,5)+' bar/100m','dP_total/100m = '+fmtN(dP_100,5)+' bar/100m','dP_pipe/km   = '+fmtN(dP_km,5)+' bar/km','dP_total/km  = '+fmtN(dP_total_km,5)+' bar/km','dP/P_in = '+fmtN(dPfrac*100,4)+' %','P_out   = '+fmtN(Pout_bara,5)+' bara','rho*v²  = '+fmtN(rhoV2,2)+' kg/(m·s²)','a       = sqrt(k*Z*R*T/MW) = '+fmtN(a,4)+' m/s','Mach    = '+fmtN(Mach,5)].join('\n');
-renderResults({s,rho,Q,v:velocity,Re,f,regime,rhoV2,dP_bar,dP_pipe_bar,dP_K_bar,dP_100,dP_pipe_100,dP_km,dP_total_km,dPfrac,Pout_bara,a,Mach,warnings,limitRows,svc,trace})}
-function rr(l,v,u,cls=''){return '<div class="res-row'+(cls?' '+cls:'')+'"><span class="res-lbl">'+l+'</span><span><span class="res-val">'+v+'</span><span class="res-unit">'+(u||'')+'</span></span></div>'}
-function renderResults(r){const imp=unitSys==='IMP',dpF=imp?14.5038:1,velF=imp?3.28084:1,densF=imp?0.062428:1,dp100F=imp?14.5038*0.3048:1;document.getElementById('placeholderCard').style.display='none';document.getElementById('unitBadge').textContent=imp?'Imperial':'SI';document.getElementById('regimeChip').innerHTML='<span class="regime '+r.regime.cls+'">'+r.regime.label+' — Re = '+Math.round(r.Re).toLocaleString()+'</span>';document.getElementById('bigDP').textContent=fmtN(r.dP_bar*dpF,4);document.getElementById('kpiDPUnit').textContent=U.dp[unitSys];document.getElementById('bigDPSub').textContent='ΔP/P_in = '+fmtN(r.dPfrac*100,3)+'% | Pout '+fmtN(imp?r.Pout_bara*14.5038:r.Pout_bara,4)+' '+U.pressure[unitSys];document.getElementById('bigVel').textContent=fmtN(r.v*velF,4);document.getElementById('kpiVelUnit').textContent=U.vel[unitSys];document.getElementById('bigVelSub').textContent='Mach '+fmtN(r.Mach,4)+' | ρv² '+fmtN(r.rhoV2,1)+' kg/(m·s²)';
-const rows=[rr('Mass Flow Rate',fmtN(imp?r.s.mdot_kgph*2.20462:r.s.mdot_kgph,3),U.flow[unitSys],'hl'),rr('Gas Density',fmtN(r.rho*densF,4),U.density[unitSys]),rr('Actual Volumetric Flow',fmtN(imp?r.Q*2118.88:r.Q*3600,4),imp?'ACFM':'m³/h'),rr('Velocity',fmtN(r.v*velF,4),U.vel[unitSys],'hl-green'),rr('Straight-Pipe Pressure Drop',fmtN(r.dP_pipe_bar*dpF,4),U.dp[unitSys]),rr('Fittings / Minor Loss ΔP',fmtN(r.dP_K_bar*dpF,4),U.dp[unitSys]),rr('Total Pressure Drop',fmtN(r.dP_bar*dpF,4),U.dp[unitSys],'hl'),rr('Outlet Pressure',fmtN(imp?r.Pout_bara*14.5038:r.Pout_bara,4),U.pressure[unitSys],r.Pout_bara<=0?'hl-red':''),rr('ΔPtotal / Pin',fmtN(r.dPfrac*100,3),'%'),rr('Straight ΔP / 100 m',fmtN(r.dP_pipe_100*dp100F,4),U.dp100[unitSys]),rr('Total ΔP / 100 m',fmtN(r.dP_100*dp100F,4),U.dp100[unitSys]),rr('Straight ΔP / km',fmtN(r.dP_km,4),'bar/km'),rr('Total ΔP / km',fmtN(r.dP_total_km,4),'bar/km'),rr('Fittings ΣK',fmtN(r.s.Ksum,4),'—'),rr('Reynolds Number',Math.round(r.Re).toLocaleString(),'—'),rr('Friction Factor f',fmtN(r.f,6),'—'),rr('Mach Number',fmtN(r.Mach,5),'—',r.Mach>0.3?'hl-red':r.Mach>0.2?'hl-amber':''),rr('ρv²',fmtN(r.rhoV2,2),'kg/(m·s²)'),rr('Speed of Sound (approx.)',fmtN(imp?r.a*3.28084:r.a,4),U.vel[unitSys])];document.getElementById('detailGrid').innerHTML=rows.join('');
-const wb=document.getElementById('warningsCard');if(r.warnings.length){wb.style.display='flex';document.getElementById('warningsText').innerHTML=r.warnings.map((w,i)=>'<span style="display:block">'+(i+1)+'. '+w+'</span>').join('')}else wb.style.display='none';
-const lc=document.getElementById('limitsCard');if(r.limitRows.length){lc.style.display='block';document.getElementById('limitsServiceName').textContent=document.getElementById('selService').value;document.getElementById('limitsBody').innerHTML=r.limitRows.map(row=>'<div class="limit-row-print"><span style="color:var(--muted)">'+row.param+'</span><div style="display:flex;align-items:center;gap:.45rem"><span style="font-weight:600">'+row.val+'</span><span style="font-size:.6rem;color:var(--muted)">limit '+row.max+'</span>'+lbadgeHTML(row.status)+'</div></div>').join('')+(r.svc?.notes?'<div style="font-size:.6rem;color:var(--muted);padding:.25rem .6rem;line-height:1.5">'+r.svc.notes+'</div>':'')}else lc.style.display='none';
-document.getElementById('resultsCard').style.display='block';document.getElementById('traceAccordion').style.display='block';document.getElementById('traceBox').textContent=r.trace;lucide.createIcons()}
-function loadTestCase(){if(unitSys!=='SI')setUnits('SI');document.getElementById('inpFlow').value='50000';document.getElementById('inpPressure').value='30';document.getElementById('inpTemp').value='40';document.getElementById('inpLen').value='500';document.getElementById('selNPS').value='10"';onNPSChange();document.getElementById('selSch').value='40';onSchChange();document.getElementById('selMaterial').value='Commercial Carbon Steel (clean)';document.getElementById('inpRough').value='0.0457';document.getElementById('inpMW').value='18.5';document.getElementById('inpZ').value='0.92';document.getElementById('inpK').value='1.27';document.getElementById('inpMu').value='0.012';document.getElementById('selService').value='Continuous – Pop 7 to 35 barg';updateRoughnessNote();calculate()}
-function resetForm(){['inpFlow','inpPressure','inpTemp','inpLen','inpDia'].forEach(id=>document.getElementById(id).value='');document.getElementById('selNPS').value='custom';document.getElementById('selSch').innerHTML='<option value="custom">— Custom —</option>';document.getElementById('selMaterial').value='Commercial Carbon Steel (clean)';document.getElementById('inpRough').value=unitSys==='SI'?'0.0457':'0.0018';document.getElementById('inpMW').value='18.5';document.getElementById('inpZ').value='0.92';document.getElementById('inpK').value='1.27';document.getElementById('inpMu').value='0.012';document.getElementById('selService').value='';fittings=[];renderFittings();resetGasComponents();setGasPropMode('manual');clearErrors();hideResults();updateRoughnessNote()}
-function toggleAcc(bodyId,trigger){const b=document.getElementById(bodyId),open=b.classList.toggle('open');trigger.setAttribute('aria-expanded',open)}
-function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);['themeIconD','themeIconM'].forEach(id=>{const el=document.getElementById(id);if(el)el.setAttribute('data-lucide',t==='dark'?'moon':'sun')});lucide.createIcons()}
-function toggleMenu(){const m=document.getElementById('mobileMenu');m.classList.toggle('open');document.getElementById('menuIcon').setAttribute('data-lucide',m.classList.contains('open')?'x':'menu');lucide.createIcons()}
-function printCalc(){const g=id=>document.getElementById(id)?.value?.trim()||'—';document.getElementById('ph_company').textContent=g('docCompany');document.getElementById('ph_project').textContent=g('docProject');document.getElementById('ph_docname').textContent=g('docName');document.getElementById('ph_number').textContent=g('docNumber');document.getElementById('ph_rev').textContent=g('docRev');document.getElementById('ph_line').textContent=g('docLine');const pd=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});document.getElementById('ph_date').textContent=pd;document.getElementById('pf_docname').textContent=(g('docName')==='—'?'Gas Hydraulic Calculation':g('docName'));document.getElementById('pf_docnumber').textContent=(g('docNumber')==='—'?'':g('docNumber'));document.getElementById('pf_date').textContent=pd;const raw=id=>document.getElementById(id).value||'—';const rows=[['Mass Flow Rate',raw('inpFlow'),U.flow[unitSys],'Mass flow basis'],['Operating Pressure',raw('inpPressure'),U.pressure[unitSys],'Absolute pressure basis'],['Operating Temperature',raw('inpTemp'),U.temp[unitSys],''],['Pipe Length',raw('inpLen'),U.len[unitSys],''],['NPS',document.getElementById('selNPS').value,'','Nominal pipe size'],['Schedule',document.getElementById('selSch').value,'','Wall schedule'],['Pipe ID',raw('inpDia'),U.dia[unitSys],'Internal diameter'],['Material / Roughness Basis',document.getElementById('selMaterial').value,'','Screening roughness basis'],['Roughness',raw('inpRough'),U.rough[unitSys],'Confirm project pipe data'],['Fittings ΣK',fmtN(fittingSumK(),4),'—','Minor losses included as ΣK × ρv²/2'],['Gas Property Mode',gasPropMode==='manual'?'Manual':'Gas Mixing / EoS','',''],['EoS Model',gasPropMode==='manual'?'—':(eosMode==='pitzer'?'Generalized Z':eosMode.toUpperCase()),'',''],['Gas Composition Total',document.getElementById('gasCompTotal')?.textContent||'—','mol%','For Gas Mixing / EoS mode'],['Molecular Weight',gasPropMode==='manual'?raw('inpMW'):document.getElementById('propMWOut')?.textContent,'kg/kmol',''],['Z-Factor',gasPropMode==='manual'?raw('inpZ'):document.getElementById('propZOut')?.textContent,'—',''],['Cp/Cv, k',gasPropMode==='manual'?raw('inpK'):document.getElementById('propKOut')?.textContent,'—',''],['Viscosity',gasPropMode==='manual'?raw('inpMu'):document.getElementById('propMuOut')?.textContent,'cP',''],['Service Type',document.getElementById('selService').value||'None','','Industry best-practice screening'],['Unit Basis',unitSys,'','']];document.getElementById('printInputBody').innerHTML=rows.map((r,i)=>'<tr style="background:'+(i%2===0?'#fff':'#f3f6fb')+'"><td style="padding:3pt 6pt;border:1px solid #d0d7e3;font-weight:500;color:#111;font-size:8pt">'+r[0]+'</td><td style="padding:3pt 6pt;border:1px solid #d0d7e3;text-align:right;font-variant-numeric:tabular-nums;color:#111;font-size:8pt">'+r[1]+'</td><td style="padding:3pt 6pt;border:1px solid #d0d7e3;color:#444;font-size:8pt">'+r[2]+'</td><td style="padding:3pt 6pt;border:1px solid #d0d7e3;color:#666;font-size:7.5pt">'+r[3]+'</td></tr>').join('');const w=window.open('','_blank','width=900,height=700');w.document.open();w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:1.1cm 1.2cm 1.3cm 1.2cm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0;padding:0;background:#fff}</style></head><body>'+document.documentElement.outerHTML.replace(/<script[\s\S]*?<\/script>/gi,'')+'</body></html>');w.document.close();w.focus();setTimeout(()=>{w.print();w.close()},600)}
-window.addEventListener('scroll',()=>{document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>10)});document.getElementById('year').textContent=new Date().getFullYear();initPickers();renderGasCompTable();lucide.createIcons();
-</script>
+function toggleTrace() {
+  const p = document.getElementById('tracePanel');
+  p.style.display = p.style.display==='none' ? 'block' : 'none';
+}
+function toggleTheme() {
+  const t = document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  ['themeIconD','themeIconM'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.setAttribute('data-lucide', t==='dark'?'moon':'sun');
+  });
+  lucide.createIcons();
+}
+function toggleMenu() {
+  const m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+  document.getElementById('menuIcon').setAttribute('data-lucide', m.classList.contains('open')?'x':'menu');
+  lucide.createIcons();
+}
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 10);
+});
 
+function addRow(name, mol) {
+  rows.push({ id: rowId++, name: name||'Methane', mol: mol!==undefined ? mol : '' });
+  renderTable(); calculate();
+}
+function removeRow(id) { rows = rows.filter(r=>r.id!==id); renderTable(); calculate(); }
+function onNameChange(id,val) { const r=rows.find(r=>r.id===id); if(r){r.name=val;calculate();} }
+function sanitizeMolValue(val) {
+  if(val === '' || val === null || val === undefined || val === '-') return '';
+  const n = Number(val);
+  if(!Number.isFinite(n)) return '';
+  return Math.max(0, Math.min(100, n));
+}
+function onMolChange(id,val) {
+  const r=rows.find(r=>r.id===id);
+  if(r){ r.mol=sanitizeMolValue(val); calculate(); }
+}
+function sanitizeMolInput(id,inputEl) {
+  const r=rows.find(r=>r.id===id);
+  if(!r || !inputEl) return;
+  r.mol=sanitizeMolValue(inputEl.value);
+  inputEl.value = r.mol === '' ? '' : r.mol;
+  calculate();
+}
+function addComponent() { addRow('Methane',''); }
+function clearAll() { rows=[]; renderTable(); calculate(); }
+function normalise() {
+  const total = rows.reduce((s,r)=>s+(sanitizeMolValue(r.mol)||0),0);
+  if(total<=0) return;
+  rows.forEach(r=>{ r.mol=parseFloat(((sanitizeMolValue(r.mol)||0)/total*100).toFixed(4)); });
+  renderTable(); calculate();
+}
+function loadPreset(key) {
+  if(!key) return;
+  const data = PRESETS[key]; if(!data) return;
+  rows=[]; rowId=0;
+  data.forEach(([n,m])=>rows.push({id:rowId++,name:n,mol:m}));
+  document.getElementById('presetSelect').value='';
+  renderTable(); calculate();
+}
+
+function renderTable() {
+  const names = Object.keys(DB);
+  const tbody = document.getElementById('compBody');
+  tbody.innerHTML = rows.map(r => {
+    const d = DB[r.name]||{};
+    const opts = names.map(n=>`<option value="${n}"${n===r.name?' selected':''}>${n}</option>`).join('');
+    return `<tr>
+      <td><select onchange="onNameChange(${r.id},this.value)" style="width:100%;padding:.28rem .35rem;background:var(--input-bg);border:1px solid var(--border);border-radius:.3rem;font-size:.72rem;color:var(--foreground);font-family:var(--font);outline:none">${opts}</select></td>
+      <td><span class="comp-formula">${d.f||''}</span></td>
+      <td><input type="number" class="mol-input" value="${r.mol===''?'':r.mol}" min="0" max="100" step="any" placeholder="0" oninput="onMolChange(${r.id},this.value)" onblur="sanitizeMolInput(${r.id},this)" /></td>
+      <td class="prop-cell">${d.MW?d.MW.toFixed(3):''}</td>
+      <td class="prop-cell">${d.Tc?d.Tc.toFixed(1):''}</td>
+      <td class="prop-cell">${d.Pc?d.Pc.toFixed(2):''}</td>
+      <td class="prop-cell">${d.w!=null?d.w.toFixed(4):''}</td>
+      <td class="prop-cell">${d.LHV!=null?d.LHV.toFixed(2):''}</td>
+      <td><button onclick="removeRow(${r.id})" style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:.3rem;color:var(--muted);background:none;border:none;cursor:pointer"><i data-lucide="x" style="width:13px;height:13px"></i></button></td>
+    </tr>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function readNumber(id) {
+  const el = document.getElementById(id);
+  if(!el) return NaN;
+  const raw = String(el.value).trim();
+  if(raw === '' || raw === '-' || raw === '.' || raw === '-.') return NaN;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : NaN;
+}
+function getTK() {
+  const v=readNumber('inpT');
+  if(!Number.isFinite(v)) return NaN;
+  const u=document.getElementById('unitT').value;
+  const T = u==='K'?v : u==='F'?(v-32)*5/9+273.15 : v+273.15;
+  return T>0 ? T : NaN;
+}
+function getPkPa() {
+  const v=readNumber('inpP');
+  if(!Number.isFinite(v)) return NaN;
+  const u=document.getElementById('unitP').value;
+  let p;
+  if(u==='kPa') p = v;
+  else if(u==='bara') p = v*100;
+  else if(u==='psia') p = v*6.89476;
+  else if(u==='barg') p = (v+1.01325)*100;
+  else if(u==='psig') p = (v+14.696)*6.89476;
+  else if(u==='MPa')  p = v*1000;
+  else p = v;
+  return p>0 ? p : NaN;
+}
+function getPbar() { const p = getPkPa(); return Number.isFinite(p) ? p/100 : NaN; }
+function sanitizeOperatingInput(id) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  let v = readNumber(id);
+  if(!Number.isFinite(v)) { calculate(); return; }
+  if(id === 'inpT') {
+    const u = document.getElementById('unitT').value;
+    const min = u==='K' ? 0.0001 : u==='F' ? -459.669 : -273.149;
+    if(v < min) { v = min; el.value = Number(v.toFixed(6)); }
+  }
+  if(id === 'inpP') {
+    const u = document.getElementById('unitP').value;
+    const min = u==='barg' ? -1.01324 : u==='psig' ? -14.6959 : 0.000001;
+    if(v < min) { v = min; el.value = Number(v.toFixed(6)); }
+  }
+  calculate();
+}
+
+function pitzerZ(Tr, Pr, omega) {
+  const B0 = 0.083 - 0.422/Math.pow(Tr,1.6);
+  const C0 = 0.139 - 0.172/Math.pow(Tr,4.2);
+  const Z0 = 1 + B0*Pr/Tr + C0*Math.pow(Pr/Tr,2);
+  const B1 = 0.139 - 0.172/Math.pow(Tr,4.2);
+  const C1 = 0.008 + 0.043/Math.pow(Tr,2);
+  const Z1 = B1*Pr/Tr + C1*Math.pow(Pr/Tr,2);
+  let Z = Z0 + omega*Z1;
+  return Math.max(0.05, Math.min(5.0, Z));
+}
+
+function solveCubicZ(A, B, isPR) {
+  let a2, a1, a0;
+  if(isPR) {
+    a2 = -(1-B);
+    a1 = A-3*B*B-2*B;
+    a0 = -(A*B-B*B-B*B*B);
+  } else {
+    a2 = -1;
+    a1 = A-B-B*B;
+    a0 = -A*B;
+  }
+  const roots = cubicRoots(1, a2, a1, a0).filter(z=>z>B && z>0.0);
+  roots.sort((a,b)=>a-b);
+  return roots;
+}
+function cubicRoots(a,b,c,d) {
+  b/=a; c/=a; d/=a;
+  const p = c - b*b/3;
+  const q = 2*b*b*b/27 - b*c/3 + d;
+  const D = q*q/4 + p*p*p/27;
+  const results=[];
+  if(D>1e-12) {
+    const sqD=Math.sqrt(D);
+    const u=Math.cbrt(-q/2+sqD), v=Math.cbrt(-q/2-sqD);
+    results.push(u+v-b/3);
+  } else if(D<-1e-12) {
+    const r=Math.sqrt(-p*p*p/27);
+    const theta=Math.acos(Math.max(-1,Math.min(1,-q/(2*r))));
+    const m=2*Math.cbrt(r);
+    [0,1,2].forEach(k=>results.push(m*Math.cos((theta+2*Math.PI*k)/3)-b/3));
+  } else {
+    const u=Math.cbrt(-q/2);
+    results.push(2*u-b/3, -u-b/3);
+  }
+  return results;
+}
+
+function prMixtureAB(fracs, T_K, P_bar) {
+  const R = 83.14462;
+  const ai=[], bi=[];
+  fracs.forEach(c => {
+    const Tr = T_K/c.Tc;
+    const kappa = 0.37464+1.54226*c.w-0.26992*c.w*c.w;
+    const alpha = Math.pow(1+kappa*(1-Math.sqrt(Tr)),2);
+    ai.push(0.45724*R*R*c.Tc*c.Tc/c.Pc * alpha);
+    bi.push(0.07780*R*c.Tc/c.Pc);
+  });
+  let a_mix=0, b_mix=0;
+  fracs.forEach((ci,i)=>{
+    b_mix += ci.yi*bi[i];
+    fracs.forEach((cj,j)=>{ a_mix += ci.yi*cj.yi*Math.sqrt(ai[i]*ai[j]); });
+  });
+  const A = a_mix*P_bar/(R*T_K)/(R*T_K);
+  const B = b_mix*P_bar/(R*T_K);
+  return {A,B,ai,bi,a_mix,b_mix};
+}
+function srkMixtureAB(fracs, T_K, P_bar) {
+  const R = 83.14462;
+  const ai=[], bi=[];
+  fracs.forEach(c => {
+    const Tr = T_K/c.Tc;
+    const m = 0.48+1.574*c.w-0.176*c.w*c.w;
+    const alpha = Math.pow(1+m*(1-Math.sqrt(Tr)),2);
+    ai.push(0.42748*R*R*c.Tc*c.Tc/c.Pc * alpha);
+    bi.push(0.08664*R*c.Tc/c.Pc);
+  });
+  let a_mix=0, b_mix=0;
+  fracs.forEach((ci,i)=>{
+    b_mix += ci.yi*bi[i];
+    fracs.forEach((cj,j)=>{ a_mix += ci.yi*cj.yi*Math.sqrt(ai[i]*ai[j]); });
+  });
+  const A = a_mix*P_bar/(R*T_K)/(R*T_K);
+  const B = b_mix*P_bar/(R*T_K);
+  return {A,B,ai,bi,a_mix,b_mix};
+}
+function eosZ(fracs, T_K, P_bar, isPR) {
+  const {A,B} = isPR ? prMixtureAB(fracs,T_K,P_bar) : srkMixtureAB(fracs,T_K,P_bar);
+  const roots = solveCubicZ(A,B,isPR);
+  return { roots, A, B };
+}
+
+function wilsonKi(fracs, T_K, P_bar) {
+  return fracs.map(c => (c.Pc/P_bar)*Math.exp(5.373*(1+c.w)*(1-c.Tc/T_K)));
+}
+
+function rachfordRice(zi, Ki) {
+  const Kmin = Math.min(...Ki), Kmax = Math.max(...Ki);
+  if(Kmin >= 1.0) return 1.0;
+  if(Kmax <= 1.0) return 0.0;
+  const beta_min = 1/(1-Kmax)+1e-8;
+  const beta_max = 1/(1-Kmin)-1e-8;
+  function F(beta) {
+    return zi.reduce((s,z,i)=>s + z*(Ki[i]-1)/(1+beta*(Ki[i]-1)), 0);
+  }
+  let lo = Math.max(0.0, beta_min), hi = Math.min(1.0, beta_max);
+  if(lo >= hi) return F(0.5)>0 ? 1.0 : 0.0;
+  for(let iter=0; iter<80; iter++) {
+    const mid=(lo+hi)/2;
+    if(F(mid)>0) lo=mid; else hi=mid;
+    if(hi-lo<1e-8) break;
+  }
+  const beta=Math.max(0,Math.min(1,(lo+hi)/2));
+  return beta;
+}
+
+function lgeViscosity(T_K, rho_kgm3, MW) {
+  const T_R = T_K*1.8;
+  const rho_gcm3 = rho_kgm3/1000;
+  const K = (9.379+0.01607*MW)*Math.pow(T_R,1.5)/(209.2+19.26*MW+T_R);
+  const X = 3.448+986.4/T_R+0.01009*MW;
+  const Y = 2.447-0.2224*X;
+  const mu = K*Math.exp(X*Math.pow(rho_gcm3,Y))*1e-4;
+  return (isFinite(mu)&&mu>0&&mu<1)?mu:0.010;
+}
+
+function fmt(v,d) { return (v===null||v===undefined||isNaN(v)) ? '—' : v.toFixed(d); }
+
+function calculate() {
+  const active = rows.filter(r=>sanitizeMolValue(r.mol)!=='' && sanitizeMolValue(r.mol)>0);
+  const total = active.reduce((s,r)=>s+(sanitizeMolValue(r.mol)||0),0);
+
+  const totEl = document.getElementById('totalMol');
+  totEl.value = total.toFixed(2);
+  totEl.style.color = Math.abs(total-100)<0.01 ? 'var(--primary)' : 'hsl(0,72%,65%)';
+
+  const bar = document.getElementById('normBar');
+  if(active.length>0) {
+    bar.style.display='flex';
+    const ok=Math.abs(total-100)<0.01;
+    bar.className='norm-bar '+(ok?'norm-ok':'norm-warn');
+    document.getElementById('normDot').style.background=ok?'hsl(142,71%,50%)':'hsl(38,92%,55%)';
+    document.getElementById('normMsg').textContent=ok
+      ?`Composition total = ${total.toFixed(2)} % ✓`
+      :`Total = ${total.toFixed(2)} % — click Normalise`;
+  } else { bar.style.display='none'; }
+
+  const CLEAR=['resMW','resSG','resDens','resDensN','resCp','resGamma','resSos','resVisc','resJT',
+               'resLHVmol','resLHVmass','resWobbe','resZ','resTpc','resPpc','resOmega','totalMW'];
+
+  if(active.length===0||total<=0) {
+    CLEAR.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='—';});
+    document.getElementById('compBars').innerHTML='';
+    document.getElementById('phasePanel').innerHTML='<div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.75rem">Enter composition and conditions to calculate phase state.</div>';
+    document.getElementById('traceBox').textContent='—';
+    document.getElementById('flagsRow').innerHTML='';
+    document.getElementById('warningsBox').style.display='none';
+    return;
+  }
+
+  const fracs = active.map(r=>({ ...DB[r.name]||{}, name:r.name, yi:(sanitizeMolValue(r.mol)||0)/total }));
+
+  const MW_mix = fracs.reduce((s,c)=>s+c.yi*(c.MW||0),0);
+  const Tpc = fracs.every(c=>c.Tc) ? fracs.reduce((s,c)=>s+c.yi*c.Tc,0) : null;
+  const Ppc = fracs.every(c=>c.Pc) ? fracs.reduce((s,c)=>s+c.yi*c.Pc,0) : null;
+  const omega_mix = fracs.every(c=>c.w!=null) ? fracs.reduce((s,c)=>s+c.yi*c.w,0) : null;
+  const gamma_mix = fracs.every(c=>c.g) ? fracs.reduce((s,c)=>s+c.yi*c.g,0) : null;
+  const Cp_mix = fracs.every(c=>c.Cp) ? fracs.reduce((s,c)=>{ return s + (c.yi*c.MW/MW_mix)*c.Cp; },0) : null;
+  const LHV_mol = fracs.reduce((s,c)=>s+c.yi*(c.LHV||0),0);
+  const LHV_mass = MW_mix>0 ? LHV_mol/(MW_mix/22.414) : null;
+  const SG = MW_mix/MW_AIR;
+  const Wobbe = SG>0 ? LHV_mol/Math.sqrt(SG) : null;
+
+  const T_K = getTK();
+  const P_kPa = getPkPa();
+  if(!(T_K>0) || !(P_kPa>0)) {
+    set('resMW',   fmt(MW_mix,3));
+    set('resSG',   fmt(SG,4));
+    set('resDens', '—');
+    set('resDensN','—');
+    set('resZ',    '—');
+    set('resTpc',  Tpc?fmt(Tpc,2):'—');
+    set('resPpc',  Ppc?fmt(Ppc,3):'—');
+    set('resOmega',omega_mix!=null?fmt(omega_mix,4):'—');
+    set('totalMW', fmt(MW_mix,3));
+    set('resCp',   Cp_mix!=null?fmt(Cp_mix,3):'—');
+    set('resGamma',gamma_mix!=null?fmt(gamma_mix,3):'—');
+    set('resSos',  '—');
+    set('resVisc', '—');
+    set('resJT',   '—');
+    set('resLHVmol',fmt(LHV_mol,3));
+    set('resLHVmass',LHV_mass!=null?fmt(LHV_mass,2):'—');
+    set('resWobbe',Wobbe!=null?fmt(Wobbe,3):'—');
+    document.getElementById('phasePanel').innerHTML='<div style="text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.75rem">Enter valid operating temperature and positive absolute pressure.</div>';
+    document.getElementById('traceBox').textContent='Operating-condition validation failed: temperature must be above absolute zero and absolute pressure must be positive.';
+    document.getElementById('flagsRow').innerHTML='<span class="flag-pill flag-warn">INVALID T/P</span>';
+    document.getElementById('warningsBox').style.display='flex';
+    document.getElementById('warningsText').innerHTML='<span style="display:block">1. Invalid operating condition. Temperature must be above absolute zero and pressure must be positive on an absolute basis.</span>';
+    const barsEl = document.getElementById('compBars');
+    barsEl.innerHTML = fracs.map((c,i)=>`<div class="comp-bar-row"><span class="comp-bar-label" title="${c.name}">${c.name}</span><div class="comp-bar-track"><div class="comp-bar-fill" style="width:${(c.yi*100).toFixed(2)}%;background:${COLORS[i%COLORS.length]}"></div></div><span class="comp-bar-pct">${(c.yi*100).toFixed(2)}%</span></div>`).join('');
+    lucide.createIcons();
+    return;
+  }
+  const P_bar = P_kPa/100;
+  const P_Pa = P_kPa*1000;
+
+  let Z=1, trace=[];
+  const flags=[], warnings=[];
+  let Tr=null, Pr=null;
+
+  if(eosMode==='pitzer') {
+    if(Tpc&&Ppc&&omega_mix!=null) {
+      Tr = T_K/Tpc; Pr = P_bar/Ppc;
+      Z  = pitzerZ(Tr, Pr, omega_mix);
+      trace.push(`EoS: Pitzer (Lee-Kesler simplified)`);
+      trace.push(`Tpc = ${Tpc.toFixed(2)} K  |  Ppc = ${Ppc.toFixed(3)} bar`);
+      trace.push(`Tr = ${Tr.toFixed(4)}  |  Pr = ${Pr.toFixed(4)}  |  ω = ${omega_mix.toFixed(4)}`);
+      trace.push(`Z = Z⁰ + ω·Z¹ = ${Z.toFixed(5)}`);
+      if(Tr<1.0){flags.push('NEAR_CRITICAL');warnings.push(`Tr=${Tr.toFixed(3)} < 1.0 — below pseudocritical T. Possible condensation. Pitzer accuracy degrades.`);}
+      if(Pr>10){flags.push('HIGH_Pr');warnings.push(`Pr=${Pr.toFixed(2)} > 10 — use PR or SRK for accurate Z.`);}
+    } else { trace.push('Pitzer: missing Tc/Pc/ω — Z = 1 (ideal gas)'); }
+  } else {
+    const isPR = eosMode==='pr';
+    if(fracs.every(c=>c.Tc&&c.Pc&&c.w!=null)) {
+      const {roots,A,B} = eosZ(fracs, T_K, P_bar, isPR);
+      const Zv = roots.length>0 ? roots[roots.length-1] : 1;
+      Z = Zv;
+      trace.push(`EoS: ${isPR?'Peng-Robinson (1976/1978)':'SRK (Soave 1972)'}`);
+      trace.push(`A = ${A.toFixed(6)}  |  B = ${B.toFixed(6)}`);
+      trace.push(`Cubic roots: ${roots.map(r=>r.toFixed(5)).join(', ')}`);
+      trace.push(`Z (vapor root) = ${Z.toFixed(5)}`);
+    } else { trace.push(`${eosMode.toUpperCase()} EoS: missing Tc/Pc/ω for some components — Z = 1`); }
+  }
+
+  const rho = (P_Pa*MW_mix)/(Z*R_J*T_K);
+  const rho_N = (101325*MW_mix)/(R_J*273.15);
+  trace.push(`ρ = P·MW/(Z·R·T) = ${rho.toFixed(4)} kg/m³`);
+  trace.push(`ρ_N = ${rho_N.toFixed(4)} kg/Nm³`);
+
+  const visc = lgeViscosity(T_K, rho, MW_mix);
+  trace.push(`μ (Lee-Gonzalez-Eakin) = ${visc.toFixed(4)} cP`);
+
+  let sos=null, JT=null;
+  if(gamma_mix!=null&&gamma_mix>1) {
+    const Rsp = R_U/MW_mix*1000;
+    sos = Math.sqrt(gamma_mix*Z*Rsp*T_K);
+    trace.push(`a = √(γ·Z·R·T/MW) = ${sos.toFixed(2)} m/s`);
+    if(Tpc&&Ppc) {
+      const Tr_v = T_K/Tpc, Pr_v = P_bar/Ppc;
+      const B0 = 0.083-0.422/Math.pow(Tr_v,1.6);
+      const dB0 = 0.422*1.6/Math.pow(Tr_v,2.6);
+      const Cp_k = gamma_mix/(gamma_mix-1)*(R_U/MW_mix);
+      JT = (Tpc/(Ppc*100))*(dB0*Tr_v-B0)/Cp_k;
+      trace.push(`μ_JT (virial) = ${JT.toFixed(4)} K/bar`);
+      if(JT<0){flags.push('INVERSION');warnings.push('Negative JT coefficient — above inversion temperature (heating on expansion).');}
+    }
+  }
+
+  const h2s = fracs.find(c=>c.name==='Hydrogen Sulfide');
+  const co2 = fracs.find(c=>c.name==='Carbon Dioxide');
+  if(h2s&&h2s.yi>0.0001){flags.push('SOUR GAS');warnings.push(`H₂S = ${(h2s.yi*100).toFixed(2)} mol%. Apply Wichert-Aziz correction for Tc_pc/Pc_pc if H₂S > 4 mol%.`);}
+  if(co2&&co2.yi>0.05){flags.push('HIGH CO₂');warnings.push(`CO₂ = ${(co2.yi*100).toFixed(1)} mol% — verify pseudocriticals with Wichert-Aziz correction.`);}
+  if(MW_mix<2){flags.push('LOW MW');warnings.push('MW < 2 — verify component data.');}
+  if(MW_mix>100){flags.push('HIGH MW');warnings.push('MW > 100 — unusually heavy for a gas stream.');}
+
+  let vf=null, phaseLabel='', phaseClass='phase-vapor', vfWarnings=[];
+  if(fracs.every(c=>c.Tc&&c.Pc&&c.w!=null)) {
+    const Ki = wilsonKi(fracs, T_K, P_bar);
+    const zi = fracs.map(c=>c.yi);
+    vf = rachfordRice(zi, Ki);
+    trace.push(`Wilson Ki = [${Ki.map(k=>k.toFixed(4)).join(', ')}]`);
+    trace.push(`Vapor fraction β (Rachford-Rice) = ${vf.toFixed(5)}`);
+    if(vf>=0.9999){phaseLabel='All Vapor';phaseClass='phase-vapor';}
+    else if(vf<=0.0001){phaseLabel='All Liquid';phaseClass='phase-liquid';vfWarnings.push('Mixture is fully liquid at these conditions — all EoS gas-phase properties above are for the vapor phase only.');}
+    else{phaseLabel='Two-Phase';phaseClass='phase-two';flags.push('TWO-PHASE');vfWarnings.push(`Two-phase region detected. Vapor fraction β = ${(vf*100).toFixed(1)} mol%. Gas-phase properties above apply to vapor portion only.`);}
+    if(Tpc&&Ppc&&T_K>Tpc&&P_bar>Ppc){
+      phaseLabel='Supercritical';phaseClass='phase-super';
+      flags.push('SUPERCRITICAL');vfWarnings.push('T > Tpc and P > Ppc — supercritical region. Single phase but dense fluid; EoS Z applies.');
+      vf=null;
+    }
+  }
+  warnings.push(...vfWarnings);
+
+  set('resMW',   fmt(MW_mix,3));
+  set('resSG',   fmt(SG,4));
+  set('resDens', fmt(rho,3));
+  set('resDensN',fmt(rho_N,4));
+  set('resZ',    fmt(Z,5));
+  set('resTpc',  Tpc?fmt(Tpc,2):'—');
+  set('resPpc',  Ppc?fmt(Ppc,3):'—');
+  set('resOmega',omega_mix!=null?fmt(omega_mix,4):'—');
+  set('totalMW', fmt(MW_mix,3));
+  set('resCp',   Cp_mix!=null?fmt(Cp_mix,3):'—');
+  set('resGamma',gamma_mix!=null?fmt(gamma_mix,3):'—');
+  set('resSos',  sos!=null?fmt(sos,1):'—');
+  set('resVisc', fmt(visc,4));
+  set('resJT',   JT!=null?fmt(JT,4):'—');
+  set('resLHVmol',fmt(LHV_mol,3));
+  set('resLHVmass',LHV_mass!=null?fmt(LHV_mass,2):'—');
+  set('resWobbe',Wobbe!=null?fmt(Wobbe,3):'—');
+
+  const flagsRow = document.getElementById('flagsRow');
+  const flagClasses = {'SOUR GAS':'flag-sour','TWO-PHASE':'flag-warn','NEAR_CRITICAL':'flag-warn','HIGH_Pr':'flag-warn','SUPERCRITICAL':'flag-info','INVERSION':'flag-warn','HIGH MW':'flag-warn','LOW MW':'flag-warn','HIGH CO₂':'flag-warn'};
+  flagsRow.innerHTML = flags.map(f=>`<span class="flag-pill ${flagClasses[f]||'flag-info'}">${f}</span>`).join('');
+
+  if(warnings.length>0) {
+    document.getElementById('warningsBox').style.display='flex';
+    document.getElementById('warningsText').innerHTML = warnings.map((w,i)=>`<span style="display:block">${i+1}. ${w}</span>`).join('');
+    lucide.createIcons();
+  } else { document.getElementById('warningsBox').style.display='none'; }
+
+  document.getElementById('traceBox').textContent = trace.join('\n');
+
+  const pp = document.getElementById('phasePanel');
+  if(phaseLabel) {
+    const vfPct = vf!=null ? (vf*100).toFixed(2) : null;
+    const liqPct = vf!=null ? ((1-vf)*100).toFixed(2) : null;
+    pp.innerHTML = `
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+        <span class="phase-badge ${phaseClass}">${phaseLabel}</span>
+        ${vf!=null?`<span style="font-size:.72rem;color:var(--muted)">@ T=${document.getElementById('inpT').value} ${document.getElementById('unitT').value==='C'?'°C':document.getElementById('unitT').value} · P=${document.getElementById('inpP').value} ${document.getElementById('unitP').value}</span>`:''}
+      </div>
+      ${vf!=null ? `
+      <div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem">Vapor Fraction (β) — Rachford-Rice / Wilson Ki</div>
+      <div style="font-size:1.3rem;font-weight:700;color:var(--primary);font-variant-numeric:tabular-nums">${(vf*100).toFixed(3)} <span style="font-size:.75rem;font-weight:400">mol%</span></div>
+      <div class="vf-gauge-wrap">
+        <div class="vf-gauge-track"><div class="vf-gauge-fill" style="width:${vfPct}%;background:${vf<0.001?'hsl(271,81%,65%)':vf>0.999?'hsl(217,91%,60%)':'linear-gradient(90deg,hsl(271,81%,65%),hsl(217,91%,60%)'}"></div></div>
+        <div class="vf-gauge-labels"><span>Liquid 0%</span><span>Vapor 100%</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.6rem">
+        <div style="padding:.5rem .75rem;background:hsl(217,91%,60%,.08);border:1px solid hsl(217,91%,60%,.2);border-radius:var(--radius)">
+          <div style="font-size:.65rem;color:var(--muted)">Vapor Phase</div>
+          <div style="font-size:.95rem;font-weight:700;color:hsl(217,91%,60%)">${vfPct} mol%</div>
+        </div>
+        <div style="padding:.5rem .75rem;background:hsl(271,81%,60%,.08);border:1px solid hsl(271,81%,60%,.2);border-radius:var(--radius)">
+          <div style="font-size:.65rem;color:var(--muted)">Liquid Phase</div>
+          <div style="font-size:.95rem;font-weight:700;color:hsl(271,81%,70%)">${liqPct} mol%</div>
+        </div>
+      </div>
+      <div style="margin-top:.65rem;font-size:.65rem;color:var(--muted);line-height:1.6">
+        Method: Wilson equilibrium constants Ki = (Pc_i/P)·exp[5.373·(1+ωi)·(1−Tc_i/T)]<br>
+        Rachford-Rice: Σ z_i·(K_i−1)/(1+β·(K_i−1)) = 0 &nbsp;[bisection, 80 iter, ε=1×10⁻⁸]
+      </div>` : `
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.5rem">${phaseLabel==='Supercritical'?'Above both Tpc and Ppc — dense supercritical fluid. No distinct vapor/liquid phases.':''}</div>`}
+      `;
+  } else if(fracs.some(c=>!c.Tc||!c.Pc||c.w==null)) {
+    pp.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Vapor fraction requires Tc, Pc and ω for all components. Check composition contains only listed components.</div>';
+  }
+
+  const barsEl = document.getElementById('compBars');
+  barsEl.innerHTML = fracs.map((c,i)=>`
+    <div class="comp-bar-row">
+      <span class="comp-bar-label" title="${c.name}">${c.name}</span>
+      <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${(c.yi*100).toFixed(2)}%;background:${COLORS[i%COLORS.length]}"></div></div>
+      <span class="comp-bar-pct">${(c.yi*100).toFixed(2)}%</span>
+    </div>`).join('');
+  if(typeof populatePrintReport === 'function') populatePrintReport();
+}
+
+function set(id,v) { const el=document.getElementById(id); if(el) el.textContent=v; }
+
+
+function textOf(id){ const el=document.getElementById(id); return el ? (el.textContent||'').trim() : '—'; }
+function htmlToPlain(id){ const el=document.getElementById(id); return el ? (el.innerText||el.textContent||'').trim() : ''; }
+function setPrintText(id,val){ const el=document.getElementById(id); if(el) el.textContent = (val===undefined||val===null||val==='') ? '—' : String(val); }
+function populatePrintReport(){
+  const model = eosMode==='pitzer' ? 'Pitzer / Generalized Z' : eosMode==='pr' ? 'Peng-Robinson EoS' : 'SRK EoS';
+  const docVal = id => (document.getElementById(id)?.value || '—').trim() || '—';
+  setPrintText('prCompany', docVal('docCompany'));
+  setPrintText('prProject', docVal('docProject'));
+  setPrintText('prDocName', docVal('docName'));
+  setPrintText('prDocNo', docVal('docNumber'));
+  setPrintText('prRev', docVal('docRev'));
+  setPrintText('prLine', docVal('docLine'));
+  const total = rows.reduce((sum,r)=>sum+(parseFloat(r.mol)||0),0);
+  setPrintText('prModel', model);
+  setPrintText('prTemp', `${document.getElementById('inpT')?.value || '—'} ${document.getElementById('unitT')?.value || ''}`);
+  setPrintText('prPress', `${document.getElementById('inpP')?.value || '—'} ${document.getElementById('unitP')?.value || ''}`);
+  setPrintText('prTotal', `${total.toFixed(2)} mol%`);
+  setPrintText('prDate', new Date().toLocaleDateString());
+
+  setPrintText('prKpiMW', textOf('resMW'));
+  setPrintText('prKpiZ', textOf('resZ'));
+  setPrintText('prKpiDens', textOf('resDens'));
+  const phaseTxt = (document.querySelector('#phasePanel .phase-badge')?.textContent || '—').trim();
+  setPrintText('prKpiPhase', phaseTxt);
+
+  const props = [
+    ['Molecular Weight', textOf('resMW'), 'g/mol'],
+    ['Specific Gravity, air = 1', textOf('resSG'), '—'],
+    ['Density @ conditions', textOf('resDens'), 'kg/m³'],
+    ['Density @ normal conditions', textOf('resDensN'), 'kg/Nm³'],
+    ['Compressibility Factor, Z', textOf('resZ'), '—'],
+    ['Pseudo-critical Tc', textOf('resTpc'), 'K'],
+    ['Pseudo-critical Pc', textOf('resPpc'), 'bar'],
+    ['Acentric Factor', textOf('resOmega'), '—'],
+    ['Cp, ideal mixture', textOf('resCp'), 'kJ/kg·K'],
+    ['Cp/Cv, γ', textOf('resGamma'), '—'],
+    ['Speed of Sound', textOf('resSos'), 'm/s'],
+    ['Dynamic Viscosity', textOf('resVisc'), 'cP'],
+    ['Joule-Thomson Coefficient', textOf('resJT'), 'K/bar'],
+    ['LHV, molar basis', textOf('resLHVmol'), 'MJ/Nm³'],
+    ['LHV, mass basis', textOf('resLHVmass'), 'MJ/kg'],
+    ['Wobbe Index', textOf('resWobbe'), 'MJ/Nm³']
+  ];
+  const propRows = document.getElementById('prPropRows');
+  if(propRows) propRows.innerHTML = props.map(r=>`<tr><td>${r[0]}</td><td class="pr-val">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+
+  let vfText = '—';
+  const vfBadge = document.querySelector('#phasePanel .phase-badge');
+  const vfPanel = document.getElementById('phasePanel');
+  if(vfPanel && vfPanel.innerText){
+    const m = vfPanel.innerText.match(/([0-9]+(?:\.[0-9]+)?)\s*mol%/);
+    if(m) vfText = `${m[1]} mol% vapor`;
+  }
+  const phaseRows = document.getElementById('prPhaseRows');
+  if(phaseRows) phaseRows.innerHTML = [
+    ['Phase State', phaseTxt, '—'],
+    ['Vapor Fraction', vfText, 'mol basis'],
+    ['Flash Method', eosMode==='pitzer' ? 'Wilson Ki / RR display only' : 'Wilson Ki + Rachford-Rice', 'screening'],
+    ['EoS Limitation', eosMode==='pitzer' ? 'Corresponding-states Z' : 'Vapor-root cubic EoS; kij = 0', 'basis']
+  ].map(r=>`<tr><td>${r[0]}</td><td class="pr-val">${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+
+  const active = rows.filter(r=>(parseFloat(r.mol)||0)>0).map(r=>({name:r.name, mol:parseFloat(r.mol)||0, ...(DB[r.name]||{})})).sort((a,b)=>b.mol-a.mol);
+  const maxRows = 15;
+  const shown = active.slice(0,maxRows);
+  const hidden = active.slice(maxRows);
+  const compRows = document.getElementById('prCompRows');
+  if(compRows){
+    let html = shown.map(c=>`<tr><td class="pr-comp-name">${c.name}</td><td>${c.f||''}</td><td class="pr-val">${c.mol.toFixed(3)}</td><td class="pr-val">${fmt(c.MW,3)}</td><td class="pr-val">${fmt(c.Tc,1)}</td><td class="pr-val">${fmt(c.Pc,2)}</td><td class="pr-val">${fmt(c.w,4)}</td><td class="pr-val">${fmt(c.LHV,2)}</td></tr>`).join('');
+    if(hidden.length){
+      const otherMol = hidden.reduce((s,c)=>s+c.mol,0);
+      html += `<tr><td class="pr-comp-name">Other (${hidden.length} components)</td><td>—</td><td class="pr-val">${otherMol.toFixed(3)}</td><td colspan="5">Aggregated to keep one-page A4 report.</td></tr>`;
+    }
+    compRows.innerHTML = html || '<tr><td colspan="8">No active components.</td></tr>';
+  }
+
+  const warnings = htmlToPlain('warningsText') || 'No warnings generated. Screening limitations remain: validate final gas properties using the project-approved property package for EPC deliverables.';
+  setPrintText('prWarnings', warnings);
+}
+
+function printCalc(){
+  calculate();
+  populatePrintReport();
+  const html = document.documentElement.outerHTML;
+  const w = window.open('', '_blank');
+  if(!w){ alert('Pop-up blocked. Please allow pop-ups to export PDF.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.onload = () => {
+    try { w.document.querySelectorAll('script').forEach(s=>s.remove()); } catch(e) {}
+    setTimeout(() => { w.focus(); w.print(); setTimeout(()=>w.close(), 500); }, 250);
+  };
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+loadPreset('lean');
+lucide.createIcons();
+</script>
 </body>
 </html>
