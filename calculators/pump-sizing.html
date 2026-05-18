@@ -76,6 +76,11 @@
     .unit-pill{display:inline-flex;align-items:center;background:var(--sec-bg);border:1px solid var(--border);border-radius:9999px;padding:2px}
     .unit-pill button{padding:.22rem .75rem;font-size:.65rem;font-weight:600;letter-spacing:.06em;border-radius:9999px;color:var(--muted);transition:background .15s,color .15s;border:none;background:none;cursor:pointer}
     .unit-pill button.active{background:var(--primary);color:#fff;box-shadow:0 1px 4px hsl(217,91%,60%,.35)}
+    .toggle-tabs{display:inline-flex;align-items:center;gap:.25rem;background:var(--sec-bg);border:1px solid var(--border);border-radius:9999px;padding:2px;flex-wrap:wrap}
+    .toggle-tabs button{padding:.24rem .9rem;font-size:.66rem;font-weight:700;letter-spacing:.02em;border-radius:9999px;color:var(--muted);transition:background .15s,color .15s,box-shadow .15s;border:none;background:transparent;cursor:pointer}
+    .toggle-tabs button.active{background:var(--primary);color:#fff;box-shadow:0 1px 4px hsl(217,91%,60%,.35)}
+    .toggle-tabs button:not(.active):hover{color:var(--fg);background:var(--primary-bg)}
+    .is-hidden{display:none!important}
 
     .calc-wrap{max-width:72rem;margin:0 auto;padding:1.25rem 1rem 1rem}
     .calc-grid{display:grid;gap:1.25rem;grid-template-columns:1fr}
@@ -370,7 +375,7 @@
       <div class="bae-row">
         <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>Hydraulic Institute</span>
         <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>API 610 / ISO 13709</span>
-        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>GPSA &sect;12</span>
+        <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>GPSA &sect;13</span>
         <span class="bae"><i data-lucide="book-open" style="width:10px;height:10px"></i>Perry's &sect;10</span>
       </div>
     </div>
@@ -427,26 +432,42 @@
             <div class="isec-title"><i data-lucide="settings-2" style="width:12px;height:12px"></i>Pump Configuration</div>
             <div style="margin-bottom:.65rem">
               <label class="flabel">Pump Type</label>
-              <select id="selPumpType" onchange="onPumpTypeChange();calculate()">
+              <select id="selPumpType" onchange="onPumpTypeChange();calculate()" style="display:none" aria-hidden="true" tabindex="-1">
                 <option value="centrifugal">Centrifugal</option>
                 <option value="reciprocating">Reciprocating</option>
                 <option value="screw">Screw</option>
               </select>
+              <div class="toggle-tabs" role="tablist" aria-label="Pump type selector">
+                <button type="button" id="pumpTabCentrifugal" class="active" onclick="setPumpType('centrifugal')">Centrifugal</button>
+                <button type="button" id="pumpTabReciprocating" onclick="setPumpType('reciprocating')">Reciprocating</button>
+                <button type="button" id="pumpTabScrew" onclick="setPumpType('screw')">Screw</button>
+              </div>
             </div>
-            <div class="g2" style="margin-bottom:.65rem">
-              <div><label class="flabel" id="lblCL">Pump CL Elevation (m)</label><input type="number" id="inpCL" step="any" value="0" oninput="calculate()" /><div class="fnote">Above grade</div></div>
-              <div><label class="flabel" id="lblSpeed">Pump Speed (rpm)</label><input type="number" id="inpSpeed" min="0" step="1" oninput="calculate()" placeholder="e.g. 1450" /></div>
+            <div class="g2" id="rowCLSpeed" style="margin-bottom:.65rem">
+              <div id="rowCL"><label class="flabel" id="lblCL">Pump CL Elevation (m)</label><input type="number" id="inpCL" step="any" value="0" oninput="calculate()" /><div class="fnote">Above grade</div></div>
+              <div id="rowSpeed" data-pump="centrifugal reciprocating"><label class="flabel" id="lblSpeed">Pump Speed (rpm)</label><input type="number" id="inpSpeed" min="0" step="1" oninput="calculate()" placeholder="e.g. 1450" /><div class="fnote">Required for centrifugal specific speed and reciprocating acceleration-head checks.</div></div>
             </div>
-            <!-- Centrifugal only -->
-            <div id="rowStages" style="margin-bottom:.65rem">
-              <label class="flabel">Number of Stages</label>
-              <input type="number" id="inpStages" min="1" step="1" value="1" oninput="calculate()" />
-              <div class="fnote">Typical: 1 stage (single-stage) or multi-stage for high-head service</div>
+            <div class="g2" id="rowCentConfig" data-pump="centrifugal" style="margin-bottom:.65rem">
+              <div id="rowStages" data-pump="centrifugal">
+                <label class="flabel">Number of Stages</label>
+                <input type="number" id="inpStages" min="1" step="1" value="1" oninput="calculate()" />
+                <div class="fnote">Centrifugal only: 1 stage or multi-stage high-head service.</div>
+              </div>
+              <div id="rowNPSHBasis" data-pump="centrifugal">
+                <label class="flabel">Suction Impeller / NPSHr Basis</label>
+                <select id="selNPSHBasis" onchange="calculate()">
+                  <option value="8500" selected>Workbook Option 1 — Nss 8500</option>
+                  <option value="11000">Low-NPSH suction impeller — Nss 11000</option>
+                  <option value="13000">High suction specific speed — Nss 13000</option>
+                </select>
+                <div class="fnote">Centrifugal only. Used for workbook-style required NPSH screening.</div>
+              </div>
             </div>
-            <div class="g2">
-              <div><label class="flabel" id="lblNPSHMargin">NPSH Margin Allowance (m)</label><input type="number" id="inpNPSHMargin" min="0" step="any" value="1.0" oninput="calculate()" /><div class="fnote">Screening allowance only; final margin by project/vendor NPSHr.</div></div>
-              <div><label class="flabel">Pump Efficiency (%)</label><input type="number" id="inpEff" min="1" max="100" step="any" placeholder="auto" oninput="calculate()" /><div class="fnote">Blank = screening estimate; manual value preferred for EPC checks.</div></div>
+            <div class="g2" id="rowMarginEff">
+              <div id="rowNPSHMargin"><label class="flabel" id="lblNPSHMargin">NPSH Design Margin (m)</label><input type="number" id="inpNPSHMargin" min="0" step="any" value="1.0" oninput="calculate()" /><div class="fnote" id="npshMarginNote">Workbook cell F38. Final value by project/vendor criteria.</div></div>
+              <div id="rowEfficiency"><label class="flabel">Pump Efficiency (%)</label><input type="number" id="inpEff" min="1" max="100" step="any" placeholder="auto" oninput="calculate()" /><div class="fnote" id="effNote">Blank = centrifugal screening estimate; manual value preferred for EPC checks.</div></div>
             </div>
+            <div id="pdNote" class="fnote" style="display:none;margin-top:.55rem">For positive-displacement pumps, centrifugal stage and suction-impeller/NPSHr-basis fields are hidden. Maximum discharge pressure is governed by relief / blocked-discharge protection and vendor data.</div>
           </div>
 
           <!-- Suction Conditions -->
@@ -622,7 +643,8 @@
           <ul>
             <li>Hydraulic Institute Standards for Centrifugal, Rotary and Reciprocating Pumps</li>
             <li>API 610 / ISO 13709: Centrifugal Pumps for Petroleum, Petrochemical and Natural Gas Industries</li>
-            <li>GPSA Engineering Data Book, Section 12 (Pumps)</li>
+            <li>GPSA Engineering Data Book, Section 13 (Pumps / reciprocating pump acceleration-head screening)</li>
+            <li>Crane TP-410 and API RP 14E are referenced indirectly for suction/discharge line loss and velocity-limit inputs developed in companion hydraulics calculations.</li>
             <li>Perry's Chemical Engineers' Handbook, Section 10</li>
           </ul>
         </div>
@@ -750,11 +772,61 @@ function updateLabels() {
   document.getElementById('lblSpeed').textContent = 'Pump Speed (rpm)';
 }
 
+function setPumpType(type) {
+  const sel = document.getElementById('selPumpType');
+  if (sel) sel.value = type;
+  onPumpTypeChange();
+  calculate();
+}
 function onPumpTypeChange() {
   const t = document.getElementById('selPumpType').value;
-  document.getElementById('recipSucFields').style.display = t === 'reciprocating' ? 'block' : 'none';
-  document.getElementById('rowStages').style.display = t === 'centrifugal' ? 'block' : 'none';
-  document.getElementById('shutoffIsec').style.display = (t === 'centrifugal' || t === 'screw') ? 'block' : 'none';
+  const isCent = t === 'centrifugal';
+  const isRecip = t === 'reciprocating';
+  const isScrew = t === 'screw';
+
+  ['centrifugal','reciprocating','screw'].forEach(pt => {
+    const el = document.getElementById('pumpTab' + pt.charAt(0).toUpperCase() + pt.slice(1));
+    if (el) el.classList.toggle('active', t === pt);
+  });
+
+  const setVisible = (id, state) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('is-hidden', !state);
+    el.style.display = state ? '' : 'none';
+  };
+
+  // Pump-type-specific fields. Keep CL, NPSH margin and efficiency visible for all pump types.
+  setVisible('rowSpeed', isCent || isRecip);
+  setVisible('rowCentConfig', isCent);
+  setVisible('rowStages', isCent);
+  setVisible('rowNPSHBasis', isCent);
+  setVisible('recipSucFields', isRecip);
+  setVisible('shutoffIsec', isCent || isScrew);
+  setVisible('pdNote', isRecip || isScrew);
+
+  // Extra guard: hide every element tagged as pump-specific unless the selected type is included.
+  document.querySelectorAll('[data-pump]').forEach(el => {
+    const allowed = (el.getAttribute('data-pump') || '').split(/\s+/).includes(t);
+    el.classList.toggle('is-hidden', !allowed);
+    el.style.display = allowed ? '' : 'none';
+  });
+
+  const effNote = document.getElementById('effNote');
+  if (effNote) {
+    effNote.textContent = isCent
+      ? 'Blank = workbook-style PRCA008 screening efficiency estimate; manual value preferred for EPC checks.'
+      : (isRecip
+        ? 'Blank = 90% reciprocating screening assumption; enter vendor efficiency when available.'
+        : 'Blank = 85% screw pump screening assumption; enter vendor efficiency when available.');
+  }
+
+  const npshNote = document.getElementById('npshMarginNote');
+  if (npshNote) {
+    npshNote.textContent = isCent
+      ? 'Workbook cell F38. Final value by project/vendor criteria.'
+      : 'Screening margin allowance only. Final value by project/vendor criteria.';
+  }
 }
 
 function showErr(id) { const e = document.getElementById(id); if (e) e.style.display = 'block'; }
@@ -818,9 +890,9 @@ function calculate() {
     document.getElementById('globalErrText').textContent = 'Flow margins must be finite and non-negative.';
     ok = false;
   }
-  if (!Number.isFinite(N_rpm) || N_rpm <= 0) {
+  if ((pumpType === 'centrifugal' || pumpType === 'reciprocating') && (!Number.isFinite(N_rpm) || N_rpm <= 0)) {
     document.getElementById('globalErr').style.display = 'flex';
-    document.getElementById('globalErrText').textContent = 'Pump speed must be greater than zero for pump screening outputs.';
+    document.getElementById('globalErrText').textContent = 'Pump speed must be greater than zero for the selected pump type.';
     ok = false;
   }
   if (pumpType === 'centrifugal' && (!Number.isInteger(N_stages) || N_stages < 1)) {
@@ -1249,6 +1321,8 @@ function resetForm() {
   document.getElementById('inpStages').value = '1';
   document.getElementById('inpNPSHMargin').value = unitSys === 'SI' ? '1.0' : '3.281';
   document.getElementById('inpSORatio').value = '1.25';
+  document.getElementById('selPumpType').value = 'centrifugal';
+  onPumpTypeChange();
   clearErrors();
   hideResults();
 }
@@ -1305,10 +1379,11 @@ function printCalc() {
     ['Design Margin, Flow', rv2('inpMarginFlow'), '%', ''],
     ['Pump Type', pumpType.charAt(0).toUpperCase() + pumpType.slice(1), '', ''],
     ['Pump CL Elevation', rv2('inpCL'), imp ? 'ft' : 'm', 'Above grade'],
-    ['Pump Speed', rv2('inpSpeed'), 'rpm', ''],
-    pumpType === 'centrifugal' ? ['Number of Stages', rv2('inpStages'), '', ''] : null,
-    ['NPSH Margin Allowance', rv2('inpNPSHMargin'), imp ? 'ft' : 'm', 'Screening allowance only'],
-    ['Pump Efficiency', rv2('inpEff') || 'Auto', '%', 'Blank = screening estimate'],
+    (pumpType === 'centrifugal' || pumpType === 'reciprocating') ? ['Pump Speed', rv2('inpSpeed'), 'rpm', pumpType === 'centrifugal' ? 'Specific speed / impeller screening' : 'Acceleration head screening'] : null,
+    pumpType === 'centrifugal' ? ['Number of Stages', rv2('inpStages'), '', 'Centrifugal only'] : null,
+    pumpType === 'centrifugal' && document.getElementById('selNPSHBasis') ? ['Suction Impeller / NPSHr Basis', document.getElementById('selNPSHBasis').options[document.getElementById('selNPSHBasis').selectedIndex].text, '', 'Centrifugal only'] : null,
+    ['NPSH Margin Allowance', rv2('inpNPSHMargin'), imp ? 'ft' : 'm', 'Project/vendor margin basis'],
+    ['Pump Efficiency', rv2('inpEff') || 'Auto', '%', pumpType === 'centrifugal' ? 'Blank = centrifugal screening estimate' : (pumpType === 'reciprocating' ? 'Blank = assumed 90%' : 'Blank = assumed 85%')],
     ['Suction Vessel Pressure', rv2('inpPsucVessel'), imp ? 'psia' : 'kPaa', ''],
     ['Suction Liquid Level', rv2('inpLsuc'), imp ? 'ft' : 'm', 'Above grade'],
     ['Suction Line \u0394P', rv2('inpDPsucLine'), imp ? 'psi' : 'kPa', ''],
@@ -1321,9 +1396,9 @@ function printCalc() {
     ['Discharge Line \u0394P', rv2('inpDPdisLine'), imp ? 'psi' : 'kPa', ''],
     ['Control Valve \u0394P', rv2('inpDPCV'), imp ? 'psi' : 'kPa', ''],
     ['Equipment \u0394P', rv2('inpDPeq'), imp ? 'psi' : 'kPa', ''],
-    ['Max Suction Source Pressure', rv2('inpPSV'), imp ? 'psia' : 'kPaa', 'Absolute basis for shut-off screening'],
-    ['Vessel HH Level', rv2('inpLHH'), imp ? 'ft' : 'm', 'Above grade'],
-    ['Shut-off / Rated Head Ratio', rv2('inpSORatio'), '', 'Centrifugal screening assumption'],
+    (pumpType === 'centrifugal' || pumpType === 'screw') ? ['Max Suction Source Pressure', rv2('inpPSV'), imp ? 'psia' : 'kPaa', 'Absolute basis for shut-off screening'] : null,
+    (pumpType === 'centrifugal' || pumpType === 'screw') ? ['Vessel HH Level', rv2('inpLHH'), imp ? 'ft' : 'm', 'Above grade'] : null,
+    pumpType === 'centrifugal' ? ['Shut-off / Rated Head Ratio', rv2('inpSORatio'), '', 'Centrifugal screening assumption'] : null,
     ['Unit System', unitSys, '', ''],
   ].filter(Boolean);
 
@@ -1357,6 +1432,7 @@ window.addEventListener('scroll', () => {
 });
 document.getElementById('year').textContent = new Date().getFullYear();
 onPumpTypeChange();
+window.addEventListener('load', onPumpTypeChange);
 lucide.createIcons();
 </script>
 </body>
